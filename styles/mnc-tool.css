@@ -3,6 +3,18 @@
   font-family: consolas, monospace;
 }
 
+/* Style Scrollbar */
+/******************************************************************************/
+::-webkit-scrollbar {
+        background-color: #313131;
+        width: .8em
+}
+
+::-webkit-scrollbar-thumb:window-inactive,
+::-webkit-scrollbar-thumb {
+        background:  #515151
+}
+
 /* Style Body */
 /******************************************************************************/
 body {
@@ -18,17 +30,8 @@ header {
   background-color: #313131;
   color: #eeeeee;
   padding: 30px;
-  height: 280px;
+  height: 40%;;
   text-align: center;
-}
-
-/* Style the footer */
-/******************************************************************************/
-footer {
-  background-color: #313131;
-  padding: 8px;
-  text-align: center;
-  color: #eeeeee;
 }
 
 /* Style Status Bar */
@@ -44,7 +47,7 @@ footer {
 
 .status-column {
   float: left;
-  width: 10%;
+  width: 50px;
 }
 
 .row:after {
@@ -54,7 +57,7 @@ footer {
 }
 
 .status-image {
-  padding-left: 30px;
+  padding-left: px;
 }
 
 .status-text  {

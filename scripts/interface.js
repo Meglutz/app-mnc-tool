@@ -151,13 +151,16 @@ function updateDOMStatus(warn) {
   let circleElement = document.getElementById(stateNotifier);
   let pElement     = document.getElementById(stateText);
 
+  pElement.innerHTML = "<b>"
   if (warn != null) {
     circleElement.setAttribute("fill", stateRed);
-    pElement.innerHTML = Data.sourceLines[8] + ": " + warn;
+    pElement.innerHTML += warn;
   } else {
     circleElement.setAttribute("fill", stateGreen);
-    pElement.innerHTML = Data.sourceLines[8] + ": All Good!"
+    pElement.innerHTML += "All Good!"
   }
+  pElement.innerHTML += "</b>" + "<br>" +
+  MNCType + " | " + MNCRelease + " | Compile Date: " + MNCCompileDate + " | " + MNCNote;
 }
 
 
