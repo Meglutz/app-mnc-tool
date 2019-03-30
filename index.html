@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="libs/p5.min.js"></script>            <!-- p5.js Main Libraray-->
+    <script src="libs/p5.min.js"></script>     <!-- p5.js Main Libraray-->
     <script src="libs/p5.dom.min.js"></script> <!-- p5.js DOM Library -->
-    <script src="libs/hammer.min.js"></script>    <!-- Hammer Library (Touchscreen) -->
-    <link rel="stylesheet" type="text/css" href="mnc-tester.css">
+    <script src="libs/hammer.min.js"></script> <!-- Hammer Library (Touchscreen) -->
+    <script>require('./scripts/renderer.js')</script>
+    <link rel="stylesheet" type="text/css" href="styles/mnc-tester.css">
     <meta charset="utf-8" />
 
   </head>
@@ -40,7 +41,6 @@
     <section class="timeline">
       <!-- TimeLine Content "Modals" -->
       <ol>
-        <div id="timeLine_element"><time>START</time>CHKFEE is reset (RST) in<br>fc62500 | DCS-GRUNDMODUL </div>
         <!-- Auto-Generated Modals will be placed inside this <ol> tag -->
       </ol>
 
@@ -56,11 +56,11 @@
     </section>
 
     <!-- Scripts -->
-    <script src="DOMint.js"></script>
-    <script src="DOMlogic.js"></script>
-    <script src="query.js"></script>
-    <script src="resources.js"></script>
-    <script src="core.js"></script>
+    <script src="scripts/interface.js"></script>
+    <script src="scripts/timeline.js"></script>
+    <script src="scripts/query.js"></script>
+    <script src="scripts/resources.js"></script>
+    <script src="scripts/core.js"></script>
 
   </body>
 </html>

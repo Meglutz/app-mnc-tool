@@ -11,7 +11,7 @@ const yellow = "#998429"
 let CurrentModule;
 let CurrentNetwork;
 
-let Source = "https://raw.githubusercontent.com/WashirePie/CFX.Web/master/%2BDOC/RAW/mnemonic.mnc";
+let Source = "./mnemonic.mnc";
 let Warnings = null;
 
 let MyQueries = [];
