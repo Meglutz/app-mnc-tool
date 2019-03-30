@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="libs/p5.min.js"></script>            <!-- p5.js Main Libraray-->
+    <script src="libs/p5.dom.min.js"></script> <!-- p5.js DOM Library -->
+    <script src="libs/hammer.min.js"></script>    <!-- Hammer Library (Touchscreen) -->
+    <link rel="stylesheet" type="text/css" href="mnc-tester.css">
+    <meta charset="utf-8" />
+
+  </head>
+
+  <body>
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <svg class="status-image status-column" height="50" width="50">
+        <circle id="stNotifier" cx="40" cy="20" r="5" stroke="black" stroke-width="0" fill="#212121" />
+      </svg>
+      <p id="stText" class="status-text status-column">---</p>
+    </div>
+
+    <!-- Header -->
+    <header>
+      <label for="query-type">Type</label>
+      <select id="query-type" name="query-type">
+        <option value="definedBitRead">Find Bit-Read Operations for defined Bits</option>
+        <option value="definedBitWrite">Find Bit-Write Operations for defined Bits</option>
+      </select>
+
+      <label for="query-value">Value</label>
+      <input type="text" name="query-value" value="ALADGK"><br>
+
+      <input type="submit" id="query-submit" value="Query">
+    </header>
+
+    <!-- TimeLine -->
+    <section class="section intro" id="timeline_title">
+        <!-- Auto-Generated Title will be placed inside this <section> tag -->
+    </section>
+
+    <section class="timeline">
+      <!-- TimeLine Content "Modals" -->
+      <ol>
+        <div id="timeLine_element"><time>START</time>CHKFEE is reset (RST) in<br>fc62500 | DCS-GRUNDMODUL </div>
+        <!-- Auto-Generated Modals will be placed inside this <ol> tag -->
+      </ol>
+
+      <!-- Buttons -->
+      <div class="arrows">
+        <button class="arrow arrow__prev disabled" disabled>
+          <img src="resources/Arrow_Previous.svg" alt="prev timeline arrow">
+        </button>
+        <button class="arrow arrow__next">
+          <img src="resources/Arrow_Next.svg" alt="next timeline arrow">
+        </button>
+      </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="DOMint.js"></script>
+    <script src="DOMlogic.js"></script>
+    <script src="query.js"></script>
+    <script src="resources.js"></script>
+    <script src="core.js"></script>
+
+  </body>
+</html>
