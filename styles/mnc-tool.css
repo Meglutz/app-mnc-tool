@@ -3,23 +3,34 @@
   font-family: consolas, monospace;
 }
 
+:root {
+  --main-bg-color:     #313131;
+  --main-bg-accent:    #515151;
+  --main-font-color:   #eeeeee;
+  --dark-accent:       #212121;
+  --accent-color:      #eef929;
+  --status-font-color: #a2a2a2;
+  --status-box-shadow: rgba(33, 33, 33, 0.52);
+}
+
+
 /* Style Scrollbar */
 /******************************************************************************/
 ::-webkit-scrollbar {
-        background-color: #313131;
+        background-color: var(--main-bg-color);
         width: .8em
 }
 
 ::-webkit-scrollbar-thumb:window-inactive,
 ::-webkit-scrollbar-thumb {
-        background:  #515151
+        background:  var(--main-bg-accent);
 }
 
 /* Style Body */
 /******************************************************************************/
 body {
-  background-color: #313131;
-  color: #eeeeee;
+  background-color: var(--main-bg-color);
+  color: var(--main-font-color);
   padding: 0px;
   margin: 0;
 }
@@ -27,8 +38,8 @@ body {
 /* Style Header */
 /******************************************************************************/
 header {
-  background-color: #313131;
-  color: #eeeeee;
+  background-color: var(--main-bg-color);
+  color: var(--main-font-color);
   padding: 30px;
   height: 40%;;
   text-align: center;
@@ -39,10 +50,10 @@ header {
 .status-bar {
   width: 100%;
   height: 50px;
-  background-color: #313131;
+  background-color: var(--main-bg-color);
   top: 0;
   left: 0;
-  box-shadow: inset 0px -8px 20px 5px rgba(33, 33, 33, 0.52);
+  box-shadow: inset 0px -8px 20px 5px var(--status-box-shadow);
 }
 
 .status-column {
@@ -63,7 +74,7 @@ header {
 .status-text  {
   font-size: 0.7rem;
   /* text-transform: uppercase; */
-  color: #a2a2a2;
+  color: var(--status-font-color);
   padding-top: 13px;
   white-space: nowrap;
   padding-left:10px;
@@ -77,8 +88,8 @@ header label {
 }
 
 header input[type=text], select {
-  background-color: #eeeeee;
-  color: #313131;
+  background-color: var(--main-font-color);
+  color: var(--main-bg-color);
   width: 100%;
   height: auto;
   padding: 8px 2%;
@@ -87,12 +98,12 @@ header input[type=text], select {
   border: 0px;
   outline: 0px;
   border-radius: 10px;
-  box-shadow: 0 0 20px 5px #212121;
+  box-shadow: 0 0 20px 5px var(--dark-accent);
 }
 
 header input[type=submit] {
-  background-color: #313131;
-  color: #eeeeee;
+  background-color: var(--main-bg-color);
+  color: var(--main-font-color);
   width: 100%;
   height: auto;
   margin-top: 8px;
@@ -101,12 +112,12 @@ header input[type=submit] {
   border: 0px;
   outline: 0px;
   border-radius: 10px;
-  box-shadow: inset 0 0 20px 5px #212121;
+  box-shadow: inset 0 0 20px 5px var(--dark-accent);
 }
 header input[type=submit]:hover {
-  background-color: #d0f520;
-  color: #212121;
-  box-shadow: inset 0 0 4px 1px #212121;
+  background-color: var(--accent-color);
+  color: var(--dark-accent);
+  box-shadow: inset 0 0 4px 1px var(--dark-accent);
 }
 
 /* Style Timeline General*/
@@ -144,7 +155,7 @@ button {
 .section .container p {
   font-size: 0.9rem;
   font-weight: 100;
-  color: #eeeeee;
+  color: var(--main-font-color);
 }
 
 
@@ -168,7 +179,7 @@ button {
   list-style-type: none;
   width: 60px;
   height: 3px;
-  background: #eeeeee;
+  background: var(--main-font-color);
 }
 
 .timeline ol li:last-child {
@@ -190,7 +201,7 @@ button {
   height: 12px;
   transform: translateY(-50%);
   border-radius: 50%;
-  background: #515151;
+  background: var(--main-bg-accent);
 }
 
 .timeline ol li div {
@@ -200,12 +211,12 @@ button {
   padding: 15px;
   font-size: 0.7rem;                            /* Font size of "Modal" text */
   white-space: normal;
-  color: #313131;
-  background: #eeeeee;
+  color: var(--main-bg-color);
+  background: var(--main-font-color);
 }
 
 .timeline .highlight-div {
-  background: #d0f520;
+  background: var(--accent-color);
 }
 
 .timeline ol li div::before {
@@ -228,7 +239,7 @@ button {
 .timeline ol li:nth-child(odd) div::before {
   top: 100%;
   border-width: 8px 8px 0 0;
-  border-color: #eeeeee transparent transparent transparent;
+  border-color: var(--main-font-color);  transparent transparent transparent;
 }
 
 .timeline ol li:nth-child(even) div {
@@ -238,7 +249,7 @@ button {
 .timeline ol li:nth-child(even) div::before {
   top: -8px;
   border-width: 8px 0 0 8px;
-  border-color: transparent transparent transparent #eeeeee;
+  border-color: transparent transparent transparent var(--main-font-color);
 }
 
 .timeline time {
