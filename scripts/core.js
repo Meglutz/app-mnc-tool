@@ -12,10 +12,13 @@ let CurrentModule;
 let CurrentNetwork;
 
 let Source = "./mnemonic.mnc";
-    let MNCRelease;
-    let MNCCompileDate;
-    let MNCType;
-    let MNCNote;
+
+let MNCData = {
+                Release: null,
+                CompileDate: null,
+                Type: null,
+                Note: null
+              }
 
 let Warnings = null;
 
@@ -34,10 +37,10 @@ function preload() {
 
 function setup() {
   /* set global vars for mnc info */
-  MNCCompileDate =  Data.sourceLines[6].substring(2);
-  MNCNote =         Data.sourceLines[7].substring(2);
-  MNCType =         Data.sourceLines[8].substring(2);
-  MNCRelease =      Data.sourceLines[10].substring(2) + "." + Data.sourceLines[11].substring(2);
+  MNCData.CompileDate =  Data.sourceLines[6].substring(2);
+  MNCData.Note =         Data.sourceLines[7].substring(2);
+  MNCData.Type =         Data.sourceLines[8].substring(2);
+  MNCData.Release =      Data.sourceLines[10].substring(2) + "." + Data.sourceLines[11].substring(2);
 }
 
 

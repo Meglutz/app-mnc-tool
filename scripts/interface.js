@@ -5,7 +5,9 @@
 const tlElementId    = "timeLine_element";
 const tlElementTitle = "timeline_title";
 const stateNotifier  = "stNotifier";
-const stateText      = "stText";
+const stateText      = "stWarn";
+const mncInfoText    = "stMNCInfo";
+const mncStatsText   = "stMNCStats";
 
 const stateRed       = "#e74848";
 const stateGreen     = "#53d467";
@@ -72,7 +74,7 @@ document.getElementById("query-submit").onclick = function() {
   addDOMlastLine();
 
   /* Update State */
-  updateDOMStatus(Warnings);
+  updateDOMStatus(Warnings, Data);
 }
 
 
@@ -147,20 +149,45 @@ function removeDOMelements(id) {
 ** Action: Updates Status Bar
 ** Return: null
 *******************************************************************************/
-function updateDOMStatus(warn) {
+function updateDOMStatus(warningStr, source) {
   let circleElement = document.getElementById(stateNotifier);
-  let pElement     = document.getElementById(stateText);
+  let pElement      = {
+                       state: document.getElementById(stateText),
+                       info:  document.getElementById(mncInfoText),
+                       stats: document.getElementById(mncStatsText)
+                      }
 
-  pElement.innerHTML = "<b>"
-  if (warn != null) {
+  /* warning string */
+  if (warningStr != null) {
     circleElement.setAttribute("fill", stateRed);
-    pElement.innerHTML += warn;
+    pElement.state.innerHTML = warningStr;
   } else {
     circleElement.setAttribute("fill", stateGreen);
-    pElement.innerHTML += "All Good!"
+    pElement.state.innerHTML = "All Good!"
   }
-  pElement.innerHTML += "</b>" + "<br>" +
-  MNCType + " | " + MNCRelease + " | Compile Date: " + MNCCompileDate + " | " + MNCNote;
+
+  /* mnemonic info string */
+  if (MNCData != null) {
+    pElement.info.innerHTML  =  MNCData.Type + " | " +
+                                MNCData.Release + " | " + "Compile Date: " +
+                                MNCData.CompileDate + " | " +
+                                MNCData.Note;
+  } else {
+    pElement.info.innerHTML = "No Source Data"
+  }
+
+  /* mnemonic statistics string */
+  if (source != null) {
+    pElement.stats.innerHTML = "MNC Lines: " + source.sourceLines.length + " | " +
+                               "Bit Defs: " + source.SBDMemory.length + " | " +
+                               "Byte Defs: " + source.MBDMemory.length + " | " +
+                               "Total Ops: " + (source.bitReadOperations.length +
+                                                source.bitWriteOperations.length +
+                                                source.instructionOperations.length)
+  } else {
+    pElement.stats.innerHTML = "No Source Data"
+  }
+
 }
 
 
