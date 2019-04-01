@@ -4,6 +4,7 @@
 const dummyMemory = "DUMMY_MEMORY";
 const bitReadOps = "Bit-Read";
 const bitWriteOps = "Bit-Write";
+const definedBitsInInstructions = "Defined Bits which are handled in Instructions";
 
 /*******************************************************************************
 ** Class - Query
@@ -35,6 +36,10 @@ class Query {
     let query;
     let bit;
     let byte;
+    let start, end;
+
+    /* start timer */
+    start = new Date().getTime();
 
     switch (this.type) {
       /* ---------------------------------------------------------------------*/
@@ -100,7 +105,7 @@ class Query {
         /* look for parent definition */
         byte = this.getByte((bit.byteType + bit.byteAddress), this.src);
 
-        /* look for matching bitRead operations */
+        /* look for matching bitWrite operations */
         this.log.push("Looking for write operations...");
         for (let bitW of this.src.bitWriteOperations) {
           if (bitW.memory ==  bit.byteType  + bit.byteAddress  + "." + bit.bitAddress) {
@@ -120,9 +125,43 @@ class Query {
         break;
 
       /* ---------------------------------------------------------------------*/
+      case definedBitsInInstructions:
+        query = this.memory;
+        this.queryLogHead("Defined Bits which are handled in Instructions");
+
+        /* get definition */
+        this.log.push("Looking trough all definitions...");
+        for (let bit of this.src.SBDMemory) {
+
+          /* look for matching "writes" in instructionOperations */
+          for (let ins of this.src.instructionOperations) {
+            /* loop trough "writes" array, if there is one */
+            if (ins.writes != null) {
+              this.checkInstuctionRange(ins.writes, bit.byteType, bit.byteAddress, ins, bit);
+            }
+          }
+
+          /* look for matching "reads" in instructionOperations */
+          for (let ins of this.src.instructionOperations) {
+            /* loop trough "reads" array, if there is one */
+            if (ins.reads != null) {
+              /* If it "reads" is an array, loop trough it */
+              this.checkInstuctionRange(ins.reads, bit.byteType, bit.byteAddress, ins, bit);
+            }
+          }
+        }
+
+        this.queryLogFooter(this.result);
+        break;
+      /* ---------------------------------------------------------------------*/
       default:
         this.log.push("Query Type undefined.");
     }
+
+    /* stop timer */
+    end = new Date().getTime();
+    this.log.push("Query took " + (end - start) + " ms");
+    this.log.push(" ");
 
     /* plot log of this query */
     for (let str of this.log) {
@@ -151,7 +190,6 @@ class Query {
       this.log.push("Found this:");
       this.log.push(result);
     }
-    this.log.push(" ");
   }
 
 /*******************************************************************************
@@ -196,22 +234,26 @@ class Query {
   **         this is why the bitAddress property is not queried.
   ** Return: null. Writes directly to object
   *******************************************************************************/
-  checkInstuctionRange(values, byteType, byteAddress, ins) {
+  checkInstuctionRange(values, byteType, byteAddress, ins, bitDefinition = null) {
     /* Loop trough if array, else handle as one */
     if (isIterable(values)) {
       for (let value of values) {
         /* Check if the current bit is contained in an arrangement of bytes. */
         if (checkInstructionByteRange(value, ins.formatLength, byteType, byteAddress)) {
-          this.result.push(ins);
+          if (bitDefinition == null) {this.result.push(ins);}
+          else {this.result.push({bit: bitDefinition, foundIn: ins} ); }
         }
       }
     } else {
       if (checkInstructionByteRange(values, ins.formatLength, byteType, byteAddress)) {
-        this.result.push(ins);
+        if (bitDefinition == null) {this.result.push(ins);}
+        else {this.result.push({bit: bitDefinition, foundIn: ins} ); }
       }
     }
   }
 }
+
+
 function checkInstructionByteRange(startByte, length, checkByteType, checkByteAddress) {
   if (startByte != null) {
     let match = (/^([A-Z])(\d*)$/).exec(startByte);
@@ -249,7 +291,6 @@ function makeDummyDefinition(query) {
   let match = /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*|)$/.exec(query);
 
   if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
-    console.log(match);
     return new Memory(match[1], match[2], match[4], 1, dummyMemory);
   } else {
     return null;

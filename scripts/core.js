@@ -62,6 +62,10 @@ function draw() {
   /* stop timer */
   end = new Date().getTime();  MNCData.Time = (end - start);
   updateDOMStatus(Warnings, Data);
+
+  /* Query to see all defined bits which are handled in Instructions */
+  // let test = new Query(Data, definedBitsInInstructions, null);
+
   noLoop();
 }
 

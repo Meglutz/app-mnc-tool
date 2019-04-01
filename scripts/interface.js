@@ -205,9 +205,6 @@ function parseToOutput(result, action, query, type) {
   let LineString = "";
   let Highlight = false;
 
-
-  console.log(type + " " + bitWriteOps);
-
   /* Loop trough each property of all objects in result array */
   Object.entries(result).forEach(entry => {
     let propt = entry[0]; let value = entry[1];
@@ -217,13 +214,13 @@ function parseToOutput(result, action, query, type) {
       case "operation":
         if (value != null && OperationString == "") {OperationString = beautify(value);}
         break;
-      case "writes":
+      case "writes": /* Only if query type is of bitWriteOps */
         if (value != null && OperationString == "" && type == bitWriteOps) {
           Highlight = true; /* Set highlight if it's an instruction */
           OperationString = "(" + result.writes + ") " +
                             "is overwritten by " + result.reads + " (via " + result.instruction + ")";
         } break;
-      case "reads":
+      case "reads": /* Only if query type is of bitReadOps */
         if (value != null && OperationString == "" && type == bitReadOps) {
           Highlight = true; /* Set highlight if it's an instruction */
           OperationString = "(" + result.reads + ") " +
