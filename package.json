@@ -1,18 +1,18 @@
 {
-  "name": "electron-quick-start",
+  "name": "MNC.Tool",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Electron based tool to analyze Fanuc mnemonic files",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/WashirePie/MNC.Tool",
   "keywords": [
     "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "MNC",
+    "Mnemonic",
+    "Fanuc",
+    "Analyzer"
   ],
   "author": "GitHub",
   "license": "CC0-1.0",
