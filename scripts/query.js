@@ -1,4 +1,9 @@
-const dummyMemory = "DUMMY_MEMORY"
+/*******************************************************************************
+** Definitions
+*******************************************************************************/
+const dummyMemory = "DUMMY_MEMORY";
+const bitReadOps = "Bit-Read";
+const bitWriteOps = "Bit-Write";
 
 /*******************************************************************************
 ** Class - Query
@@ -33,7 +38,7 @@ class Query {
 
     switch (this.type) {
       /* ---------------------------------------------------------------------*/
-      case "Bit-Read":
+      case bitReadOps:
         query = this.memory;
         this.queryLogHead("Defined-Bit Read Operations for (" + query + ")");
 
@@ -75,7 +80,7 @@ class Query {
         break;
 
       /* ---------------------------------------------------------------------*/
-      case "Bit-Write":
+      case bitWriteOps:
         query = this.memory;
         this.queryLogHead("Defined-Bit Write Operations for (" + query + ")");
 

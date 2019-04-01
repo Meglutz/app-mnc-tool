@@ -60,7 +60,7 @@ document.getElementById("query-submit").onclick = function() {
 
   /* Add a new TimeLine "Modal" for each result */
   for (let result of MyQueries[latestQuery].result) {
-    content = parseToOutput(result, typeVal, query);
+    content = parseToOutput(result, typeVal, query, typeVal);
     if (content != undefined) {
         addDOMelement(content.lineString,
                       content.actionString,
@@ -194,10 +194,10 @@ function updateDOMStatus(warningStr, source) {
 
 
 /*******************************************************************************
-** Action: Formats query results into prepared Strings for the DOM Table
+** Action: Formats query results into prepared Strings for the DOM Elements
 ** Return: action-, operation-, module- lineString
 *******************************************************************************/
-function parseToOutput(result, action, query) {
+function parseToOutput(result, action, query, type) {
   /* These strings represent one column in the output table */
   let ActionString = query;
   let OperationString = "";
@@ -205,24 +205,29 @@ function parseToOutput(result, action, query) {
   let LineString = "";
   let Highlight = false;
 
+
+  console.log(type + " " + bitWriteOps);
+
   /* Loop trough each property of all objects in result array */
   Object.entries(result).forEach(entry => {
-    let key = entry[0]; let value = entry[1];
+    let propt = entry[0]; let value = entry[1];
 
     /* Pick out the relevant properties for the output */
-    switch (key) {
+    switch (propt) {
       case "operation":
         if (value != null && OperationString == "") {OperationString = beautify(value);}
         break;
       case "writes":
-        if (value != null && OperationString == "") {
-          Highlight = true; /* Set highlight if it's a instruction */
-          OperationString = "is overwritten by " + result.reads + " (" + result.instruction + ")";
+        if (value != null && OperationString == "" && type == bitWriteOps) {
+          Highlight = true; /* Set highlight if it's an instruction */
+          OperationString = "(" + result.writes + ") " +
+                            "is overwritten by " + result.reads + " (via " + result.instruction + ")";
         } break;
       case "reads":
-        Highlight = true; /* Set highlight if it's a instruction */
-        if (value != null && OperationString == "") {
-          OperationString = "is overriding " + result.writes + " (" + result.instruction + ")";
+        if (value != null && OperationString == "" && type == bitReadOps) {
+          Highlight = true; /* Set highlight if it's an instruction */
+          OperationString = "(" + result.reads + ") " +
+                            "is overriding " + result.writes + " (via " + result.instruction + ")";
         } break;
       case "inModule":
         if (value != null && ModuleString == "") {
