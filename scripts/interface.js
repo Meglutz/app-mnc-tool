@@ -168,10 +168,12 @@ function updateDOMStatus(warningStr, source) {
 
   /* mnemonic info string */
   if (MNCData != null) {
+    if (MNCData.Time == undefined) {MNCData.Time = 0}
     pElement.info.innerHTML  =  MNCData.Type + " | " +
                                 MNCData.Release + " | " + "Compile Date: " +
                                 MNCData.CompileDate + " | " +
-                                MNCData.Note;
+                                MNCData.Note + " | " + "Analyze time: " +
+                                MNCData.Time.toFixed(2) + " ms";
   } else {
     pElement.info.innerHTML = "No Source Data"
   }

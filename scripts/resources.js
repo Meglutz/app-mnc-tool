@@ -1,12 +1,12 @@
 
 
 const multiBitDefinitionRegex =      /^(T|D|E|F|G|R|X|Y)(\d*)(\s*)([A-Z0-9\-\_\#]*)$/;
-const singleBitDefinitionRegex =     /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*)([A-Z0-9\-\_]*)$/;
+const singleBitDefinitionRegex =     /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*)([A-Z0-9\-\_\+]*)$/;
 const moduleNumberDefinitionRegex =  /^[P](\d*)\s*C(\d*)$/;
 const moduleTitleDefinitionRegex =   /^;---------------\s*fc(\d*).lad\s*\(([^\)]*)\)$/i;
 
-const currentModuleNumberRegex =     /^([P])(\d*)$/;
-const currentModuleSourceRegex =     /^;---------------\s*fc(\d*).lad\s*\(([^\)]*)\)$/i;
+const currentModuleNumberRegex =     /^([P])(\d*)/;
+const currentModuleSourceRegex =     /^;---------------\s*fc(\d*).lad\s*\(([^\)]*)\$/i;
 const currentNetworkRegex =          /^N(\d\d\d\d\d)\:$/g;
 const readBitOperationsRegex =       /^(RD|OR|AND)(\.NOT\.STK|\.NOT|\.STK|)\s*(.*)$/;
 const writeBitOperationsRegex =      /^(WRT|SET|RST)(\.NOT|)\s*(.*)$/;

@@ -2,8 +2,7 @@
 /*******************************************************************************
 ** Definitions
 *******************************************************************************/
-const heightContractor = 0.75;
-
+/* colors for console highlighting */
 const red   = "#b72828"
 const green = "#3bb728"
 const yellow = "#998429"
@@ -17,7 +16,8 @@ let MNCData = {
                 Release: null,
                 CompileDate: null,
                 Type: null,
-                Note: null
+                Note: null,
+                Time: null
               }
 
 let Warnings = null;
@@ -29,22 +29,28 @@ let Data;
 ** Main functions
 *******************************************************************************/
 function preload() {
-  /* The loadStrings function returns an array, indexed by the line count of the loaded file
-  syntax: loadStrings(filename,callback,errorCallback)*/
-  Data = new Resource(loadStrings(Source));
+  /* The loadStrings function returns an array, indexed by the line count of the loaded file */
+  Data = new Resource(loadStrings(Source,
+                                  console.log("Mnemonic file loaded."),
+                                  updateDOMStatus("Fatal: No mnemonic file was found (.mnc)")));
 }
 
 
 function setup() {
   /* set global vars for mnc info */
-  MNCData.CompileDate =  Data.sourceLines[6].substring(2);
-  MNCData.Note =         Data.sourceLines[7].substring(2);
-  MNCData.Type =         Data.sourceLines[8].substring(2);
-  MNCData.Release =      Data.sourceLines[10].substring(2) + "." + Data.sourceLines[11].substring(2);
+  MNCData.CompileDate =  formatDate(Data.sourceLines[8].substring(2));
+  MNCData.Note =         Data.sourceLines[9].substring(2);
+  MNCData.Type =         Data.sourceLines[10].substring(2);
+  MNCData.Release =      Data.sourceLines[12].substring(2) + "." + Data.sourceLines[13].substring(2);
 }
 
 
 function draw() {
+  let start, end;
+  /* start timer */
+  start = new Date().getTime();
+  updateDOMStatus("Loading", Data);
+
   /* Run all sequences to analyze the mnemonic */
   let warn = 0;
   warn += getDefinitions      (Data);
@@ -53,6 +59,9 @@ function draw() {
   warn += analyzeResults      (Data);
   Warnings = checkWarnings(warn);
 
+  /* stop timer */
+  end = new Date().getTime();  MNCData.Time = (end - start);
+  updateDOMStatus(Warnings, Data);
   noLoop();
 }
 
@@ -242,4 +251,24 @@ function checkWarnings(warn) {
     return null;
   }
   console.log(" ");
+}
+
+
+/*******************************************************************************
+** Action: Formats strings from YY/MM/DD HH:MM to DD.MMMM YYYY HH:MM
+** Return: Reformatted string
+*******************************************************************************/
+function formatDate(str) {
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+                      "July", "August", "September", "October", "November", "December"];
+  let regexp = /^(\d\d)\/(\d\d)\/(\d\d)\s*(\d\d)\:(\d\d)/;
+  let Year  = str.match(regexp)[1];
+  console.log(Year);
+  let Month = monthNames[parseInt(str.match(regexp)[2], 10) - 1]
+  console.log(Month);
+  let Day =   str.match(regexp)[3];
+  console.log(Day);
+  let Time =  str.match(regexp)[4] + ":" + str.match(regexp)[5];
+  console.log(Time);
+  return Day + ". " + Month + " " + "20" + Year + ", " + Time; /* LOL */
 }
