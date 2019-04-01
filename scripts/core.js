@@ -94,9 +94,12 @@ function getDefinitions(source) {
     where the program is called in the file). Add to equally named existing module */
     source.getModuleTitleDefinition(line);
   }
-  console.log("-- Multibit definitions  : " + source.MBDMemory.length);
-  console.log("-- Singlebit definitions : " + source.SBDMemory.length);
-  console.log("-- Module definitions    : " + source.Modules.length);
+  console.log("-- Multibit definitions  :");
+  console.log(source.MBDMemory);
+  console.log("-- Singlebit definitions :");
+  console.log(source.SBDMemory);
+  console.log("-- Module definitions    :");
+  console.log(source.Modules);
   finishSequence(w, 2);
   return w
 }
@@ -144,11 +147,11 @@ function analyzeLogic(source) {
                                                                                   i));}
     }
   }
-  console.log("-- Found bitwise Read operations:");
+  console.log("-- Found bitwise Read operations :");
   console.log(source.bitReadOperations);
   console.log("-- Found bitwise Write operations:");
   console.log(source.bitWriteOperations);
-  console.log("-- Found instruction operations:");
+  console.log("-- Found instruction operations  :");
   console.log(source.instructionOperations);
   finishSequence(w, 2);
   return w
