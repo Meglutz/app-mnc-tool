@@ -1,3 +1,4 @@
+const dummyMemory = "DUMMY_MEMORY"
 
 /*******************************************************************************
 ** Class - Query
@@ -32,68 +33,84 @@ class Query {
 
     switch (this.type) {
       /* ---------------------------------------------------------------------*/
-      case "definedBitRead":
+      case "Bit-Read":
         query = this.memory;
         this.queryLogHead("Defined-Bit Read Operations for (" + query + ")");
 
         /* get definitions */
         this.log.push("Looking for definitions...");
         bit = this.getBit(query, this.src);
-        /* exit if no bit has been found */
+
+        /* check if bit has been found */
         if (bit != undefined) {
           this.memoryDefinition = bit;
-          byte = this.getByte((bit.byteType + bit.byteAddress), this.src);
+        } else { /* bit has no definition, create Dummy */
+          this.log.push("Creating Dummy Memory...");
+          this.memoryDefinition, bit = makeDummyDefinition(query)
+          if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
+        }
 
-          this.log.push("Looking for read operations...");
-          /* check for matching bitRead operations */
-          for (let bitR of this.src.bitReadOperations) {
-            if (bitR.memory ==  bit.byteType  + bit.byteAddress  + "." + bit.bitAddress) {
-              this.result.push(bitR);
-            }
-          }
+        /* look for parent definition */
+        byte = this.getByte((bit.byteType + bit.byteAddress), this.src);
 
-          /* check for matching "reads" in instructionOperations */
-          for (let ins of this.src.instructionOperations) {
-            /* loop trough "reads" array, if there is one */
-            if (ins.reads != null) {
-              /* If it "reads" is an array, loop trough it */
-              this.checkInstuctionRange(ins.reads, bit.byteType, bit.byteAddress, ins);
-            }
+        /* look for matching bitRead operations */
+        this.log.push("Looking for read operations...");
+        for (let bitR of this.src.bitReadOperations) {
+          if (bitR.memory ==  bit.byteType  + bit.byteAddress  + "." + bit.bitAddress) {
+            this.result.push(bitR);
           }
         }
+
+        /* look for matching "reads" in instructionOperations */
+        for (let ins of this.src.instructionOperations) {
+          /* loop trough "reads" array, if there is one */
+          if (ins.reads != null) {
+            /* If it "reads" is an array, loop trough it */
+            this.checkInstuctionRange(ins.reads, bit.byteType, bit.byteAddress, ins);
+          }
+        }
+
 
         this.queryLogFooter(this.result);
         break;
 
       /* ---------------------------------------------------------------------*/
-      case "definedBitWrite":
+      case "Bit-Write":
         query = this.memory;
         this.queryLogHead("Defined-Bit Write Operations for (" + query + ")");
 
-        /* get definitions */
+        /* get definition */
         this.log.push("Looking for definitions...");
         bit = this.getBit(query, this.src);
-        /* exit if no bit has been found */
+
+        /* check if bit has been found */
         if (bit != undefined) {
           this.memoryDefinition = bit;
-          byte = this.getByte((bit.byteType + bit.byteAddress), this.src);
+        } else { /* bit has no definition, create Dummy */
+          this.log.push("Creating Dummy Memory...");
+          this.memoryDefinition, bit = makeDummyDefinition(query)
+          if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
+        }
 
-          this.log.push("Looking for write operations...");
-          /* check for matching bitRead operations */
-          for (let bitW of this.src.bitWriteOperations) {
-            if (bitW.memory ==  bit.byteType  + bit.byteAddress  + "." + bit.bitAddress) {
-              this.result.push(bitW);
-            }
-          }
+        /* look for parent definition */
+        byte = this.getByte((bit.byteType + bit.byteAddress), this.src);
 
-          /* check for matching "writes" in instructionOperations */
-          for (let ins of this.src.instructionOperations) {
-            /* loop trough "writes" array, if there is one */
-            if (ins.writes != null) {
-              this.checkInstuctionRange(ins.writes, bit.byteType, bit.byteAddress, ins);
-            }
+        /* look for matching bitRead operations */
+        this.log.push("Looking for write operations...");
+        for (let bitW of this.src.bitWriteOperations) {
+          if (bitW.memory ==  bit.byteType  + bit.byteAddress  + "." + bit.bitAddress) {
+            this.result.push(bitW);
           }
         }
+
+        /* look for matching "writes" in instructionOperations */
+        for (let ins of this.src.instructionOperations) {
+          /* loop trough "writes" array, if there is one */
+          if (ins.writes != null) {
+            this.checkInstuctionRange(ins.writes, bit.byteType, bit.byteAddress, ins);
+          }
+        }
+
         this.queryLogFooter(this.result);
         break;
 
@@ -101,6 +118,7 @@ class Query {
       default:
         this.log.push("Query Type undefined.");
     }
+
     /* plot log of this query */
     for (let str of this.log) {
       console.log(str);
@@ -216,4 +234,19 @@ function isIterable(obj) {
     return false;
   }
   return typeof obj[Symbol.iterator] === 'function';
+}
+
+/*******************************************************************************
+** Action: Creates a new Memory Object if the given query is valid
+** Return: Dummy Memory Object
+*******************************************************************************/
+function makeDummyDefinition(query) {
+  let match = /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*|)$/.exec(query);
+
+  if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
+    console.log(match);
+    return new Memory(match[1], match[2], match[4], 1, dummyMemory);
+  } else {
+    return null;
+  }
 }

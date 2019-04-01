@@ -110,11 +110,8 @@ class Resource {
   getMultiBitDefinitions(str) {
     let match = multiBitDefinitionRegex.exec(str);
     if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
-      let definition = new Memory(match[1], match[2], "", ">=8", match[4])
-      return definition;
-    } else {
-      return null;
-    }
+      return new Memory(match[1], match[2], "", ">=8", match[4])
+    } else {return null;}
   }
 
   /*******************************************************************************
@@ -124,11 +121,8 @@ class Resource {
   getSingleBitDefinitions(str) {
     let match = singleBitDefinitionRegex.exec(str);
     if (match != null && match[1,2,4,6] != null && match[1,2,4,6] != "") {
-      let definition = new Memory(match[1], match[2], match[4], 1, match[6])
-      return definition;
-    } else {
-      return null;
-    }
+      return new Memory(match[1], match[2], match[4], 1, match[6])
+    } else {return null;}
   }
 
   /*******************************************************************************
@@ -138,11 +132,8 @@ class Resource {
   getModuleNumberDefinition(str) {
     let match = moduleNumberDefinitionRegex.exec(str);
     if (match != null && match[1,2] != null && match[1,2] != "") {
-      let mod = new Module(parseInt(match[1], 10), parseInt(match[2], 10));
-      return mod;
-    } else {
-      return null;
-    }
+      return new Module(parseInt(match[1], 10), parseInt(match[2], 10));
+    } else {return null;}
   }
 
   /*******************************************************************************
@@ -160,9 +151,7 @@ class Resource {
           break;
         }
       }
-    } else {
-      return null;
-    }
+    } else {return null;}
   }
 
   /*******************************************************************************
@@ -212,9 +201,7 @@ class Resource {
     let match = currentNetworkRegex.exec(str);
     if (match != null && match[1] != null && match[1] != "") {
       return match[1];
-    } else {
-      return null;
-    }
+    } else {return null;}
   }
 
   /*******************************************************************************
@@ -225,9 +212,7 @@ class Resource {
     let match = readBitOperationsRegex.exec(str);
     if (match != null && match[1,3] != null && match[1,3] != "") {
       return {op: match[1] + match[2], mem: match[3]};
-    } else {
-      return null;
-    }
+    } else {return null;}
   }
 
   /*******************************************************************************
@@ -238,9 +223,7 @@ class Resource {
     let match = writeBitOperationsRegex.exec(str);
     if (match != null && match[1,3] != null && match[1,3] != "") {
       return {op: match[1] + match[2], mem: match[3]};
-    } else {
-      return null;
-    }
+    } else {return null;}
   }
 
   /*******************************************************************************
