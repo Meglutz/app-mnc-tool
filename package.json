@@ -14,8 +14,8 @@
     "Fanuc",
     "Analyzer"
   ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "author": "WashirePie",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^4.1.1"
   }
