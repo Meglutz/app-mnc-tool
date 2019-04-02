@@ -70,9 +70,6 @@ document.getElementById("query-submit").onclick = function() {
     }
   }
 
-  /* Add last line of the TimeLine */
-  addDOMlastLine();
-
   /* Update State */
   updateDOMStatus(Warnings, Data);
 }
@@ -103,34 +100,26 @@ function addDOMtitle(title) {
 ** Return: null
 *******************************************************************************/
 function addDOMelement(title, content1, content2, content3, highlight = false) {
-    let tlBody =      document.getElementsByTagName("ol").item(0);
-    let liElement =   document.createElement("li");   liElement.setAttribute  ("id", tlElementId);
-    let timeElement = document.createElement("time"); timeElement.setAttribute("id", tlElementId);
-    let divElement =  document.createElement("div");  divElement.setAttribute ("id", tlElementId);
+    let tlBody =      document.getElementById("timeline_location");
 
-    /* Assemble text content of "modal" */
-    timeElement.innerHTML += "L" + title;
-    if (highlight) {
-      let currentAttr = divElement.getAttribute("class");
-      divElement.setAttribute("class", currentAttr + " highlight-div");
-    }
-    divElement.appendChild(timeElement);
-    divElement.innerHTML += content1 + " " + content2 + "<br>";
-    divElement.innerHTML += content3;
+    let h1Element =   document.createElement("h1");   h1Element.setAttribute("id", tlElementId);
+    let pElement = document.createElement("p");        pElement.setAttribute("id", tlElementId);
+    let divElement =  document.createElement("div"); divElement.setAttribute("id", tlElementId);
 
-    liElement.appendChild(divElement);
-    tlBody.appendChild(liElement);
-}
+    /* Assemble modal div */
+    divElement.setAttribute ("class", "timeline-item");
+    divElement.setAttribute ("on-line", "MNC Line " + title);
 
+    /* TODO Remove HIGHLIGH logic */
 
-/*******************************************************************************
-** Action: Adds the finishing line to the TimeLine
-** Return: null
-*******************************************************************************/
-function addDOMlastLine() {
-    let tlBody =      document.getElementsByTagName("ol").item(0);
-    let liElement =   document.createElement("li");   liElement.setAttribute  ("id", tlElementId);
-    tlBody.appendChild(liElement);
+    h1Element.innerHTML = content1;
+    pElement.innerHTML =  content2 + "<br>";
+    pElement.innerHTML += content3;
+
+    divElement.appendChild(h1Element);
+    divElement.appendChild(pElement);
+
+    tlBody.appendChild(divElement);
 }
 
 
