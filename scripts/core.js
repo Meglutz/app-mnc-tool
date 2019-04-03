@@ -21,7 +21,8 @@ let MNCData = {
               }
 
 let Warnings = null;
-let WarningLog = [];
+let WarningLog = []; /* Contains html styled string array of all warnings
+                        which occured during the sequences */
 
 
 let MyQueries = [];
@@ -34,7 +35,7 @@ function preload() {
   /* The loadStrings function returns an array, indexed by the line count of the loaded file */
   Data = new Resource(loadStrings(Source,
                                   console.log("Mnemonic file loaded."),
-                                  updateDOMStatus("Fatal: No mnemonic file was found (.mnc)")));
+                                  console.log("Fatal: No mnemonic file was found (.mnc)")));
 }
 
 
@@ -51,7 +52,6 @@ function draw() {
   let start, end;
   /* start timer */
   start = new Date().getTime();
-  updateDOMStatus("Loading", Data);
 
   /* Run all sequences to analyze the mnemonic */
   getDefinitions      (Data);
@@ -61,12 +61,13 @@ function draw() {
 
   /* handle warnings */
   Warnings = checkWarnings(WarningLog);
-  console.log("Warning Log:");
-  for (let warn of WarningLog) {console.log(warn);}
 
   /* stop timer */
   end = new Date().getTime();  MNCData.Time = (end - start);
-  updateDOMStatus(Warnings, WarningLog, Data);
+
+  /* plot mnemonic info to DOM header & update overlay */
+  updateDOMheader(Data);
+  updateDOMinfo(Warnings, WarningLog, Data);
 
   /* Query to see all defined bits which are handled in Instructions */
   // let test = new Query(Data, definedBitsInInstructions, null);
@@ -172,8 +173,6 @@ function analyzeLogic(source) {
 *******************************************************************************/
 function analyzeDependencies(source) {
   console.log("Analyzing Dependencies...");
-  addWarning(WarningLog, analyzeDependencies.name, "This is a dummy Warning");
-
   /* None */
   finishSequence(2);
 }
@@ -206,8 +205,7 @@ function analyzeResults(source) {
   if (unused.length == 0) {
     console.log("%c--- None. All Modules were used in this file.", "color: " + green);
   } else {
-    w.push("Unused, but defined modules found:");
-    for (let mod of unused) {w.push(mod);}
+    addWarning(WarningLog, analyzeResults.name, "Unused, but defined modules found:", unused);
     console.log("%c--- There are some...", "color: " + red);
     console.log(unused);
   }
@@ -217,7 +215,10 @@ function analyzeResults(source) {
   if (Data.usedUndefinedInstructions.length == 0) {
     console.log("%c--- None. All Instructions are handled in this file.", "color: " + green);
   } else {
-    addWarning(WarningLog, analyzeResults.name, "Used, but not-handled Instructions found:", Data.usedUndefinedInstructions);
+    addWarning(WarningLog, analyzeResults.name, "Used, but not-handled Instructions found. Query results may not be 100% correct. :", Data.usedUndefinedInstructions);
+    console.log("%c--- There are some...", "color: " + red);
+    console.log(Data.usedUndefinedInstructions);
+
   }
 
 
@@ -277,8 +278,8 @@ function formatDate(str) {
 ** Return: null
 *******************************************************************************/
 function addWarning(wLog, fName, desc, optData = null) {
-  wLog.push("-- Warning from <b>" + fName + "</b>: ");
-  wLog.push("   " + desc);
+  wLog.push("<h3>- Warning from <b>" + fName + ":</b></h3> ");
+  wLog.push(desc);
   if (optData != null) {wLog.push("   " + optData)};
   wLog.push(" ");
 }

@@ -13,6 +13,9 @@
   --tone-3-color:         #a2a2a2;
   --tone-3-accent-color:  #a2a2a2;
 
+  --tone-4-color:         #b34b4b;
+  --tone-4-accent:        #b34b4b; /* unused*/
+
   --overlay-background:   rgba(0,0,0, 0.6);
   --box-shadow:           rgba(33, 33, 33, 0.52);
 }
@@ -89,6 +92,9 @@ header {
 
 .overlay h1 {
   padding-left: 15px;
+}
+.overlay h2, h3 {
+  margin: 0px;
 }
 
 

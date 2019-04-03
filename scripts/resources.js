@@ -91,6 +91,7 @@ class InstructionOperation {
 class Resource {
   constructor(sourceLines) {
     this.sourceLines = sourceLines;         /* String array, each index holds 1 line */
+    this.sequenceLog = [];                  /* String array, containing analyze-log of mnc */
 
     this.Modules = [];                      /* Array of Module objects, holds module definitions */
     this.SBDMemory = [];                    /* Array of Memory objects, holds Single bit definitions */
@@ -678,5 +679,29 @@ class Resource {
       }
     }
     return {kind: kind, length: length};
+  }
+
+  /*******************************************************************************
+  ** Action: Adds a log line to the log array
+  ** Return: null
+  *******************************************************************************/
+  log(str, arr = null, logToConsole = false, logColor = null) {
+    this.sequenceLog.push(str);
+
+    if (arr != null) {
+      this.sequenceLog.push(arr);
+    }
+
+    if (logToConsole) {
+      if (logColor != null) {
+        console.log("%c" + str, "color: " + logColor);
+      } else {
+        console.log(str);
+      }
+
+      if (arr != null) {
+        console.log(arr);
+      }
+    }
   }
 }

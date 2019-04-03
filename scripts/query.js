@@ -60,9 +60,6 @@ class Query {
           if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
         }
 
-        /* look for parent definition */
-        byte = this.getByte((bit.byteType + bit.byteAddress), this.src);
-
         /* look for matching bitRead operations */
         this.log.push("Looking for read operations...");
         for (let bitR of this.src.bitReadOperations) {
@@ -101,9 +98,6 @@ class Query {
           this.memoryDefinition, bit = makeDummyDefinition(query)
           if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
         }
-
-        /* look for parent definition */
-        byte = this.getByte((bit.byteType + bit.byteAddress), this.src);
 
         /* look for matching bitWrite operations */
         this.log.push("Looking for write operations...");
@@ -208,23 +202,6 @@ class Query {
     /* not defined */
     this.log.push("-- Bit is undefined");
     return undefined
-  }
-
-/*******************************************************************************
-** Action: Looks for correct byte definitions in the [source.Memory] array
-** Return: b [MBDMemeory], if it matches to [byte]
-*******************************************************************************/
-  getByte(byte, src) {
-    /* find byte */
-    this.log.push("Parent Byte Definition:");
-    for (let b of src.MBDMemory) {
-      if (byte == b.byteType + b.byteAddress) {
-        this.log.push(b);
-        return b
-      }
-    }
-    /* not defined */
-    this.log.push("-- Has no parent Byte Definition");
   }
 
 

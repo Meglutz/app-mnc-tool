@@ -29,7 +29,7 @@ document.getElementById("overlay-close-button").onclick = function() {
 ** Action: Event: onClick Submit Button.
            - Clears all DOM Elements with the [tlElementId] id
            - Makes a new query using the DOM inputs
-           - Creates a TimeLine and a "Modal" for each result
+           - Creates a DOM TimeLine and a "Modal" for each result
 ** Return: null
 *******************************************************************************/
 document.getElementById("query-submit").onclick = function() {
@@ -53,74 +53,69 @@ document.getElementById("query-submit").onclick = function() {
   if (MyQueries[latestQuery].memoryDefinition != null || undefined) {
       Object.entries(MyQueries[latestQuery].memoryDefinition).forEach(memDefAttr => {
           switch (memDefAttr[0]) {
-              case "byteType":    memDefString += "<b>Address:</b> " + memDefAttr[1];                break;
-              case "byteAddress": memDefString += memDefAttr[1];                                     break;
-              case "bitAddress":  memDefString += "." + memDefAttr[1];                               break;
+              case "byteType":    memDefString += "<b>Address:</b> " + memDefAttr[1]; break;
+              case "byteAddress": memDefString += memDefAttr[1]; break;
+              case "bitAddress":  memDefString += "." + memDefAttr[1]; break;
               case "length":      let bitStr = " bits";
                                   if (memDefAttr[1] == 1) {bitStr = " bit"};
-                                  memDefString += " | <b>length:</b> " + memDefAttr[1] + bitStr;     break;
-              case "symbol":      memDefString += "<br><b>" + "Symbol:</b> " + memDefAttr[1];        break;
+                                  memDefString += " | <b>length:</b> " + memDefAttr[1] + bitStr; break;
+              case "symbol":      memDefString += "<br><b>" + "Symbol:</b> " + memDefAttr[1]; break;
           }
       })
   } else {memDefString = "<b>No definition was found</b>"}
 
 
   /* Add TimeLine title */
-  addDOMtitle(MyQueries[latestQuery].type + " for " +
-              MyQueries[latestQuery].memory + "<br><br>" +
-              memDefString);
+  let titleSection = document.getElementById(tlElementTitle);
+  let divElement   = addDOMelement("div", tlElementId, "container");
+  let pElement     = addDOMelement("p",   tlElementId);
+
+  pElement.innerHTML += MyQueries[latestQuery].type + " for " +
+                        MyQueries[latestQuery].memory + "<br><br>" +
+                        memDefString + " &rarr;";
+  divElement.appendChild(pElement);
+  titleSection.appendChild(divElement);
+
 
   /* Add a new TimeLine "Modal" for each result */
   for (let result of MyQueries[latestQuery].result) {
     content = parseToOutput(result, typeVal, query, typeVal);
     if (content != undefined) {
-        addDOMelement(content.lineString,
-                      content.actionString,
-                      content.operationString,
-                      content.moduleString,
-                      content.highlight);
+        addDOMresult(content.lineString,
+                     content.actionString,
+                     content.operationString,
+                     content.moduleString,
+                     content.highlight);
     }
   }
 
-  /* Update State */
-  updateDOMStatus(Warnings, WarningLog, Data);
+  /* update Warning state */
+  updateDOMinfo(Warnings, WarningLog, Data);
+
 }
 
 
 /*******************************************************************************
-** Action: Adds a DOM Title to the TimeLine
-** Return: null
-*******************************************************************************/
-function addDOMtitle(title) {
-    let titleSection = document.getElementById(tlElementTitle);
-    let divElement   = document.createElement("div");
-        divElement.setAttribute("class", "container"); divElement.setAttribute("id", tlElementId);
-    let pElement     = document.createElement("p");    pElement.setAttribute  ("id", tlElementId);
-
-    pElement.innerHTML += title + " &rarr;";
-    divElement.appendChild(pElement);
-    titleSection.appendChild(divElement);
-}
-
-
-/*******************************************************************************
-** Action: Adds a new DOM TimeLine Element inside the tbody tag.
+** Action: Adds a new DOM TimeLine Element  at timeline_location.
 **         for a new result: title = lineString
 **                           content1 = actionString
 **                           content2 = operationString
 **                           content3 = moduleString
 ** Return: null
 *******************************************************************************/
-function addDOMelement(title, content1, content2, content3, highlight = false) {
+function addDOMresult (title, content1, content2, content3, highlight = false) {
     let tlBody =      document.getElementById("timeline_location");
 
-    let h1Element =   document.createElement("h1");   h1Element.setAttribute("id", tlElementId);
-    let pElement = document.createElement("p");        pElement.setAttribute("id", tlElementId);
-    let divElement =  document.createElement("div"); divElement.setAttribute("id", tlElementId);
+    let h1Element =   addDOMelement("h1", tlElementId);
+    let pElement =    addDOMelement("p", tlElementId);
+    let divElement =  addDOMelement("div", tlElementId, "timeline-item");
 
     /* Assemble modal div */
-    divElement.setAttribute ("class", "timeline-item");
     divElement.setAttribute ("on-line", "MNC Line " + title);
+
+    if (highlight != false) {
+      divElement.setAttribute("style", "border-left: 2px solid var(--tone-4-color)");
+    }
 
     h1Element.innerHTML = content1;
     pElement.innerHTML =  content2 + "<br>";
@@ -132,6 +127,21 @@ function addDOMelement(title, content1, content2, content3, highlight = false) {
     tlBody.appendChild(divElement);
 }
 
+/*******************************************************************************
+** Action: Adds new DOM element of type [type]
+** Return: DOM element
+*******************************************************************************/
+function addDOMelement(type, id, addClass = null) {
+  let el = document.createElement(type);
+  el.setAttribute("id", id);
+  if (addClass != null) {
+    let currClass = el.getAttribute("class");
+    /* append class if [el] already ha a class, overwrite it it didn't have one */
+    if (currClass != null) {el.setAttribute("class", currClass + " " + addClass);}
+    else {el.setAttribute("class", addClass);}
+  }
+  return el;
+}
 
 /*******************************************************************************
 ** Action: Removes all DOM Elements which are of the ID "id"
@@ -145,17 +155,16 @@ function removeDOMelements(id) {
 }
 
 /*******************************************************************************
-** Action: Updates Status Bar
+** Action: Updates header circle & Overlay strings
 ** Return: null
 *******************************************************************************/
-function updateDOMStatus(warningStr, warningLog = null, source) {
+function updateDOMinfo(warningStr, warningLog = null, source) {
   let circleElement = document.getElementById(stateNotifier);
-  let pElement      = document.getElementById(stateText);
-
   let aElement      = {warn:    document.getElementById(overlayWarning),
                        warnLog: document.getElementById(overlayWarningLog),
                        info:    document.getElementById(overlayLog)};
 
+  /* update overlay elements: */
 
   /* warning string */
   if (warningStr != null) {
@@ -176,19 +185,8 @@ function updateDOMStatus(warningStr, warningLog = null, source) {
 
   } else {
     circleElement.setAttribute("fill", stateGreen);
-    aElement.log.innerHTML = "All Good!";
-  }
-
-  /* mnemonic info string */
-  if (MNCData != null) {
-    if (MNCData.Time == undefined) {MNCData.Time = 0}
-    pElement.innerHTML  =       MNCData.Type + " | " +
-                                MNCData.Release + " | " + "Compile Date: " +
-                                MNCData.CompileDate + " | " +
-                                MNCData.Note + " | " + "Analyze time: " +
-                                MNCData.Time.toFixed(2) + " ms";
-  } else {
-    pElement.innerHTML = "No Source Data"
+    aElement.warn.innerHTML = "No Warnings - All Good!";
+    aElement.warnLog.innerHTML  = "---";
   }
 
   /* mnemonic statistics string */
@@ -206,6 +204,25 @@ function updateDOMStatus(warningStr, warningLog = null, source) {
 }
 
 
+/*******************************************************************************
+** Action: Updates header string
+** Return: null
+*******************************************************************************/
+function updateDOMheader(source) {
+  let pElement = document.getElementById(stateText);
+
+  /* mnemonic info string */
+  if (MNCData != null) {
+    if (MNCData.Time == undefined) {MNCData.Time = 0}
+    pElement.innerHTML  =       MNCData.Type + " | " +
+                                MNCData.Release + " | " + "Compile Date: " +
+                                MNCData.CompileDate + " | " +
+                                MNCData.Note + " | " + "Analyze time: " +
+                                MNCData.Time.toFixed(2) + " ms";
+  } else {
+    pElement.innerHTML = "No Source Data"
+  }
+}
 /*******************************************************************************
 ** Action: Formats query results into prepared Strings for the DOM Elements
 ** Return: action-, operation-, module- lineString
