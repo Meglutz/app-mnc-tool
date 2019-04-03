@@ -163,12 +163,13 @@ function addDOMoverlayTable(source, insOp) {
     /* check if the instruction is a read/write instruction (applies in most cases */)
     case insOp.reads != null && insOp.writes != null:
       for (let i = 0; i < bitAmount) {
+        // getDef insOp.reads
         addDOMtableColumn(document.getElementById(insOpTableLoc),
-                          a,
-                          b
-                          c,
-                          d,
-                          e);
+                          defOne.byteType + defOne.byteAddress + "." + defOne.bitAddress,
+                          defOne.symbol,
+                          insOps.action, /* // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+                          defTwo.byteType + defTwo.byteAddress + "." + defTwo.bitAddress,
+                          defTwo.symbol);
       }
       break;
     default:
