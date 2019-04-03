@@ -21,6 +21,8 @@ let MNCData = {
               }
 
 let Warnings = null;
+let WarningLog = [];
+
 
 let MyQueries = [];
 let Data;
@@ -52,16 +54,19 @@ function draw() {
   updateDOMStatus("Loading", Data);
 
   /* Run all sequences to analyze the mnemonic */
-  let warn = 0;
-  warn += getDefinitions      (Data);
-  warn += analyzeLogic        (Data);
-  warn += analyzeDependencies (Data);
-  warn += analyzeResults      (Data);
-  Warnings = checkWarnings(warn);
+  getDefinitions      (Data);
+  analyzeLogic        (Data);
+  analyzeDependencies (Data);
+  analyzeResults      (Data);
+
+  /* handle warnings */
+  Warnings = checkWarnings(WarningLog);
+  console.log("Warning Log:");
+  for (let warn of WarningLog) {console.log(warn);}
 
   /* stop timer */
   end = new Date().getTime();  MNCData.Time = (end - start);
-  updateDOMStatus(Warnings, Data);
+  updateDOMStatus(Warnings, WarningLog, Data);
 
   /* Query to see all defined bits which are handled in Instructions */
   // let test = new Query(Data, definedBitsInInstructions, null);
@@ -81,7 +86,6 @@ function draw() {
 ** Return: [w] (Integer), amount of warnings
 *******************************************************************************/
 function getDefinitions(source) {
-  let w = 0;
   /* Get all definitions in the current file */
   console.log("Getting definitions...");
   for (let line of source.sourceLines) {
@@ -104,8 +108,7 @@ function getDefinitions(source) {
   console.log(source.SBDMemory);
   console.log("-- Module definitions    :");
   console.log(source.Modules);
-  finishSequence(w, 2);
-  return w
+  finishSequence(2);
 }
 
 /*******************************************************************************
@@ -118,7 +121,6 @@ function getDefinitions(source) {
 ** Return: [w] (Integer), amount of warnings
 *******************************************************************************/
 function analyzeLogic(source) {
-  let w = 0;
   console.log("Analyzing logic...");
   /* Get all logic events in the whole file */
   let lines = source.sourceLines;
@@ -157,8 +159,7 @@ function analyzeLogic(source) {
   console.log(source.bitWriteOperations);
   console.log("-- Found instruction operations  :");
   console.log(source.instructionOperations);
-  finishSequence(w, 2);
-  return w
+  finishSequence(2);
 }
 
 /*******************************************************************************
@@ -170,12 +171,11 @@ function analyzeLogic(source) {
 ** Return: [w] (Integer), amount of warnings
 *******************************************************************************/
 function analyzeDependencies(source) {
-  let w = 0;
   console.log("Analyzing Dependencies...");
+  addWarning(WarningLog, analyzeDependencies.name, "This is a dummy Warning");
 
   /* None */
-  finishSequence(w, 2);
-  return w
+  finishSequence(2);
 }
 
 /*******************************************************************************
@@ -191,7 +191,6 @@ function analyzeDependencies(source) {
 ** Return: [w] (Integer), amount of warnings
 *******************************************************************************/
 function analyzeResults(source) {
-  let w = 0;
   console.log("Analyzing Results...");
 
   /* Check if all defined programs appear in the logic */
@@ -201,13 +200,14 @@ function analyzeResults(source) {
     for (let j = 0; j < source.Modules[i].length; j++) {
       if (source.Modules[i][j] == undefined) {
         unused.push(source.Modules[i]);
-        w += 1;
       }
     }
   }
   if (unused.length == 0) {
     console.log("%c--- None. All Modules were used in this file.", "color: " + green);
   } else {
+    w.push("Unused, but defined modules found:");
+    for (let mod of unused) {w.push(mod);}
     console.log("%c--- There are some...", "color: " + red);
     console.log(unused);
   }
@@ -217,24 +217,18 @@ function analyzeResults(source) {
   if (Data.usedUndefinedInstructions.length == 0) {
     console.log("%c--- None. All Instructions are handled in this file.", "color: " + green);
   } else {
-    console.log("%c--- There are some...", "color: " + red);
-    console.log(Data.usedUndefinedInstructions);
-    w += Data.usedUndefinedInstructions.length;
+    addWarning(WarningLog, analyzeResults.name, "Used, but not-handled Instructions found:", Data.usedUndefinedInstructions);
   }
 
 
-  finishSequence(w, 2);
-  return w;
+  finishSequence(2);
 }
 
 /*******************************************************************************
-** Action: Debug function, plots eventual warnings which came forth in a
-**         a sequence to the console.
+** Action: Debug function, sequence ending script
 ** Return: null
 *******************************************************************************/
-function finishSequence(w, spaces = 1, additionalString = "") {
-  if (w != 0) {console.log("%cWarnings: " + w, "color: " + yellow);}
-  else        {console.log("No Warnings");}
+function finishSequence(spaces = 1, additionalString = "") {
 
   console.log("Finished. " + additionalString);
   for (let i = 0; i < spaces; i++) {
@@ -249,11 +243,12 @@ function finishSequence(w, spaces = 1, additionalString = "") {
 *******************************************************************************/
 function checkWarnings(warn) {
   let str;
-  if (warn != 0) {
-    str = "There are " + warn + " Warnings overall!"
+  if (warn != null) {
+    str = "There are Warnings, please check the Log!"
     console.log("%c" + str, "color: " + red);
     return str;
   } else {
+    /* str needs to be null if no warnings occured! */
     console.log("%cNo Warnings overall", "color: " + green);
     return null;
   }
@@ -270,12 +265,20 @@ function formatDate(str) {
                       "July", "August", "September", "October", "November", "December"];
   let regexp = /^(\d\d)\/(\d\d)\/(\d\d)\s*(\d\d)\:(\d\d)/;
   let Year  = str.match(regexp)[1];
-  console.log(Year);
   let Month = monthNames[parseInt(str.match(regexp)[2], 10) - 1]
-  console.log(Month);
   let Day =   str.match(regexp)[3];
-  console.log(Day);
   let Time =  str.match(regexp)[4] + ":" + str.match(regexp)[5];
-  console.log(Time);
   return Day + ". " + Month + " " + "20" + Year + ", " + Time; /* LOL */
+}
+
+
+/*******************************************************************************
+** Action: Adds Warning string to a given array
+** Return: null
+*******************************************************************************/
+function addWarning(wLog, fName, desc, optData = null) {
+  wLog.push("-- Warning from <b>" + fName + "</b>: ");
+  wLog.push("   " + desc);
+  if (optData != null) {wLog.push("   " + optData)};
+  wLog.push(" ");
 }

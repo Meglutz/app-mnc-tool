@@ -2,16 +2,28 @@
 /*******************************************************************************
 ** Definitions
 *******************************************************************************/
-const tlElementId    = "timeLine_element";
-const tlElementTitle = "timeline_title";
-const stateNotifier  = "stNotifier";
-const stateText      = "stWarn";
-const mncInfoText    = "stMNCInfo";
-const mncStatsText   = "stMNCStats";
+const tlElementId    =    "timeLine_element";
+const tlElementTitle =    "timeline_title";
+const stateNotifier  =    "status-button";
+const stateText      =    "status-label";
 
-const stateRed       = "#e74848";
-const stateGreen     = "#53d467";
+const overlayWarning =    "overlay-warning";
+const overlayWarningLog = "overlay-warning-log";
+const overlayLog     =    "overlay-info";
 
+const stateRed       =    "#e74848";
+const stateGreen     =    "#53d467";
+
+/*******************************************************************************
+** Action: Event: onClick Status / Close Button. Open / Close Overlay
+** Return: null
+*******************************************************************************/
+document.getElementById("status-button").onclick = function() {
+  document.getElementById("overlay-container").style.display = "block";
+}
+document.getElementById("overlay-close-button").onclick = function() {
+  document.getElementById("overlay-container").style.display = "none";
+}
 
 /*******************************************************************************
 ** Action: Event: onClick Submit Button.
@@ -71,7 +83,7 @@ document.getElementById("query-submit").onclick = function() {
   }
 
   /* Update State */
-  updateDOMStatus(Warnings, Data);
+  updateDOMStatus(Warnings, WarningLog, Data);
 }
 
 
@@ -110,8 +122,6 @@ function addDOMelement(title, content1, content2, content3, highlight = false) {
     divElement.setAttribute ("class", "timeline-item");
     divElement.setAttribute ("on-line", "MNC Line " + title);
 
-    /* TODO Remove HIGHLIGH logic */
-
     h1Element.innerHTML = content1;
     pElement.innerHTML =  content2 + "<br>";
     pElement.innerHTML += content3;
@@ -138,45 +148,59 @@ function removeDOMelements(id) {
 ** Action: Updates Status Bar
 ** Return: null
 *******************************************************************************/
-function updateDOMStatus(warningStr, source) {
+function updateDOMStatus(warningStr, warningLog = null, source) {
   let circleElement = document.getElementById(stateNotifier);
-  let pElement      = {
-                       state: document.getElementById(stateText),
-                       info:  document.getElementById(mncInfoText),
-                       stats: document.getElementById(mncStatsText)
-                      }
+  let pElement      = document.getElementById(stateText);
+
+  let aElement      = {warn:    document.getElementById(overlayWarning),
+                       warnLog: document.getElementById(overlayWarningLog),
+                       info:    document.getElementById(overlayLog)};
+
 
   /* warning string */
   if (warningStr != null) {
     circleElement.setAttribute("fill", stateRed);
-    pElement.state.innerHTML = warningStr;
+    aElement.warn.innerHTML = warningStr;
+
+    /* if the warning log isn't empty, then add it to the overlay string */
+    if (warningLog != null) {
+      aElement.warnLog.innerHTML = "<br><br>";
+      if (isIterable(warningLog)) {
+        for (let str of warningLog) {
+          aElement.warnLog.innerHTML += str + "<br>";
+        }
+      } else {
+        aElement.warnLog.innerHTML += warningLog;
+      }
+    }
+
   } else {
     circleElement.setAttribute("fill", stateGreen);
-    pElement.state.innerHTML = "All Good!"
+    aElement.log.innerHTML = "All Good!";
   }
 
   /* mnemonic info string */
   if (MNCData != null) {
     if (MNCData.Time == undefined) {MNCData.Time = 0}
-    pElement.info.innerHTML  =  MNCData.Type + " | " +
+    pElement.innerHTML  =       MNCData.Type + " | " +
                                 MNCData.Release + " | " + "Compile Date: " +
                                 MNCData.CompileDate + " | " +
                                 MNCData.Note + " | " + "Analyze time: " +
                                 MNCData.Time.toFixed(2) + " ms";
   } else {
-    pElement.info.innerHTML = "No Source Data"
+    pElement.innerHTML = "No Source Data"
   }
 
   /* mnemonic statistics string */
   if (source != null) {
-    pElement.stats.innerHTML = "MNC Lines: " + source.sourceLines.length + " | " +
-                               "Bit Defs: " + source.SBDMemory.length + " | " +
-                               "Byte Defs: " + source.MBDMemory.length + " | " +
-                               "Total Ops: " + (source.bitReadOperations.length +
+    aElement.info.innerHTML =  "<b>MNC Lines:</b> " +  source.sourceLines.length + " | " +
+                               "<b>Bit Defs:</b> " +   source.SBDMemory.length +   " | " +
+                               "<b>Byte Defs:</b> " +  source.MBDMemory.length +   " | " +
+                               "<b>Total Ops:</b> " + (source.bitReadOperations.length +
                                                 source.bitWriteOperations.length +
                                                 source.instructionOperations.length)
   } else {
-    pElement.stats.innerHTML = "No Source Data"
+    aElement.info.innerHTML = "No Source Data"
   }
 
 }

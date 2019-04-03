@@ -13,6 +13,7 @@
   --tone-3-color:         #a2a2a2;
   --tone-3-accent-color:  #a2a2a2;
 
+  --overlay-background:   rgba(0,0,0, 0.6);
   --box-shadow:           rgba(33, 33, 33, 0.52);
 }
 
@@ -48,12 +49,55 @@ header {
   text-align: center;
 }
 
+/* Style Overlay */
+/******************************************************************************/
+.overlay {
+  height: 100%;
+  width: 100%;
+  display: none;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: var(--overlay-background);
+}
+
+.overlay-content {
+  position: relative;
+  top: 25%;
+  width: 100%;
+  text-align: left;
+  margin-top: 30px;
+}
+
+.overlay-close {
+  cursor: pointer;
+  font-weight: 700;
+  text-align: right;
+}
+
+.overlay a {
+  padding: 8px;
+  padding-left: 15px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-family: "Roboto";
+  color: var(--tone-1-color);
+  display: block;
+  transition: 0.3s;
+}
+
+.overlay h1 {
+  padding-left: 15px;
+}
+
+
 /* Style Status Bar */
 /******************************************************************************/
 .status-bar {
   width: 100%;
   font-family: consolas;
-  height: 65px;
+  height: 25px;
   background-color: var(--main-color);
   top: 0;
   left: 0;
@@ -65,19 +109,20 @@ header {
   width: 50px;
 }
 
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
 .status-text  {
   font-size: 0.7rem;
-  font-family: "consolas";
+  font-family: "Roboto";
+  text-transform: uppercase;
+  letter-spacing: 2px;
   color: var(--tone-3-color);
   padding-top: 6px;
+  margin: 0px !important;
   white-space: nowrap;
   padding-left:10px;
+}
+
+.status-button {
+  cursor: pointer;
 }
 
 /* Style Controls */
@@ -136,7 +181,7 @@ h1 {
 
 p {
   font-family: "Roboto", sans-serif;
-  colro:  var(--tone-1-color);
+  color:  var(--tone-1-color);
   font-size: 0.8rem;
 }
 
@@ -176,7 +221,7 @@ p {
   display: block;
   top: 1em;
   position: absolute;
-  left: -7px;
+  left: -7.5px;
   border-radius: 10px;
   content: "";
   border: 2px solid var(--tone-1-color);;

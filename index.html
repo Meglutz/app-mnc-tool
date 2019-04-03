@@ -11,15 +11,27 @@
   </head>
 
   <body>
+
+    <!-- Overlay -->
+    <div id="overlay-container" class="overlay">
+      <a class="overlay-close" id="overlay-close-button">CLOSE</a>
+      <div class="overlay-content">
+          <h1>Warnings</h1>
+          <a id="overlay-warning">---</a>
+          <a id="overlay-warning-log">---</a>
+          <h1>Mnemonic Stats</h1>
+          <a id="overlay-info">---</a>
+      </div>
+    </div>
+
+
     <!-- Status Bar -->
     <div class="status-bar">
       <svg class="status-image status-column" height="50" width="50">
-        <circle id="stNotifier" cx="40" cy="13" r="5" stroke="black" stroke-width="0" fill="#212121" />
+        <circle class="status-button" id="status-button" cx="40" cy="13" r="5" stroke="black" stroke-width="0" fill="#212121" />
       </svg>
       <div class="status-column">
-        <p id="stWarn" class="status-text status-column">---</p>
-        <p id="stMNCInfo" class="status-text status-column">MNC Info  ---</p>
-        <p id="stMNCStats" class="status-text status-column">MNC Stats ---</p>
+        <p id="status-label" class="status-text status-column">---</p>
       </div>
     </div>
 
