@@ -2,27 +2,44 @@
 /*******************************************************************************
 ** Definitions
 *******************************************************************************/
-const tlElementId    =    "timeLine_element";
-const tlElementTitle =    "timeline_title";
-const stateNotifier  =    "status-button";
-const stateText      =    "status-label";
+const tlElementId     =    "timeLine_element";
+const tlElementTitle  =    "timeline_title";
+const tableElementId  =    "table_element";
 
-const overlayWarning =    "overlay-warning";
-const overlayWarningLog = "overlay-warning-log";
-const overlayLog     =    "overlay-info";
+const stateButton     =    "status-button";
+const stateText       =    "status-label";
+const stateOverlay    =    "overlay-container-1";
+const stateClose      =    "overlay-close-button-1"
+const stateWarning    =    "overlay-warning";
+const stateWarningLog =    "overlay-warning-log";
+const stateLog        =    "overlay-info";
 
-const stateRed       =    "#e74848";
-const stateGreen     =    "#53d467";
+const insOpOverlay    =    "overlay-container-2";
+const insOpTableLoc   =    "insop-table-location";
+const insOpClose      =    "overlay-close-button-2";
+
+const stateRed        =    "#e74848";
+const stateGreen      =    "#53d467";
 
 /*******************************************************************************
 ** Action: Event: onClick Status / Close Button. Open / Close Overlay
 ** Return: null
 *******************************************************************************/
-document.getElementById("status-button").onclick = function() {
-  document.getElementById("overlay-container").style.display = "block";
+document.getElementById(stateButton).onclick = function() {
+  document.getElementById(stateOverlay).style.display = "block";
 }
-document.getElementById("overlay-close-button").onclick = function() {
-  document.getElementById("overlay-container").style.display = "none";
+document.getElementById(stateClose).onclick = function() {
+  document.getElementById(stateOverlay).style.display = "none";
+}
+
+document.getElementById(stateText).onclick = function() {
+  /* Clear all Elements containing [tableElementId] */
+  removeDOMelements(tableElementId);
+  addDOMoverlayTable();
+  document.getElementById(insOpOverlay).style.display = "block";
+}
+document.getElementById(insOpClose).onclick = function() {
+  document.getElementById(insOpOverlay).style.display = "none";
 }
 
 /*******************************************************************************
@@ -104,28 +121,72 @@ document.getElementById("query-submit").onclick = function() {
 ** Return: null
 *******************************************************************************/
 function addDOMresult (title, content1, content2, content3, highlight = false) {
-    let tlBody =      document.getElementById("timeline_location");
+  let tlBody =      document.getElementById("timeline_location");
 
-    let h1Element =   addDOMelement("h1", tlElementId);
-    let pElement =    addDOMelement("p", tlElementId);
-    let divElement =  addDOMelement("div", tlElementId, "timeline-item");
+  let h1Element =   addDOMelement("h1", tlElementId);
+  let pElement =    addDOMelement("p", tlElementId);
+  let divElement =  addDOMelement("div", tlElementId, "timeline-item");
 
-    /* Assemble modal div */
-    divElement.setAttribute ("on-line", "MNC Line " + title);
+  /* Assemble modal div */
+  divElement.setAttribute ("on-line", "MNC Line " + title);
 
-    if (highlight != false) {
-      divElement.setAttribute("style", "border-left: 2px solid var(--tone-4-color)");
-    }
+  if (highlight != false) {
+    divElement.setAttribute("style", "border-left: 2px solid var(--tone-4-color)");
+  }
 
-    h1Element.innerHTML = content1;
-    pElement.innerHTML =  content2 + "<br>";
-    pElement.innerHTML += content3;
+  h1Element.innerHTML = content1;
+  pElement.innerHTML =  content2 + "<br>";
 
-    divElement.appendChild(h1Element);
-    divElement.appendChild(pElement);
+  divElement.appendChild(h1Element);
+  divElement.appendChild(pElement);
 
-    tlBody.appendChild(divElement);
+  tlBody.appendChild(divElement);
 }
+
+
+/*******************************************************************************
+** Action: Adds new DOM table for instruction operation visualisation
+** Return: null
+*******************************************************************************/
+function addDOMoverlayTable(source, insOp) {
+  /* generate header */
+  addDOMoverlayTableHead(document.getElementById(insOpTableLoc), "Address", "Symbol", "Action", "Address", "Symbol", true);
+
+// COMBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK
+  // let bitAmount = insOp.formatLength * 8;
+  // switch (true) {
+  //   /* check if the instruction is a read only instruction */
+  //   case isIterable(insOp.reads):
+  //     break;
+  //   /* check if the instruction is a write only instruction (does that even exist) */
+  //   case isIterable(insOp.writes):
+  //     break;
+  //   /* check if the instruction is a read/write insturction (applies in most cases */)
+  //   case insOp.reads != null && insOp.writes != null:
+  //     for (let i = 0; i < bitAmount) {
+  //
+  //     }
+  //     break;
+  //   default:
+  //
+  // }
+}
+
+function addDOMtableColumn(parentElement, a, b, c, d, e, isHead = false) {
+  let row = addDOMelement("tr", tableElementId);
+  let temp;
+  let colType = "td";
+  let col = [a, b, c, d, e];
+  if (isHead) {colType = "th";}
+  /* create new column */
+  for (let item of col) {
+    temp = addDOMelement(colType, tableElementId);
+    temp.innerHTML = item;
+    row.appendChild(temp);
+  }
+  parentElement.appendChild(row);
+}
+
 
 /*******************************************************************************
 ** Action: Adds new DOM element of type [type]
@@ -148,10 +209,10 @@ function addDOMelement(type, id, addClass = null) {
 ** Return: null
 *******************************************************************************/
 function removeDOMelements(id) {
-    while (document.getElementById(id) != null) {
-      let elem = document.getElementById(id);
-      elem.parentNode.removeChild(elem);
-    }
+  while (document.getElementById(id) != null) {
+    let elem = document.getElementById(id);
+    elem.parentNode.removeChild(elem);
+  }
 }
 
 /*******************************************************************************
@@ -159,10 +220,10 @@ function removeDOMelements(id) {
 ** Return: null
 *******************************************************************************/
 function updateDOMinfo(warningStr, warningLog = null, source) {
-  let circleElement = document.getElementById(stateNotifier);
-  let aElement      = {warn:    document.getElementById(overlayWarning),
-                       warnLog: document.getElementById(overlayWarningLog),
-                       info:    document.getElementById(overlayLog)};
+  let circleElement = document.getElementById(stateButton);
+  let aElement      = {warn:    document.getElementById(stateWarning),
+                       warnLog: document.getElementById(stateWarningLog),
+                       info:    document.getElementById(stateLog)};
 
   /* update overlay elements: */
 
@@ -299,4 +360,20 @@ function beautify(op) {
   }
   r = r + " in";
   return r;
+}
+
+
+function getRoot(source, byte) {
+  let r = [];
+  let root;
+  for (let MBD of source.MBDMemory) {
+    if (byte == MBD.byteType + MBD.byteAddress) {r.push(MBD.symbol)}
+  }
+  for (let SBD of source.SBDMemory) {
+    if (byte + ".0" == SBD.byteType + SBD.byteAddress + "." + SBD.bitAddress) {r.push(SBD.symbol)}
+  }
+  if (r != null) {
+    for (let s of r) {root += s + " | "}
+  } else {root = "No Rootbit"}
+  return root
 }

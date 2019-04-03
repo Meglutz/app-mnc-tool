@@ -109,6 +109,13 @@ function getDefinitions(source) {
   console.log(source.SBDMemory);
   console.log("-- Module definitions    :");
   console.log(source.Modules);
+
+  let warnString = "";
+  if (source.MBDMemory.length < 1)  {warnString = "There aren't any Multi bit definitions in this MNC!";}
+  if (source.SBDMemory.length < 1)  {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any Single bit definitions in this MNC!";}
+  if (source.Modules.length < 1)    {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any Modules defined in this MNC!";}
+  if (warnString != "") {addWarning(WarningLog, getDefinitions.name, warnString, null);}
+
   finishSequence(2);
 }
 
@@ -160,6 +167,13 @@ function analyzeLogic(source) {
   console.log(source.bitWriteOperations);
   console.log("-- Found instruction operations  :");
   console.log(source.instructionOperations);
+
+  let warnString = "";
+  if (source.bitReadOperations.length < 1)  {warnString = "There aren't any bit-read Operations in this MNC!";}
+  if (source.bitWriteOperations.length < 1)  {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any bit-write Operations in this MNC!";}
+  if (source.instructionOperations.length < 1)    {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any instruction Operations in this MNC!";}
+  if (warnString != "") {addWarning(WarningLog, analyzeLogic.name, warnString, null);}
+
   finishSequence(2);
 }
 
@@ -174,6 +188,7 @@ function analyzeLogic(source) {
 function analyzeDependencies(source) {
   console.log("Analyzing Dependencies...");
   /* None */
+
   finishSequence(2);
 }
 
@@ -215,12 +230,13 @@ function analyzeResults(source) {
   if (Data.usedUndefinedInstructions.length == 0) {
     console.log("%c--- None. All Instructions are handled in this file.", "color: " + green);
   } else {
-    addWarning(WarningLog, analyzeResults.name, "Used, but not-handled Instructions found. Query results may not be 100% correct. :", Data.usedUndefinedInstructions);
     console.log("%c--- There are some...", "color: " + red);
     console.log(Data.usedUndefinedInstructions);
-
+    addWarning(WarningLog, analyzeResults.name,
+              "Used, but not-handled Instructions found.<br>" +
+              "Query results will be missing instruction Operations of :",
+               Data.usedUndefinedInstructions);
   }
-
 
   finishSequence(2);
 }
@@ -230,7 +246,6 @@ function analyzeResults(source) {
 ** Return: null
 *******************************************************************************/
 function finishSequence(spaces = 1, additionalString = "") {
-
   console.log("Finished. " + additionalString);
   for (let i = 0; i < spaces; i++) {
     if (i % 2 == 0) {console.log("");}
@@ -280,6 +295,11 @@ function formatDate(str) {
 function addWarning(wLog, fName, desc, optData = null) {
   wLog.push("<h3>- Warning from <b>" + fName + ":</b></h3> ");
   wLog.push(desc);
-  if (optData != null) {wLog.push("   " + optData)};
+  if (optData != null) {
+    if (isIterable(optData)) {
+      Object.entries(optData).forEach(el => {wLog.push(el[0] + ": " + el[1]);})
+    }
+    wLog.push(optData)
+  }
   wLog.push(" ");
 }

@@ -67,7 +67,7 @@ header {
 
 .overlay-content {
   position: relative;
-  top: 25%;
+  top: 2%;
   width: 100%;
   text-align: left;
   margin-top: 30px;
@@ -96,6 +96,10 @@ header {
 .overlay h2, h3 {
   margin: 0px;
 }
+
+/* Style Pop-Up */
+/******************************************************************************/
+
 
 
 /* Style Status Bar */

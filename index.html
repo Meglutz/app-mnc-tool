@@ -12,9 +12,9 @@
 
   <body>
 
-    <!-- Overlay -->
-    <div id="overlay-container" class="overlay">
-      <a class="overlay-close" id="overlay-close-button">CLOSE</a>
+    <!-- Info Overlay -->
+    <div id="overlay-container-1" class="overlay">
+      <a class="overlay-close" id="overlay-close-button-1">CLOSE</a>
       <div class="overlay-content">
           <h1>Warnings</h1>
           <a id="overlay-warning">---</a>
@@ -24,6 +24,15 @@
       </div>
     </div>
 
+    <!-- InstructionOp Info Overlay -->
+    <div id="overlay-container-2" class="overlay">
+      <a class="overlay-close" id="overlay-close-button-2">CLOSE</a>
+      <div class="overlay-content">
+        <table id="insop-table-location">
+          <!-- Auto-Generated Tsble elements will be placed inside this <table> tag -->
+        </table>
+      </div>
+    </div>
 
     <!-- Status Bar -->
     <div class="status-bar">
@@ -37,10 +46,12 @@
 
     <!-- Header -->
     <header>
+
+      <!-- UI -->
       <label for="query-type">Type</label>
       <select id="query-type" name="query-type">
-        <option value="Bit-Read">Find all Bit-Read Operations for →</option>
-        <option value="Bit-Write">Find all Bit-Write Operations for →</option>
+        <option value="Bit-Read">Find all Bit-Read Operations for â†’</option>
+        <option value="Bit-Write">Find all Bit-Write Operations for â†’</option>
       </select>
 
       <label for="query-value">Value</label>
