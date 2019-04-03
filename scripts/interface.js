@@ -150,26 +150,30 @@ function addDOMresult (title, content1, content2, content3, highlight = false) {
 *******************************************************************************/
 function addDOMoverlayTable(source, insOp) {
   /* generate header */
-  addDOMoverlayTableHead(document.getElementById(insOpTableLoc), "Address", "Symbol", "Action", "Address", "Symbol", true);
+  addDOMtableColumn(document.getElementById(insOpTableLoc), "Address", "Symbol", "Action", "Address", "Symbol", true);
 
-// COMBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK
-  // let bitAmount = insOp.formatLength * 8;
-  // switch (true) {
-  //   /* check if the instruction is a read only instruction */
-  //   case isIterable(insOp.reads):
-  //     break;
-  //   /* check if the instruction is a write only instruction (does that even exist) */
-  //   case isIterable(insOp.writes):
-  //     break;
-  //   /* check if the instruction is a read/write insturction (applies in most cases */)
-  //   case insOp.reads != null && insOp.writes != null:
-  //     for (let i = 0; i < bitAmount) {
-  //
-  //     }
-  //     break;
-  //   default:
-  //
-  // }
+  let bitAmount = insOp.formatLength * 8;
+  switch (true) {
+    /* check if the instruction is a read-only instruction */
+    case isIterable(insOp.reads):
+      break;
+    /* check if the instruction is a write-only instruction (does that even exist?) */
+    case isIterable(insOp.writes):
+      break;
+    /* check if the instruction is a read/write instruction (applies in most cases */)
+    case insOp.reads != null && insOp.writes != null:
+      for (let i = 0; i < bitAmount) {
+        addDOMtableColumn(document.getElementById(insOpTableLoc),
+                          a,
+                          b
+                          c,
+                          d,
+                          e);
+      }
+      break;
+    default:
+
+  }
 }
 
 function addDOMtableColumn(parentElement, a, b, c, d, e, isHead = false) {
