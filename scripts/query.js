@@ -1,7 +1,6 @@
 /*******************************************************************************
 ** Definitions
 *******************************************************************************/
-const dummyMemory = "DUMMY_MEMORY";
 const bitReadOps = "Bit-Read";
 const bitWriteOps = "Bit-Write";
 const definedBitsInInstructions = "Defined Bits which are handled in Instructions";
@@ -49,7 +48,6 @@ class Query {
 
         /* get definition */
         this.log.push("Looking for definition...");
-
         bit = this.src.getBitDef(query);
 
         /* check if bit has been found */
@@ -59,7 +57,7 @@ class Query {
           this.memoryDefinition = bit;
         } else { /* bit has no definition, create Dummy */
           this.log.push("Bit is undefined. Creating Dummy Memory...");
-          this.memoryDefinition, bit = makeDummyDefinition(query)
+          this.memoryDefinition, bit = this.src.makeDummyDefinition(query)
           if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
         }
 
@@ -100,7 +98,7 @@ class Query {
           this.memoryDefinition = bit;
         } else { /* bit has no definition, create Dummy */
           this.log.push("Bit is undefined. Creating Dummy Memory...");
-          this.memoryDefinition, bit = makeDummyDefinition(query)
+          this.memoryDefinition, bit = this.src.makeDummyDefinition(query)
           if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
         }
 
@@ -244,18 +242,4 @@ function isIterable(obj) {
     return false;
   }
   return typeof obj[Symbol.iterator] === 'function';
-}
-
-/*******************************************************************************
-** Action: Creates a new Memory Object if the given query is valid
-** Return: Dummy Memory Object
-*******************************************************************************/
-function makeDummyDefinition(query) {
-  let match = /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*|)$/.exec(query);
-
-  if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
-    return new Memory(match[1], match[2], match[4], 1, dummyMemory);
-  } else {
-    return null;
-  }
 }

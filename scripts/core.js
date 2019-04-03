@@ -237,7 +237,6 @@ function analyzeResults(source) {
               "Query results will be missing instruction Operations of :",
                Data.usedUndefinedInstructions);
   }
-
   finishSequence(2);
 }
 
@@ -298,8 +297,9 @@ function addWarning(wLog, fName, desc, optData = null) {
   if (optData != null) {
     if (isIterable(optData)) {
       Object.entries(optData).forEach(el => {wLog.push(el[0] + ": " + el[1]);})
-    }
-    wLog.push(optData)
+    } else {
+      wLog.push(optData)
+    };
   }
   wLog.push(" ");
 }

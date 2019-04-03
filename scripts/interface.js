@@ -35,7 +35,7 @@ document.getElementById(stateClose).onclick = function() {
 document.getElementById(stateText).onclick = function() {
   /* Clear all Elements containing [tableElementId] */
   removeDOMelements(tableElementId);
-  addDOMoverlayTable(Data, Data.instructionOperations[2]);
+  addDOMoverlayTable(MyQueries[MyQueries.length - 1], 0);
   document.getElementById(insOpOverlay).style.display = "block";
 }
 document.getElementById(insOpClose).onclick = function() {
@@ -58,6 +58,7 @@ document.getElementById("query-submit").onclick = function() {
 
   /* Make a new query */
   MyQueries.push(new Query(Data, typeVal, query));
+
   let latestQuery = MyQueries.length - 1;
 
   /* Make result array iterable, if there's only one result it's not iterable */
@@ -148,44 +149,96 @@ function addDOMresult (title, content1, content2, content3, highlight = false) {
 ** Action: Adds new DOM table for instruction operation visualisation
 ** Return: null
 *******************************************************************************/
-function addDOMoverlayTable(source, insOp) {
+function addDOMoverlayTable(query, resultIndex) {
+  let ins = query.result[resultIndex];
   /* generate header */
   addDOMtableColumn(document.getElementById(insOpTableLoc), "Address", "Symbol", "Action", "Address", "Symbol", true);
 
-  let bitAmount = insOp.formatLength * 8;
-  // switch (true) {
-  //   /* check if the instruction is a read-only instruction */
-  //   case isIterable(insOp.reads):
-  //     break;
-  //   /* check if the instruction is a write-only instruction (does that even exist?) */
-  //   case isIterable(insOp.writes):
-  //     break;
-  //   /* check if the instruction is a read/write instruction (applies in most cases */)
-  //   case insOp.reads != null && insOp.writes != null:
-  //     for (let i = 0; i < bitAmount) {
-  //       // getDef insOp.reads
-  //       addDOMtableColumn(document.getElementById(insOpTableLoc),
-  //                         defOne.byteType + defOne.byteAddress + "." + defOne.bitAddress,
-  //                         defOne.symbol,
-  //                         insOps.action, /* // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-  //                         defTwo.byteType + defTwo.byteAddress + "." + defTwo.bitAddress,
-  //                         defTwo.symbol);
-  //     }
-  //     break;
-  //   default:
-  //
-  // }
+  let bitAmount = ins.formatLength * 8;
+  let defOne; let srcOne;
+  let defTwo; let srcTwo;
+  let action = "";
+
+  switch (true) {
+    /* ..if the instruction is a read-only instruction */
+    case isIterable(ins.reads):
+      srcOne = ins.reads[0];
+      srcTwo = ins.reads[1];
+      action = " - ";
+      break;
+    /* ..if the instruction is a write-only instruction (does that even exist?) */
+    case isIterable(ins.writes):
+      srcOne = ins.writes[0];
+      srcTwo = ins.writes[1];
+      action = " - ";
+      break;
+    /* ..if the instruction is a read/write instruction (applies in most cases */
+    case ins.reads != null && ins.writes != null:
+      srcOne = ins.reads;
+      srcTwo = ins.writes;
+      break;
+      // TODO: Default
+  }
+
+  /* split adress */ // TODO: put all regexes in resource class and make resource class regex function
+  let regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
+  let srcOneByteType = srcOne.match(regexp)[1];
+  let srcTwoByteType = srcTwo.match(regexp)[1];
+  let srcOneByteAddress = parseInt(srcOne.match(regexp)[2], 10);
+  let srcTwoByteAddress = parseInt(srcTwo.match(regexp)[2], 10);
+  let srcOneBitAddress = 0; /* all ins only use byte addresses, so it always starts at 0 */
+  let srcTwoBitAddress = 0;
+
+  let bitCount = 0;
+  let byteCount = 0;
+
+  /* loop for the amount of bits and try to find their definitions */
+  for (let i = 0; i < bitAmount; i++) {
+
+    /* increment bit & byte offset */
+    if (bitCount == 8) {
+      bitCount = 0;
+      byteCount += 1;
+    }
+    else {
+      bitCount += 1;
+    }
+
+    /* assemble bit strings* */
+    let bitStrOne = srcOneByteType + (srcOneByteAddress + byteCount) + "." + (srcOneBitAddress + bitCount);
+    let bitStrTwo = srcTwoByteType + (srcTwoByteAddress + byteCount) + "." + (srcTwoBitAddress + bitCount);
+
+    console.log(bitStrOne + " " + bitStrTwo);
+
+    defOne = query.src.getBitDef(bitStrOne);
+    defTwo = query.src.getBitDef(bitStrTwo);
+
+    /* if no definition has been found, make a dummy */
+    if (defOne == undefined) {defOne = query.src.makeDummyDefinition(bitStrOne)};
+    if (defTwo == undefined) {defTwo = query.src.makeDummyDefinition(bitStrTwo)};
+
+    addDOMtableColumn(document.getElementById(insOpTableLoc),
+                      defOne.byteType + defOne.byteAddress + "." + defOne.bitAddress,
+                      defOne.symbol,
+                      "->",
+                      defTwo.byteType + defTwo.byteAddress + "." + defTwo.bitAddress,
+                      defTwo.symbol);
+  }
 }
 
-function addDOMtableColumn(parentElement, a, b, c, d, e, isHead = false) {
-  let row = addDOMelement("tr", tableElementId);
+/*******************************************************************************
+** Action: Adds DOM table cloumn element to specified parent element
+** Return: DOM element
+*******************************************************************************/
+function addDOMtableColumn(parentElement, a, b, c, d, e, isHead = false, optClass = null) {
+  let row = addDOMelement("tr", tableElementId, optClass);
   let temp;
   let colType = "td";
   let col = [a, b, c, d, e];
   if (isHead) {colType = "th";}
   /* create new column */
   for (let item of col) {
-    temp = addDOMelement(colType, tableElementId);
+    temp = addDOMelement(colType, tableElementId, optClass);
     temp.innerHTML = item;
     row.appendChild(temp);
   }
@@ -203,8 +256,11 @@ function addDOMelement(type, id, addClass = null) {
   if (addClass != null) {
     let currClass = el.getAttribute("class");
     /* append class if [el] already ha a class, overwrite it it didn't have one */
-    if (currClass != null) {el.setAttribute("class", currClass + " " + addClass);}
-    else {el.setAttribute("class", addClass);}
+    if (currClass != null) {
+      el.setAttribute("class", currClass + " " + addClass);
+    } else {
+      el.setAttribute("class", addClass);
+    }
   }
   return el;
 }
@@ -239,7 +295,7 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
 
     /* if the warning log isn't empty, then add it to the overlay string */
     if (warningLog != null) {
-      aElement.warnLog.innerHTML = "<br><br>";
+      aElement.warnLog.innerHTML = "<br>";
       if (isIterable(warningLog)) {
         for (let str of warningLog) {
           aElement.warnLog.innerHTML += str + "<br>";
@@ -365,20 +421,4 @@ function beautify(op) {
   }
   r = r + " in";
   return r;
-}
-
-
-function getRoot(source, byte) {
-  let r = [];
-  let root;
-  for (let MBD of source.MBDMemory) {
-    if (byte == MBD.byteType + MBD.byteAddress) {r.push(MBD.symbol)}
-  }
-  for (let SBD of source.SBDMemory) {
-    if (byte + ".0" == SBD.byteType + SBD.byteAddress + "." + SBD.bitAddress) {r.push(SBD.symbol)}
-  }
-  if (r != null) {
-    for (let s of r) {root += s + " | "}
-  } else {root = "No Rootbit"}
-  return root
 }

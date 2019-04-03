@@ -235,9 +235,24 @@ class Resource {
     for (let b of this.SBDMemory) {
       if (bit == b.byteType + b.byteAddress + "." + b.bitAddress || bit == b.symbol) {
         return b
-      } else {
-        return null;
       }
+    }
+    return undefined;
+  }
+
+  /*******************************************************************************
+  ** Action: Creates a new Memory Object if the given query is valid
+  **         bit must be a string! ("E312.2" or "ELADGK")
+  **         ATTENTION: gets not stored in SBDMemory Array!
+  ** Return: Dummy Memory Object of type [Memory]
+  *******************************************************************************/
+  makeDummyDefinition(bit) {
+    let match = /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*|)$/.exec(bit);
+
+    if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
+      return new Memory(match[1], match[2], match[4], 1, "DUMMY_MEMORY");
+    } else {
+      return null;
     }
   }
 
@@ -695,27 +710,4 @@ class Resource {
     return {kind: kind, length: length};
   }
 
-  /*******************************************************************************
-  ** Action: Adds a log line to the log array
-  ** Return: null
-  *******************************************************************************/
-  log(str, arr = null, logToConsole = false, logColor = null) {
-    this.sequenceLog.push(str);
-
-    if (arr != null) {
-      this.sequenceLog.push(arr);
-    }
-
-    if (logToConsole) {
-      if (logColor != null) {
-        console.log("%c" + str, "color: " + logColor);
-      } else {
-        console.log(str);
-      }
-
-      if (arr != null) {
-        console.log(arr);
-      }
-    }
-  }
 }
