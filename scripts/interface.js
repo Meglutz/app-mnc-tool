@@ -208,8 +208,6 @@ function addDOMoverlayTable(query, resultIndex) {
     let bitStrOne = srcOneByteType + (srcOneByteAddress + byteCount) + "." + (srcOneBitAddress + bitCount);
     let bitStrTwo = srcTwoByteType + (srcTwoByteAddress + byteCount) + "." + (srcTwoBitAddress + bitCount);
 
-    console.log(bitStrOne + " " + bitStrTwo);
-
     defOne = query.src.getBitDef(bitStrOne);
     defTwo = query.src.getBitDef(bitStrTwo);
 
@@ -232,14 +230,17 @@ function addDOMoverlayTable(query, resultIndex) {
 *******************************************************************************/
 function addDOMtableColumn(parentElement, a, b, c, d, e, isHead = false, optClass = null) {
   let row = addDOMelement("tr", tableElementId, optClass);
-  let temp;
+  let temp; let text;
   let colType = "td";
+  let texType = "p";
   let col = [a, b, c, d, e];
-  if (isHead) {colType = "th";}
+  if (isHead) {colType = "th"; texType = "h1";}
   /* create new column */
   for (let item of col) {
     temp = addDOMelement(colType, tableElementId, optClass);
-    temp.innerHTML = item;
+    text = addDOMelement(texType, tableElementId);
+    text.innerHTML = item;
+    temp.appendChild(text);
     row.appendChild(temp);
   }
   parentElement.appendChild(row);

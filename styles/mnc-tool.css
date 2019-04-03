@@ -16,7 +16,7 @@
   --tone-4-color:         #b34b4b;
   --tone-4-accent:        #b34b4b; /* unused*/
 
-  --overlay-background:   rgba(0,0,0, 0.6);
+  --overlay-background:   rgba(40, 40, 40, 0.6);
   --box-shadow:           rgba(33, 33, 33, 0.52);
 }
 
@@ -105,22 +105,41 @@ header {
 }
 
 .insop-table table, th, td {
-  border: 1px solid var(--main-color);
+  border: 1px solid var(--tone-1-accent);
 }
 
-.insop-table th {
+.insop-table th, td {
+  padding: 10px;
+  text-align: left;
+  background: var(--tone-2-color);
 }
 
-.insop-table th {
-  font-family: "Oswald", sans-serif;
-  color:  var(--tone-1-color);
-  font-size: 2rem;
+
+.insop-table h1, p {
+  margin: 0px;
+  color: var(--tone-1-color);
 }
-.insop-table td {
-  font-family: "consolas", sans-serif;
-  color:  var(--tone-1-color);
-  font-size: 1rem;
+
+.insop-table p {
+  font-family: "consolas";
+  padding: 7px;
+  background-color: var(--main-color); /*#41a64b; */
+  border-radius: 3px;
 }
+
+.insop-table td:nth-child(1) p {
+  background-color: #4e9455;
+  color: #1f3c22;
+}
+
+.insop-table td:nth-last-child(2) p {
+  background-color: #9a6153;
+  color: #402822;
+}
+/* every 2nd cell text */
+/* .insop-table td p:nth-child(2n+2) {
+  background-color: #a65441;
+} */
 
 /* Style Status Bar */
 /******************************************************************************/

@@ -250,7 +250,7 @@ class Resource {
     let match = /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*|)$/.exec(bit);
 
     if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
-      return new Memory(match[1], match[2], match[4], 1, "DUMMY_MEMORY");
+      return new Memory(match[1], match[2], match[4], 1, "Undefined (dMem)");
     } else {
       return null;
     }
