@@ -47,15 +47,18 @@ class Query {
         query = this.memory;
         this.queryLogHead("Defined-Bit Read Operations for (" + query + ")");
 
-        /* get definitions */
-        this.log.push("Looking for definitions...");
-        bit = this.getBit(query, this.src);
+        /* get definition */
+        this.log.push("Looking for definition...");
+
+        bit = this.src.getBitDef(query);
 
         /* check if bit has been found */
         if (bit != undefined) {
+          this.log.push("Found definition:");
+          this.log.push(bit);
           this.memoryDefinition = bit;
         } else { /* bit has no definition, create Dummy */
-          this.log.push("Creating Dummy Memory...");
+          this.log.push("Bit is undefined. Creating Dummy Memory...");
           this.memoryDefinition, bit = makeDummyDefinition(query)
           if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
         }
@@ -88,13 +91,15 @@ class Query {
 
         /* get definition */
         this.log.push("Looking for definitions...");
-        bit = this.getBit(query, this.src);
+        bit = this.src.getBitDef(query);
 
         /* check if bit has been found */
         if (bit != undefined) {
+          this.log.push("Found definition:");
+          this.log.push(bit);
           this.memoryDefinition = bit;
         } else { /* bit has no definition, create Dummy */
-          this.log.push("Creating Dummy Memory...");
+          this.log.push("Bit is undefined. Creating Dummy Memory...");
           this.memoryDefinition, bit = makeDummyDefinition(query)
           if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
         }
@@ -185,25 +190,6 @@ class Query {
       this.log.push(result);
     }
   }
-
-/*******************************************************************************
-** Action: Looks for correct bit definitions in the [source.Memory] array
-** Return: b [SBDMemeory], if it matches to [bit]
-*******************************************************************************/
-  getBit(bit, src) {
-    /* find bit */
-    this.log.push("Bit Definition:");
-    for (let b of src.SBDMemory) {
-      if (bit == b.byteType + b.byteAddress + "." + b.bitAddress || bit == b.symbol) {
-        this.log.push(b);
-        return b
-      }
-    }
-    /* not defined */
-    this.log.push("-- Bit is undefined");
-    return undefined
-  }
-
 
   /*******************************************************************************
   ** Action: Checks a value, or array of values [values] if it contains

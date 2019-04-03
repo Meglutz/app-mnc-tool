@@ -35,7 +35,7 @@ document.getElementById(stateClose).onclick = function() {
 document.getElementById(stateText).onclick = function() {
   /* Clear all Elements containing [tableElementId] */
   removeDOMelements(tableElementId);
-  addDOMoverlayTable();
+  addDOMoverlayTable(Data, Data.instructionOperations[2]);
   document.getElementById(insOpOverlay).style.display = "block";
 }
 document.getElementById(insOpClose).onclick = function() {
@@ -153,28 +153,28 @@ function addDOMoverlayTable(source, insOp) {
   addDOMtableColumn(document.getElementById(insOpTableLoc), "Address", "Symbol", "Action", "Address", "Symbol", true);
 
   let bitAmount = insOp.formatLength * 8;
-  switch (true) {
-    /* check if the instruction is a read-only instruction */
-    case isIterable(insOp.reads):
-      break;
-    /* check if the instruction is a write-only instruction (does that even exist?) */
-    case isIterable(insOp.writes):
-      break;
-    /* check if the instruction is a read/write instruction (applies in most cases */)
-    case insOp.reads != null && insOp.writes != null:
-      for (let i = 0; i < bitAmount) {
-        // getDef insOp.reads
-        addDOMtableColumn(document.getElementById(insOpTableLoc),
-                          defOne.byteType + defOne.byteAddress + "." + defOne.bitAddress,
-                          defOne.symbol,
-                          insOps.action, /* // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-                          defTwo.byteType + defTwo.byteAddress + "." + defTwo.bitAddress,
-                          defTwo.symbol);
-      }
-      break;
-    default:
-
-  }
+  // switch (true) {
+  //   /* check if the instruction is a read-only instruction */
+  //   case isIterable(insOp.reads):
+  //     break;
+  //   /* check if the instruction is a write-only instruction (does that even exist?) */
+  //   case isIterable(insOp.writes):
+  //     break;
+  //   /* check if the instruction is a read/write instruction (applies in most cases */)
+  //   case insOp.reads != null && insOp.writes != null:
+  //     for (let i = 0; i < bitAmount) {
+  //       // getDef insOp.reads
+  //       addDOMtableColumn(document.getElementById(insOpTableLoc),
+  //                         defOne.byteType + defOne.byteAddress + "." + defOne.bitAddress,
+  //                         defOne.symbol,
+  //                         insOps.action, /* // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+  //                         defTwo.byteType + defTwo.byteAddress + "." + defTwo.bitAddress,
+  //                         defTwo.symbol);
+  //     }
+  //     break;
+  //   default:
+  //
+  // }
 }
 
 function addDOMtableColumn(parentElement, a, b, c, d, e, isHead = false) {

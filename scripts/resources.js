@@ -228,6 +228,20 @@ class Resource {
   }
 
   /*******************************************************************************
+  ** Action: Checks for defined bits. bit must be a string! ("E312.2" or "ELADGK")
+  ** Return: SBDMemory Object
+  *******************************************************************************/
+  getBitDef(bit) {
+    for (let b of this.SBDMemory) {
+      if (bit == b.byteType + b.byteAddress + "." + b.bitAddress || bit == b.symbol) {
+        return b
+      } else {
+        return null;
+      }
+    }
+  }
+
+  /*******************************************************************************
   ** Action: Checks if string[index] contains a instruction.
   **         This method also holds all Instrucion logic. That's  why you have
   **         to pass this method a whole lines array instead of just one line: It needs
