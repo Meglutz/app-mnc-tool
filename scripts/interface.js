@@ -193,7 +193,7 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
   if (source != null) {
     aElement.info.innerHTML =  "<b>MNC Lines:</b> " +  source.sourceLines.length + " | " +
                                "<b>Bit Defs:</b> " +   source.SBDMemory.length +   " | " +
-                               "<b>Byte Defs:</b> " +  source.MBDMemory.length +   " | " +
+                               "<b>Multi Defs:</b> " +  source.MBDMemory.length +   " | " +
                                "<b>Total Ops:</b> " + (source.bitReadOperations.length +
                                                 source.bitWriteOperations.length +
                                                 source.instructionOperations.length)
@@ -264,7 +264,7 @@ function parseToOutput(result, action, query, type) {
           });
         } break;
       case "inLine":
-        if (value != null && LineString == "") {LineString = value;} break;
+        if (value != null && LineString == "") {LineString = value + 1;} break;
     }
   });
 
