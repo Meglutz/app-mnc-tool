@@ -58,7 +58,10 @@ class Query {
         } else { /* bit has no definition, create Dummy */
           this.log.push("Bit is undefined. Creating Dummy Memory...");
           this.memoryDefinition, bit = this.src.makeDummyDefinition(query)
-          if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
+          if (this.memoryDefinition = null) {
+            this.log.push("Illegal format, couldn't finish Query");
+            return;
+          }
         }
 
         /* look for matching bitRead operations */
@@ -99,7 +102,10 @@ class Query {
         } else { /* bit has no definition, create Dummy */
           this.log.push("Bit is undefined. Creating Dummy Memory...");
           this.memoryDefinition, bit = this.src.makeDummyDefinition(query)
-          if (this.memoryDefinition = null) {this.log.push("Illegal format"); break;}
+          if (this.memoryDefinition = null) {
+            this.log.push("Illegal format, couldn't finish Query");
+            return;
+          }
         }
 
         /* look for matching bitWrite operations */

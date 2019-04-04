@@ -2,6 +2,7 @@
 
 const multiBitDefinitionRegex =      /^(T|D|E|F|G|R|X|Y)(\d*)(\s*)([A-Z0-9\-\_\#]*)$/;
 const singleBitDefinitionRegex =     /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*)([A-Z0-9\-\_\+]*)$/;
+const singleBitAddressRegex =        /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*|)$/;
 const moduleNumberDefinitionRegex =  /^[P](\d*)\s*C(\d*)$/;
 const moduleTitleDefinitionRegex =   /^;---------------\s*fc(\d*).lad\s*\(([^\)]*)\)$/i;
 
@@ -240,6 +241,7 @@ class Resource {
     return undefined;
   }
 
+ 
   /*******************************************************************************
   ** Action: Creates a new Memory Object if the given query is valid
   **         bit must be a string! ("E312.2" or "ELADGK")
@@ -247,7 +249,7 @@ class Resource {
   ** Return: Dummy Memory Object of type [Memory]
   *******************************************************************************/
   makeDummyDefinition(bit) {
-    let match = /^(T|D|E|F|G|R|X|Y)(\d*)(\.)(\d)(\s*|)$/.exec(bit);
+    let match = singleBitAddressRegex.exec(bit);
 
     if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
       return new Memory(match[1], match[2], match[4], 1, "Undefined (dMem)");

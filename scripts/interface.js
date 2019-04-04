@@ -32,12 +32,18 @@ document.getElementById(stateClose).onclick = function() {
   document.getElementById(stateOverlay).style.display = "none";
 }
 
-document.getElementById(stateText).onclick = function() {
+function showInstructionOperationTable(resultId) {
+  /* exit if the user didn't click an instruction operation */
+  if (MyQueries[MyQueries.length - 1].result[resultId] instanceof InstructionOperation == false) {
+    return;
+  }
+
   /* Clear all Elements containing [tableElementId] */
   removeDOMelements(tableElementId);
-  addDOMoverlayTable(MyQueries[MyQueries.length - 1], 0);
+  addDOMoverlayTable(MyQueries[MyQueries.length - 1], resultId);
   document.getElementById(insOpOverlay).style.display = "block";
 }
+
 document.getElementById(insOpClose).onclick = function() {
   document.getElementById(insOpOverlay).style.display = "none";
 }
@@ -96,14 +102,15 @@ document.getElementById("query-submit").onclick = function() {
 
 
   /* Add a new TimeLine "Modal" for each result */
-  for (let result of MyQueries[latestQuery].result) {
-    content = parseToOutput(result, typeVal, query, typeVal);
+  for (let i = 0; i < MyQueries[latestQuery].result.length; i++) {
+    content = parseToOutput(MyQueries[latestQuery].result[i], query, typeVal);
     if (content != undefined) {
         addDOMresult(content.lineString,
                      content.actionString,
                      content.operationString,
                      content.moduleString,
-                     content.highlight);
+                     content.highlight,
+                     ["onclick", ("showInstructionOperationTable(" + i + ")")]);
     }
   }
 
@@ -119,9 +126,11 @@ document.getElementById("query-submit").onclick = function() {
 **                           content1 = actionString
 **                           content2 = operationString
 **                           content3 = moduleString
+**                           highlight = true if insOp,
+**                           optAttr = ["attrName", attrValue]
 ** Return: null
 *******************************************************************************/
-function addDOMresult (title, content1, content2, content3, highlight = false) {
+function addDOMresult (title, content1, content2, content3, highlight = false, optAttr = null) {
   let tlBody =      document.getElementById("timeline_location");
 
   let h1Element =   addDOMelement("h1", tlElementId);
@@ -130,9 +139,16 @@ function addDOMresult (title, content1, content2, content3, highlight = false) {
 
   /* Assemble modal div */
   divElement.setAttribute ("on-line", "MNC Line " + title);
+  if (optAttr != null || isIterable(optAttr)) {divElement.setAttribute(optAttr[0], optAttr[1]);}
 
+  /* Add highlight if neededv */
   if (highlight != false) {
-    divElement.setAttribute("style", "border-left: 2px solid var(--tone-4-color)");
+    let currClass = divElement.getAttribute("class");
+    if (currClass != null) {
+      divElement.setAttribute("class", currClass + " highlight-item");
+    } else {
+      divElement.setAttribute("class", "highlight-item");
+    }
   }
 
   h1Element.innerHTML = content1;
@@ -151,6 +167,7 @@ function addDOMresult (title, content1, content2, content3, highlight = false) {
 *******************************************************************************/
 function addDOMoverlayTable(query, resultIndex) {
   let ins = query.result[resultIndex];
+
   /* generate header */
   addDOMtableColumn(document.getElementById(insOpTableLoc), "Address", "Symbol", "Action", "Address", "Symbol", true);
 
@@ -350,7 +367,7 @@ function updateDOMheader(source) {
 ** Action: Formats query results into prepared Strings for the DOM Elements
 ** Return: action-, operation-, module- lineString
 *******************************************************************************/
-function parseToOutput(result, action, query, type) {
+function parseToOutput(result, query, type) {
   /* These strings represent one column in the output table */
   let ActionString = query;
   let OperationString = "";

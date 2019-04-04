@@ -16,8 +16,8 @@
   --tone-4-color:         #b34b4b;
   --tone-4-accent:        #b34b4b; /* unused*/
 
-  --overlay-background:   rgba(40, 40, 40, 0.6);
-  --box-shadow:           rgba(33, 33, 33, 0.52);
+  --overlay-background:   rgba(40, 40, 40, 0.8);
+  --box-shadow:           rgba(33, 33, 33, 0.5);
 }
 
 
@@ -48,7 +48,7 @@ header {
   background-color: var(--main-color);
   color:            var(--tone-1-color);
   padding: 30px;
-  height: 40%;;
+  height: 40%;
   text-align: center;
 }
 
@@ -65,12 +65,20 @@ header {
   background-color: var(--overlay-background);
 }
 
+.blur {
+  filter: blur(10px);
+  -webkit-filter: blur(10px);
+  -moz-filter: blur(10px);
+  -o-filter: blur(10px);
+  -ms-filter: blur(10px);
+}
+
 .overlay-content {
+  display: inline-block;
   position: relative;
-  top: 2%;
   width: 100%;
-  text-align: left;
-  margin-top: 30px;
+  text-align: center;
+  margin-top: 1%;
   margin-left: 4%;
 }
 
@@ -120,6 +128,7 @@ header {
   color: var(--tone-1-color);
 }
 
+
 .insop-table p {
   font-family: "consolas";
   padding: 7px;
@@ -127,19 +136,18 @@ header {
   border-radius: 3px;
 }
 
+/* every 1st cell text */
 .insop-table td:nth-child(1) p {
   background-color: #4e9455;
   color: #1f3c22;
 }
 
+/* every 2nd last cell text */
 .insop-table td:nth-last-child(2) p {
   background-color: #9a6153;
   color: #402822;
 }
-/* every 2nd cell text */
-/* .insop-table td p:nth-child(2n+2) {
-  background-color: #a65441;
-} */
+
 
 /* Style Status Bar */
 /******************************************************************************/
@@ -238,13 +246,20 @@ p {
   max-width: 1024px;
   width: 90%;
   margin: 0 auto;
+  margin-bottom: 10px;
 }
+
 
 .timeline-item {
   padding: 3em 2em 2em;
   position: relative;
   color: var(--tone-1-accent-color);
   border-left: 2px solid var(--tone-1-color);
+}
+
+.highlight-item {
+  border-left: 2px solid var(--tone-4-color);
+  cursor: pointer;
 }
 
 .timeline-item p {
