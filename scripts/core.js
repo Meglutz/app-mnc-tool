@@ -27,7 +27,7 @@ let WarningLog = []; /* Contains html styled string array of all warnings
 
 let MyQueries = [];
 let Data;
-
+ 
 /*******************************************************************************
 ** Main functions
 *******************************************************************************/
