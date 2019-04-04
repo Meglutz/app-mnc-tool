@@ -34,8 +34,7 @@ let Data;
 function preload() {
   /* The loadStrings function returns an array, indexed by the line count of the loaded file */
   Data = new Resource(loadStrings(Source,
-                                  console.log("Mnemonic file loaded."),
-                                  console.log("Fatal: No mnemonic file was found (.mnc)")));
+                                  console.log("Mnemonic file loaded.")));
 }
 
 

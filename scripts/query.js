@@ -44,7 +44,7 @@ class Query {
       /* ---------------------------------------------------------------------*/
       case bitReadOps:
         query = this.memory;
-        this.queryLogHead("Defined-Bit Read Operations for (" + query + ")");
+        this.queryLogHead("Bit-Read Operations for (" + query + ")");
 
         /* get definition */
         this.log.push("Looking for definition...");
@@ -88,7 +88,7 @@ class Query {
       /* ---------------------------------------------------------------------*/
       case bitWriteOps:
         query = this.memory;
-        this.queryLogHead("Defined-Bit Write Operations for (" + query + ")");
+        this.queryLogHead("Bit-Write Operations for (" + query + ")");
 
         /* get definition */
         this.log.push("Looking for definitions...");

@@ -117,7 +117,7 @@ header {
 }
 
 .insop-table th, td {
-  padding: 10px;
+  padding: 7px;
   text-align: left;
   background: var(--tone-2-color);
 }
@@ -144,8 +144,8 @@ header {
 
 /* every 2nd last cell text */
 .insop-table td:nth-last-child(2) p {
-  background-color: #9a6153;
-  color: #402822;
+  background-color: #9e3841;
+  color: #3d1518;
 }
 
 

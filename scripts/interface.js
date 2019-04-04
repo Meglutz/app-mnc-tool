@@ -194,10 +194,12 @@ function addDOMoverlayTable(query, resultIndex) {
       srcOne = ins.reads;
       srcTwo = ins.writes;
       break;
-      // TODO: Default
+    default:
+      console.error("Error in [" + addDOMoverlayTable.name + "]: reads & .writes of the result [" + resultIndex +
+                    "] seem to be empty. Cannot continue");
+
   }
 
-  /* split adress */ // TODO: put all regexes in resource class and make resource class regex function
   let regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
   let srcOneByteType = srcOne.match(regexp)[1];
   let srcTwoByteType = srcTwo.match(regexp)[1];
