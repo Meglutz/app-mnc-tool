@@ -132,7 +132,6 @@ document.getElementById("query-submit").onclick = function() {
 *******************************************************************************/
 function addDOMresult (title, content1, content2, content3, highlight = false, optAttr = null) {
   let tlBody =      document.getElementById("timeline_location");
-
   let h1Element =   addDOMelement("h1", tlElementId);
   let pElement =    addDOMelement("p", tlElementId);
   let divElement =  addDOMelement("div", tlElementId, "timeline-item");
@@ -141,7 +140,7 @@ function addDOMresult (title, content1, content2, content3, highlight = false, o
   divElement.setAttribute ("on-line", "MNC Line " + title);
   if (optAttr != null || isIterable(optAttr)) {divElement.setAttribute(optAttr[0], optAttr[1]);}
 
-  /* Add highlight if neededv */
+  /* Add highlight if needed */
   if (highlight != false) {
     let currClass = divElement.getAttribute("class");
     if (currClass != null) {
@@ -167,71 +166,17 @@ function addDOMresult (title, content1, content2, content3, highlight = false, o
 *******************************************************************************/
 function addDOMoverlayTable(query, resultIndex) {
   let ins = query.result[resultIndex];
-
-  /* generate header */
-  addDOMtableColumn(document.getElementById(insOpTableLoc), "Address", "Symbol", "Action", "Address", "Symbol", true);
-
   let bitAmount = ins.formatLength * 8;
-  let defOne; let srcOne;
-  let defTwo; let srcTwo;
-  let action = "";
+  let bitCount = 0; let byteCount = 0;
+  let row = [];
 
-  switch (true) {
-    /* ..if the instruction is a read-only instruction */
-    case isIterable(ins.reads):
-      srcOne = ins.reads[0];
-      srcTwo = ins.reads[1];
-      action = " - ";
-      break;
-    /* ..if the instruction is a write-only instruction (does that even exist?) */
-    case isIterable(ins.writes):
-      srcOne = ins.writes[0];
-      srcTwo = ins.writes[1];
-      action = " - ";
-      break;
-    /* ..if the instruction is a read/write instruction (applies in most cases */
-    case ins.reads != null && ins.writes != null:
-      srcOne = ins.reads;
-      srcTwo = ins.writes;
-      break;
-    default:
-      console.error("Error in [" + addDOMoverlayTable.name + "]: reads & .writes of the result [" + resultIndex +
-                    "] seem to be empty. Cannot continue");
-
-  }
-
-  let regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
-  let srcOneByteType = srcOne.match(regexp)[1];
-  let srcTwoByteType = srcTwo.match(regexp)[1];
-  let srcOneByteAddress = parseInt(srcOne.match(regexp)[2], 10);
-  let srcTwoByteAddress = parseInt(srcTwo.match(regexp)[2], 10);
-  let srcOneBitAddress = 0; /* all ins only use byte addresses, so it always starts at 0 */
-  let srcTwoBitAddress = 0;
-
-  let bitCount = 0;
-  let byteCount = 0;
-
-  /* loop for the amount of bits and try to find their definitions */
+  // TODO: ADD HEADER!
   for (let i = 0; i < bitAmount; i++) {
-
-    /* assemble bit strings* */
-    let bitStrOne = srcOneByteType + (srcOneByteAddress + byteCount) + "." + (srcOneBitAddress + bitCount);
-    let bitStrTwo = srcTwoByteType + (srcTwoByteAddress + byteCount) + "." + (srcTwoBitAddress + bitCount);
-
-    defOne = query.src.getBitDef(bitStrOne);
-    defTwo = query.src.getBitDef(bitStrTwo);
-
-    /* if no definition has been found, make a dummy */
-    if (defOne == undefined) {defOne = query.src.makeDummyDefinition(bitStrOne)};
-    if (defTwo == undefined) {defTwo = query.src.makeDummyDefinition(bitStrTwo)};
-
-    addDOMtableColumn(document.getElementById(insOpTableLoc),
-                      defOne.byteType + defOne.byteAddress + "." + defOne.bitAddress,
-                      defOne.symbol,
-                      "->",
-                      defTwo.byteType + defTwo.byteAddress + "." + defTwo.bitAddress,
-                      defTwo.symbol);
-
+    row = row.concat(getRowContent(bitCount, byteCount, ins.reads, query));
+    row.push("->");
+    row = row.concat(getRowContent(bitCount, byteCount, ins.writes, query));
+    addDOMtableColumn(document.getElementById(insOpTableLoc), row, false)
+    row = [];
     /* increment bit & byte offset */
     bitCount += 1;
     if (bitCount == 8) {
@@ -242,18 +187,63 @@ function addDOMoverlayTable(query, resultIndex) {
 }
 
 /*******************************************************************************
+** Action: Generates row content for the given parameters
+** Return: Array of row cells [bit, address, bit, address, ...]
+*******************************************************************************/
+function getRowContent(bitIndex, byteOffset, byteS, query) {
+  let regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
+  let byteType;
+  let byteAddress;
+  let bitString;
+  let def;
+  let rowContent = [];
+
+  switch (true) {
+    case isIterable(byteS):
+      for (let byte of byteS) {
+        byteType = byte.match(regexp)[1];
+        byteAddress = parseInt(byte.match(regexp)[2], 10);
+        bitString = byteType + (byteAddress + byteOffset) + "." + bitIndex;
+
+        /* if no definition has been found, make a dummy */
+        def = query.src.getBitDef(bitString);
+        if (def == undefined) {def = query.src.makeDummyDefinition(bitString)};
+
+        rowContent.push(def.byteType + def.byteAddress + "." + def.bitAddress)
+        rowContent.push(def.symbol);
+
+      }
+      break;
+
+    case byteS != null:
+      byteType = byteS.match(regexp)[1];
+      byteAddress = parseInt(byteS.match(regexp)[2], 10);
+      bitString = byteType + (byteAddress + byteOffset) + "." + bitIndex;
+
+      /* if no definition has been found, make a dummy */
+      def = query.src.getBitDef(bitString);
+      if (def == undefined) {def = query.src.makeDummyDefinition(bitString)};
+      rowContent.push(def.byteType + def.byteAddress + "." + def.bitAddress)
+      rowContent.push(def.symbol);
+      break;
+    default: console.log("Error");
+  }
+  return rowContent;
+}
+
+
+/*******************************************************************************
 ** Action: Adds DOM table cloumn element to specified parent element
 ** Return: DOM element
 *******************************************************************************/
-function addDOMtableColumn(parentElement, a, b, c, d, e, isHead = false, optClass = null) {
+function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass = null) {
   let row = addDOMelement("tr", tableElementId, optClass);
   let temp; let text;
   let colType = "td";
   let texType = "p";
-  let col = [a, b, c, d, e];
   if (isHead) {colType = "th"; texType = "h1";}
   /* create new column */
-  for (let item of col) {
+  for (let item of rowContent) {
     temp = addDOMelement(colType, tableElementId, optClass);
     text = addDOMelement(texType, tableElementId);
     text.innerHTML = item;

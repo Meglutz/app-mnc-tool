@@ -27,7 +27,7 @@ let WarningLog = []; /* Contains html styled string array of all warnings
 
 let MyQueries = [];
 let Data;
- 
+
 /*******************************************************************************
 ** Main functions
 *******************************************************************************/
@@ -257,7 +257,7 @@ function finishSequence(spaces = 1, additionalString = "") {
 *******************************************************************************/
 function checkWarnings(warn) {
   let str;
-  if (warn != null) {
+  if (warn.length != 0) {
     str = "There are Warnings, please check the Log!"
     console.log("%c" + str, "color: " + red);
     return str;
