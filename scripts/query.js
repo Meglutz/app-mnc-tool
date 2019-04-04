@@ -58,9 +58,9 @@ class Query {
         } else { /* bit has no definition, create Dummy */
           this.log.push("Bit is undefined. Creating Dummy Memory...");
           this.memoryDefinition, bit = this.src.makeDummyDefinition(query)
-          if (this.memoryDefinition = null) {
+          if (bit == null) {
             this.log.push("Illegal format, couldn't finish Query");
-            return;
+            break;
           }
         }
 
@@ -102,9 +102,9 @@ class Query {
         } else { /* bit has no definition, create Dummy */
           this.log.push("Bit is undefined. Creating Dummy Memory...");
           this.memoryDefinition, bit = this.src.makeDummyDefinition(query)
-          if (this.memoryDefinition = null) {
+          if (bit == null) {
             this.log.push("Illegal format, couldn't finish Query");
-            return;
+            break;
           }
         }
 

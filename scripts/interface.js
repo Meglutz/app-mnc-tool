@@ -212,15 +212,6 @@ function addDOMoverlayTable(query, resultIndex) {
   /* loop for the amount of bits and try to find their definitions */
   for (let i = 0; i < bitAmount; i++) {
 
-    /* increment bit & byte offset */
-    if (bitCount == 8) {
-      bitCount = 0;
-      byteCount += 1;
-    }
-    else {
-      bitCount += 1;
-    }
-
     /* assemble bit strings* */
     let bitStrOne = srcOneByteType + (srcOneByteAddress + byteCount) + "." + (srcOneBitAddress + bitCount);
     let bitStrTwo = srcTwoByteType + (srcTwoByteAddress + byteCount) + "." + (srcTwoBitAddress + bitCount);
@@ -238,6 +229,13 @@ function addDOMoverlayTable(query, resultIndex) {
                       "->",
                       defTwo.byteType + defTwo.byteAddress + "." + defTwo.bitAddress,
                       defTwo.symbol);
+
+    /* increment bit & byte offset */
+    bitCount += 1;
+    if (bitCount == 8) {
+      bitCount = 0;
+      byteCount += 1;
+    }
   }
 }
 

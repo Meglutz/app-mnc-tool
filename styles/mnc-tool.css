@@ -131,7 +131,7 @@ header {
 
 .insop-table p {
   font-family: "consolas";
-  padding: 7px;
+  padding: 5px;
   background-color: var(--main-color); /*#41a64b; */
   border-radius: 3px;
 }
