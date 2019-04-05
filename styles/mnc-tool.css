@@ -136,17 +136,28 @@ header {
   border-radius: 3px;
 }
 
-/* every 1st cell text */
-.insop-table td:nth-child(1) p {
+/* cell styles */
+.insop-table .green-cell {
   background-color: #4e9455;
   color: #1f3c22;
 }
-
 /* every 2nd last cell text */
-.insop-table td:nth-last-child(2) p {
+.insop-table .red-cell  {
   background-color: #9e3841;
   color: #3d1518;
 }
+
+/* every 1st cell text */
+/* .insop-table td:nth-child(1) p {
+  background-color: #4e9455;
+  color: #1f3c22;
+} */
+
+/* every 2nd last cell text */
+/* .insop-table td:nth-last-child(2) p {
+  background-color: #9e3841;
+  color: #3d1518;
+} */
 
 
 /* Style Status Bar */

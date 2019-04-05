@@ -16,6 +16,8 @@ const stateLog        =    "overlay-info";
 
 const insOpOverlay    =    "overlay-container-2";
 const insOpTableLoc   =    "insop-table-location";
+const insOpTitleLoc    =    "insop-title-location";
+const insOpInfoLoc    =    "insop-info-location";
 const insOpClose      =    "overlay-close-button-2";
 
 const stateRed        =    "#e74848";
@@ -80,8 +82,7 @@ document.getElementById("query-submit").onclick = function() {
               case "byteType":    memDefString += "<b>Address:</b> " + memDefAttr[1]; break;
               case "byteAddress": memDefString += memDefAttr[1]; break;
               case "bitAddress":  memDefString += "." + memDefAttr[1]; break;
-              case "length":      let bitStr = " bits";
-                                  if (memDefAttr[1] == 1) {bitStr = " bit"};
+              case "length":      let bitStr = " bits"; if (memDefAttr[1] == 1) {bitStr = " bit"};
                                   memDefString += " | <b>length:</b> " + memDefAttr[1] + bitStr; break;
               case "symbol":      memDefString += "<br><b>" + "Symbol:</b> " + memDefAttr[1]; break;
           }
@@ -151,7 +152,7 @@ function addDOMresult (title, content1, content2, content3, highlight = false, o
   }
 
   h1Element.innerHTML = content1;
-  pElement.innerHTML =  content2 + "<br>";
+  pElement.innerHTML =  content2 + "<br>" + content3 + "<br>";
 
   divElement.appendChild(h1Element);
   divElement.appendChild(pElement);
@@ -170,13 +171,19 @@ function addDOMoverlayTable(query, resultIndex) {
   let bitCount = 0; let byteCount = 0;
   let row = [];
 
-  // TODO: ADD HEADER!
+  let title = document.getElementById(insOpTitleLoc);
+  let info =  document.getElementById(insOpInfoLoc);
+  title.innerHTML = ins.instruction + " | SUB" + ins.instructionNumber;
+  info.innerHTML  = "Range: " + bitAmount + " bits (" + ins.formatLength + " byte(s))";
+
   for (let i = 0; i < bitAmount; i++) {
-    row = row.concat(getRowContent(bitCount, byteCount, ins.reads, query));
+
+    row = row.concat(getRowContent(bitCount, byteCount, ins.reads, ins.instruction, query, "green-cell"));
     row.push("->");
-    row = row.concat(getRowContent(bitCount, byteCount, ins.writes, query));
+    row = row.concat(getRowContent(bitCount, byteCount, ins.writes, ins.instruction, query, "red-cell"));
     addDOMtableColumn(document.getElementById(insOpTableLoc), row, false)
     row = [];
+
     /* increment bit & byte offset */
     bitCount += 1;
     if (bitCount == 8) {
@@ -186,47 +193,47 @@ function addDOMoverlayTable(query, resultIndex) {
   }
 }
 
+
 /*******************************************************************************
 ** Action: Generates row content for the given parameters
 ** Return: Array of row cells [bit, address, bit, address, ...]
 *******************************************************************************/
-function getRowContent(bitIndex, byteOffset, byteS, query) {
+function getRowContent(bitIndex, byteOffset, bytes, actionName = "", query, styling) {
   let regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
-  let byteType;
-  let byteAddress;
-  let bitString;
-  let def;
+  let Exit = "EXIT";
   let rowContent = [];
+  let byteType, byteAddress, bitString, def;
 
-  switch (true) {
-    case isIterable(byteS):
-      for (let byte of byteS) {
-        byteType = byte.match(regexp)[1];
-        byteAddress = parseInt(byte.match(regexp)[2], 10);
-        bitString = byteType + (byteAddress + byteOffset) + "." + bitIndex;
+  /* add a dummy to make every input iterable */
+  if (isIterable(bytes) != true) {
+    let temp = bytes; bytes = [];
+    bytes.push(temp); bytes.push(Exit);
+  }
 
-        /* if no definition has been found, make a dummy */
-        def = query.src.getBitDef(bitString);
-        if (def == undefined) {def = query.src.makeDummyDefinition(bitString)};
+  for (let i = 0; i < bytes.length; i++) {
+    /* exit directly if we encounter a dummy-array item */
+    if (bytes[i] == Exit) {return rowContent}
+    if (i >= 1 ) {rowContent.push(actionName)}
 
-        rowContent.push(def.byteType + def.byteAddress + "." + def.bitAddress)
-        rowContent.push(def.symbol);
+    /* add styling as the first entry of every new row addition */
+    rowContent.push("STYLE__" + styling)
 
-      }
-      break;
+    /* assemble bit string */
+    console.log(bytes[i]);
+    console.log(bytes);
+    byteType =             bytes[i].match(regexp)[1];
+    byteAddress = parseInt(bytes[i].match(regexp)[2], 10);
+    bitString =   byteType + (byteAddress + byteOffset) + "." + bitIndex;
 
-    case byteS != null:
-      byteType = byteS.match(regexp)[1];
-      byteAddress = parseInt(byteS.match(regexp)[2], 10);
-      bitString = byteType + (byteAddress + byteOffset) + "." + bitIndex;
-
-      /* if no definition has been found, make a dummy */
-      def = query.src.getBitDef(bitString);
-      if (def == undefined) {def = query.src.makeDummyDefinition(bitString)};
+    /* if no definition has been found, make a dummy */
+    def = query.src.getBitDef(bitString);
+    if (def == undefined) {
+      rowContent.push(bitString);
+      rowContent.push("No Symbol");
+    } else {
       rowContent.push(def.byteType + def.byteAddress + "." + def.bitAddress)
       rowContent.push(def.symbol);
-      break;
-    default: console.log("Error");
+    }
   }
   return rowContent;
 }
@@ -241,14 +248,23 @@ function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass =
   let temp; let text;
   let colType = "td";
   let texType = "p";
+  let style = "";
   if (isHead) {colType = "th"; texType = "h1";}
+
   /* create new column */
   for (let item of rowContent) {
-    temp = addDOMelement(colType, tableElementId, optClass);
-    text = addDOMelement(texType, tableElementId);
-    text.innerHTML = item;
-    temp.appendChild(text);
-    row.appendChild(temp);
+    /* check if the item is a style definer */
+    if (item.match(/^(STYLE__)(.*)$/) != null) {
+      style = item.match(/^(STYLE__)(.*)$/)[2];
+    } else {
+      temp = addDOMelement(colType, tableElementId, optClass);
+      text = addDOMelement(texType, tableElementId);
+      /* add style to text element, if the item before was a style definer */
+      if (style != "") {text = appendDOMtag(text, "class", style); style = "";}
+      text.innerHTML = item;
+      temp.appendChild(text);
+      row.appendChild(temp);
+    }
   }
   parentElement.appendChild(row);
 }
@@ -262,13 +278,22 @@ function addDOMelement(type, id, addClass = null) {
   let el = document.createElement(type);
   el.setAttribute("id", id);
   if (addClass != null) {
-    let currClass = el.getAttribute("class");
-    /* append class if [el] already ha a class, overwrite it it didn't have one */
-    if (currClass != null) {
-      el.setAttribute("class", currClass + " " + addClass);
-    } else {
-      el.setAttribute("class", addClass);
-    }
+    el = appendDOMtag(el, "class", addClass);
+  }
+  return el;
+}
+
+
+/*******************************************************************************
+** Action: Appends DOM tag to DOM element
+** Return: DOM element
+*******************************************************************************/
+function appendDOMtag(el, type, addVal) {
+  let curr = el.getAttribute(type);
+  if (curr != null) {
+    el.setAttribute(type, curr + " " + addVal);
+  } else {
+    el.setAttribute(type, addVal);
   }
   return el;
 }
