@@ -65,7 +65,7 @@ function draw() {
   end = new Date().getTime();  MNCData.Time = (end - start);
 
   /* plot mnemonic info to DOM header & update overlay */
-  updateDOMheader(Data);
+  updateDOMheader();
   updateDOMinfo(Warnings, WarningLog, Data);
 
   /* Query to see all defined bits which are handled in Instructions */
@@ -266,7 +266,6 @@ function checkWarnings(warn) {
     console.log("%cNo Warnings overall", "color: " + green);
     return null;
   }
-  console.log(" ");
 }
 
 

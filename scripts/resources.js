@@ -150,7 +150,6 @@ class Resource {
         if (match[1].includes(this.Modules[i].sourceFile)) { /* If the module was found in the defined modules... */
           this.Modules[i].title = match[2]; /* ..add the found title to it */
           return true;
-          break;
         }
       }
     } else {return null;}
@@ -241,7 +240,7 @@ class Resource {
     return undefined;
   }
 
- 
+
   /*******************************************************************************
   ** Action: Creates a new Memory Object if the given query is valid
   **         bit must be a string! ("E312.2" or "ELADGK")
@@ -293,17 +292,17 @@ class Resource {
           case 65: /* ☑️ */
             name = "SUBCALL";
             format.length = 1;
-            reads = this.instructionReads(lines, index, 1, format.length);
+            reads = this.instructionReads(lines, index, 1);
             break;
           case 66: /* ☑️ */
             name = "SUBCALLU";
             format.length = 1;
-            reads = this.instructionReads(lines, index, 1, format.length);
+            reads = this.instructionReads(lines, index, 1);
             break;
           case 71: /* ☑️ */
             name = "SUBPRG";
             format.length = 1;
-            reads = this.instructionReads(lines, index, 1, format.length);
+            reads = this.instructionReads(lines, index, 1);
             break;
           case 72: /* ☑️ */
             name = "SUBE";
@@ -312,47 +311,47 @@ class Resource {
           case 3: /* ☑️ */
             name = "TMR";
             format.length = 1;
-            reads = "TMR_" + this.instructionReads(lines, index, 1, format.length);
+            reads = "TMR_" + this.instructionReads(lines, index, 1);
             break;
           case 24: /* ☑️ */
             name = "TMRB";
             format.length = 1;
-            reads = "TMR_" + this.instructionReads(lines, index, 1, format.length);
+            reads = "TMR_" + this.instructionReads(lines, index, 1);
             break;
           case 54: /* ☑️ */
             name = "TMRC";
             format.length = 1;
-            reads = "TMR_" + this.instructionReads(lines, index, 1, format.length);
+            reads = "TMR_" + this.instructionReads(lines, index, 1);
             break;
           case 77: /* ☑️ */
             name = "TMBRF";
             format.length = 1;
-            reads = "TMR_" + this.instructionReads(lines, index, 1, format.length);
+            reads = "TMR_" + this.instructionReads(lines, index, 1);
             break;
           case 25: /* ☑️ */
             name = "DECB";
             format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2, format.length), this.instructionReads(lines, index, 3, format.length)];
-            writes = this.instructionWrites(lines, index, 4, format.length);
+            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
+            writes = this.instructionWrites(lines, index, 4);
             break;
           case 5: /* ☑️ */
             name = "CTR";
             format.length = 1;
-            reads = "CTR_" + this.instructionReads(lines, index, 1, format.length);
-            writes = "CTR_" + this.instructionWrites(lines, index, 1, format.length);
+            reads = "CTR_" + this.instructionReads(lines, index, 1);
+            writes = "CTR_" + this.instructionWrites(lines, index, 1);
             break;
           case 55: /* ☑️ */
             name = "CTRC";
             format.length = 2;
-            reads = this.instructionReads(lines, index, 1, format.length);
+            reads = this.instructionReads(lines, index, 1);
             format.length = 4;
-            writes = this.instructionWrites(lines, index, 1, format.length);
+            writes = this.instructionWrites(lines, index, 1);
             break;
           case 56: /* ☑️ */
             name = "CTRB";
             format.length = 1;
-            reads = "CTR_" + this.instructionReads(lines, index, 1, format.length);
-            writes = "CTR_" + this.instructionWrites(lines, index, 1, format.length);
+            reads = "CTR_" + this.instructionReads(lines, index, 1);
+            writes = "CTR_" + this.instructionWrites(lines, index, 1);
             break;
           case 6:
             name = "ROT";
@@ -369,8 +368,8 @@ class Resource {
           case 27: /* ☑️ */
             name = "CODB";
             format = this.instructionFormat(lines, index, 1);
-            reads = this.instructionReads(lines, index, 3, format.length);
-            writes = this.instructionWrites(lines, index, 4, format.length);
+            reads = this.instructionReads(lines, index, 3);
+            writes = this.instructionWrites(lines, index, 4);
             break;
           case 8:
             name = "MOVE";
@@ -379,8 +378,8 @@ class Resource {
           case 28: /* ❔ */
             name = "MOVOR";
             format.length = 1;
-            reads = [this.instructionReads(lines, index, 1, format.length), this.instructionReads(lines, index, 2, format.length)];
-            writes = this.instructionWrites(lines, index, 3, format.length);
+            reads = [this.instructionReads(lines, index, 1), this.instructionReads(lines, index, 2)];
+            writes = this.instructionWrites(lines, index, 3);
 
             break;
           case 9:
@@ -418,8 +417,8 @@ class Resource {
           case 31: /* ☑️ */
             name = "DCNVB";
             format = this.instructionFormat(lines, index, 1);
-            reads = this.instructionReads(lines, index, 2, format.length);
-            writes = this.instructionWrites(lines, index, 3, format.length);
+            reads = this.instructionReads(lines, index, 2);
+            writes = this.instructionWrites(lines, index, 3);
             break;
           case 15:
             name = "COMP";
@@ -428,7 +427,7 @@ class Resource {
           case 32: /* ☑️ */
             name = "COMPB";
             format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2, format.length), this.instructionReads(lines, index, 3, format.length)];
+            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = null;
             break;
           case 16:
@@ -462,8 +461,8 @@ class Resource {
           case 36: /* ☑️ */
             name = "ADDB";
             format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2, format.length), this.instructionReads(lines, index, 3, format.length)];
-            writes = this. instructionWrites(lines, index, 4, format.length);
+            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
+            writes = this. instructionWrites(lines, index, 4);
             break;
           case 20:
             name = "SUB";
@@ -472,8 +471,8 @@ class Resource {
           case 37: /* ☑️ */
             name = "SUBB";
             format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2, format.length), this.instructionReads(lines, index, 3, format.length)];
-            writes = this. instructionWrites(lines, index, 4, format.length);
+            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
+            writes = this. instructionWrites(lines, index, 4);
             break;
           case 21:
             name = "MUL";
@@ -482,8 +481,8 @@ class Resource {
           case 38: /* ☑️ */
             name = "MULB";
             format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2, format.length), this.instructionReads(lines, index, 3, format.length)];
-            writes = this. instructionWrites(lines, index, 4, format.length);
+            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
+            writes = this. instructionWrites(lines, index, 4);
             break;
           case 22:
             name = "DIV";
@@ -492,8 +491,8 @@ class Resource {
           case 39: /* ☑️ */
             name = "DIVB";
             format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2, format.length), this.instructionReads(lines, index, 3, format.length)];
-            writes = this. instructionWrites(lines, index, 4, format.length);
+            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
+            writes = this. instructionWrites(lines, index, 4);
             break;
           case 23: /* ❎ */
             name = "NUME";
@@ -503,7 +502,7 @@ class Resource {
             name = "NUMEB";
             format = this.instructionFormat(lines, index, 1);
             reads = null;
-            writes = this.instructionWrites(lines, index, 3, format.length);
+            writes = this.instructionWrites(lines, index, 3);
             break;
           case 49:
             name = "DISP";
@@ -516,46 +515,46 @@ class Resource {
           case 42: /* ❔ */
           name = "EXIN";
             format.length = 5;
-            reads = this.instructionReads(lines, index, 1, format.length);
-            writes = this.instructionWrites(lines, index, 1, format.length);
+            reads = this.instructionReads(lines, index, 1);
+            writes = this.instructionWrites(lines, index, 1);
             break;
           case 43: /* ☑️ */
             name = "MOVB";
             format.length = 1;
-            reads = this.instructionReads(lines, index, 1, format.length);
-            writes = this.instructionWrites(lines, index, 2, format.length);
+            reads = this.instructionReads(lines, index, 1);
+            writes = this.instructionWrites(lines, index, 2);
             break;
           case 44: /* ☑️ */
             name = "MOVW";
             format.length = 2;
-            reads = this.instructionReads(lines, index, 1, format.length);
-            writes = this.instructionWrites(lines, index, 2, format.length);
+            reads = this.instructionReads(lines, index, 1);
+            writes = this.instructionWrites(lines, index, 2);
             break;
           case 45: /* ☑️ */
             name = "MOVN";
             format = this.instructionFormat(lines, index, 1);
-            reads = this.instructionReads(lines, index, 2, format.length);
-            writes = this. instructionWrites(lines, index, 3, format.length);
+            reads = this.instructionReads(lines, index, 2);
+            writes = this. instructionWrites(lines, index, 3);
             break;
           case 51: /* ☑️ */
             name = "WINDR";
             format.length = 1;
-            writes = this.instructionWrites(lines, index, 1, format.length);
+            writes = this.instructionWrites(lines, index, 1);
             break;
           case 52:
             name = "WINDW";
             format.length = 1;
-            writes = this.instructionWrites(lines, index, 1, format.length);
+            writes = this.instructionWrites(lines, index, 1);
             break;
           case 57: /* ☑️ */
             name = "DIFU";
             format.length = 1;
-            reads = "DIFU_" + this.instructionReads(lines, index, 1, format.length);
+            reads = "DIFU_" + this.instructionReads(lines, index, 1);
             break;
           case 58: /* ☑️ */
             name = "DIFD";
             format.length = 1;
-            reads = "DIFD_" + this.instructionReads(lines, index, 1, format.length);
+            reads = "DIFD_" + this.instructionReads(lines, index, 1);
             break;
           case 53: /* ☑️ */
             name = "AXCTL";
@@ -564,26 +563,26 @@ class Resource {
           case 59: /* ☑️ */
             name = "EXOR";
             format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2, format.length), this.instructionReads(lines, index, 3, format.length)];
-            writes = this. instructionWrites(lines, index, 4, format.length);
+            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
+            writes = this. instructionWrites(lines, index, 4);
             break;
           case 60: /* ☑️ */
             name = "LOGAND";
             format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2, format.length), this.instructionReads(lines, index, 3, format.length)];
-            writes = this. instructionWrites(lines, index, 4, format.length);
+            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
+            writes = this. instructionWrites(lines, index, 4);
             break;
           case 61: /* ☑️ */
             name = "LOGOR";
             format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2, format.length), this.instructionReads(lines, index, 3, format.length)];
-            writes = this. instructionWrites(lines, index, 4, format.length);
+            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
+            writes = this. instructionWrites(lines, index, 4);
             break;
           case 62: /* ☑️ */
             name = "LOGNOT";
             format = this.instructionFormat(lines, index, 1);
-            reads = this.instructionReads(lines, index, 2, format.length);
-            writes = this. instructionWrites(lines, index, 3, format.length);
+            reads = this.instructionReads(lines, index, 2);
+            writes = this. instructionWrites(lines, index, 3);
             break;
           case 90:
             name = "FNC90";
@@ -657,10 +656,9 @@ class Resource {
   ** Action: Checks which Memory gets read by an instruction
   ** Return: String, containing Starting memory [startByte]
   *******************************************************************************/
-  instructionReads(lines, index, offset, length = 1) {
+  instructionReads(lines, index, offset) {
     let startByte = lines[index + offset];
     let match = instructionReadWriteRegex.exec(startByte);
-    let endByte
     /* If match is null then it's a constant, not a memory definition */
     if (match != null) {
       return startByte;
@@ -673,10 +671,9 @@ class Resource {
   ** Action: Checks which Memory gets written by an instruction
   ** Return: String, containing Starting memory [startByte]
   *******************************************************************************/
-  instructionWrites(lines, index, offset, length = 1) {
+  instructionWrites(lines, index, offset) {
     let startByte = lines[index + offset];
     let match = instructionReadWriteRegex.exec(startByte);
-    let endByte
     /* If match is null then it's a constant, not a memory definition */
     if (match != null) {
       return startByte;

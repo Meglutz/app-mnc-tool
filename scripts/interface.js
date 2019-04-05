@@ -363,7 +363,7 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
 ** Action: Updates header string
 ** Return: null
 *******************************************************************************/
-function updateDOMheader(source) {
+function updateDOMheader() {
   let pElement = document.getElementById(stateText);
 
   /* mnemonic info string */
