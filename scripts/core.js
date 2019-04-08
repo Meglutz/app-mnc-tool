@@ -59,6 +59,7 @@ function draw() {
   analyzeResults      (Data);
 
   /* handle warnings */
+  WarningLog = "";
   Warnings = checkWarnings(WarningLog);
   if (Warnings != null) {
     /* open state overlay in case of warnings */
