@@ -359,17 +359,17 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
 ** Action: Updates header string
 ** Return: null
 *******************************************************************************/
-function updateDOMheader() {
+function updateDOMheader(mncInfo) {
   let pElement = document.getElementById(stateText);
 
   /* mnemonic info string */
-  if (MNCData != null) {
-    if (MNCData.Time == undefined) {MNCData.Time = 0}
-    pElement.innerHTML  =       MNCData.Type + " | " +
-                                MNCData.Release + " | " + "Compile Date: " +
-                                MNCData.CompileDate + " | " +
-                                MNCData.Note + " | " + "Analyze time: " +
-                                MNCData.Time.toFixed(2) + " ms";
+  if (mncInfo != null) {
+    if (mncInfo.Time == undefined) {mncInfo.Time = 0}
+    pElement.innerHTML  =       mncInfo.Type + " | " +
+                                mncInfo.Release + " | " + "Compile Date: " +
+                                mncInfo.CompileDate + " | " +
+                                mncInfo.Note + " | " + "Analyze time: " +
+                                mncInfo.Time.toFixed(2) + " ms";
   } else {
     pElement.innerHTML = "No Source Data"
   }

@@ -9,12 +9,15 @@ const moduleTitleDefinitionRegex =   /^;---------------\s*fc(\d+).lad\s*\(([^\)]
 const currentModuleNumberRegex =     /^([P])(\d+)/;
 const currentModuleSourceRegex =     /^;---------------\s*fc(\d+).lad\s*\(([^\)]*)/i;
 const currentNetworkRegex =          /^N(\d\d\d\d\d)\:$/g;
-const readBitOperationsRegex =       /^(RD|OR|AND)(\.NOT\.STK|\.NOT|\.STK|)\s*(.*)$/;
-const writeBitOperationsRegex =      /^(WRT|SET|RST)(\.NOT|)\s*(.*)$/;
+const readBitOperationsRegex =       /^(RD|OR|AND)(\.NOT\.STK|\.NOT|\.STK|)\s+(.+)$/;
+const writeBitOperationsRegex =      /^(WRT|SET|RST)(\.NOT|)\s+(.+)$/;
 const instructionOperationRegex =    /^(SUB)\s*(\d*)$/;
 const levelSubRegex =                /^(SUB)\s*(\d*)$/;
 const instructionReadWriteRegex =    /^([A-Z])(\d*)$/;
 const instructionFormatRegex =       /^(\d|)(\d\d|)(\d|)$/;
+
+const headerMNCstartRegex =          /^\%\@1$/;
+const headerMNCstopRegex =           /^\%$/;
 
 
 /*******************************************************************************
@@ -112,6 +115,7 @@ class Resource {
   getMultiBitDefinitions(str) {
     let match = multiBitDefinitionRegex.exec(str);
     if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
+      match[2] = this.removeByteLeadingZeros(match[2]);
       return new Memory(match[1], match[2], "", ">=8", match[4])
     } else {return null;}
   }
@@ -123,6 +127,7 @@ class Resource {
   getSingleBitDefinitions(str) {
     let match = singleBitDefinitionRegex.exec(str);
     if (match != null && match[1,2,4,6] != null && match[1,2,4,6] != "") {
+      match[2] = this.removeByteLeadingZeros(match[2]);
       return new Memory(match[1], match[2], match[4], 1, match[6])
     } else {return null;}
   }
@@ -134,6 +139,8 @@ class Resource {
   getModuleNumberDefinition(str) {
     let match = moduleNumberDefinitionRegex.exec(str);
     if (match != null && match[1,2] != null && match[1,2] != "") {
+      /* no need to remove leading zeros if the p number is defined as
+      P0045 since the parseInt method will strip them */
       return new Module(parseInt(match[1], 10), parseInt(match[2], 10));
     } else {return null;}
   }
@@ -255,6 +262,72 @@ class Resource {
     } else {
       return null;
     }
+  }
+
+  /*******************************************************************************
+  ** Action: Gets the Info from the mnemonic file
+  ** Return: Object: [CompileDate, Note, Type, Release]
+  *******************************************************************************/
+  getMNCinfo() {
+    let inHeader = false;
+    let pos = 0;
+    let pos2 = 0;
+
+    /* return variables */
+    let compileDate;
+    let note;
+    let type;
+    let release;
+
+    for (let line of this.sourceLines) {
+      /* check if we are entering in the header portion */
+      if (headerMNCstartRegex.exec(line) != null) {inHeader = true;}
+      if (inHeader) {
+        /* if we hit the end of the header, return the info */
+        if (headerMNCstopRegex.exec(line) != null) {return {CompileDate: compileDate,
+                                                            Note:        note,
+                                                            Type:        type,
+                                                            Release:     release};}
+        if (line.charAt(0) == "0") {
+          pos =  parseInt(line.substring(1, 2), 10);
+          pos2 = parseInt(line.substring(2, 3), 10);
+        } else {
+          pos =  parseInt(line.substring(0, 1), 10);
+          pos2 = parseInt(line.substring(1, 2), 10);
+        }
+        switch (pos) {
+          case 7:
+            compileDate =  formatDate(line.substring(2));
+            break;
+          case 1:
+            if (pos2 == 0) {note = line.substring(3);};
+            break;
+          case 2:
+            type =         line.substring(2);
+            break;
+          case 4:
+            if (release == null) {release = line.substring(2);}
+            else {release = line.substring(2) + " " + release;};
+            break;
+          case 5:
+            if (release == null) {release = line.substring(2);}
+            else {release = release + "." + line.substring(2);};
+        }
+        console.log("Get MNC info missed exit!");
+      }
+    }
+  }
+
+  /*******************************************************************************
+  ** Action: Formats byteString e.g. "0010" or "0000" to "10" and "0" respectively
+  ** Return: formated byteString
+  *******************************************************************************/
+  removeByteLeadingZeros(byteStr) {
+    while (byteStr.substring(0, 1) == "0") {
+      if (byteStr.length == 1) {return byteStr;}
+      byteStr = byteStr.substring(1)
+    }
+    return byteStr;
   }
 
   /*******************************************************************************
@@ -709,4 +782,19 @@ class Resource {
     return {kind: kind, length: length};
   }
 
+}
+
+/*******************************************************************************
+** Action: Formats strings from YY/MM/DD HH:MM to DD.MMMM YYYY HH:MM
+** Return: Reformatted string
+*******************************************************************************/
+function formatDate(str) {
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+                      "July", "August", "September", "October", "November", "December"];
+  let regexp = /^(\d\d)\/(\d\d)\/(\d\d)\s*(\d\d)\:(\d\d)/;
+  let Year  = str.match(regexp)[1];
+  let Month = monthNames[parseInt(str.match(regexp)[2], 10) - 1]
+  let Day =   str.match(regexp)[3];
+  let Time =  str.match(regexp)[4] + ":" + str.match(regexp)[5];
+  return Day + ". " + Month + " " + "20" + Year + ", " + Time; /* LOL */
 }

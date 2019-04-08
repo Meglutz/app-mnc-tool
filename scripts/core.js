@@ -5,7 +5,6 @@
 /* colors for console highlighting */
 const red   = "#b72828"
 const green = "#3bb728"
-const yellow = "#998429"
 
 let CurrentModule;
 let CurrentNetwork;
@@ -39,11 +38,12 @@ function preload() {
 
 
 function setup() {
-  /* set global vars for mnc info */
-  MNCData.CompileDate =  formatDate(Data.sourceLines[8].substring(2));
-  MNCData.Note =         Data.sourceLines[9].substring(2);
-  MNCData.Type =         Data.sourceLines[10].substring(2);
-  MNCData.Release =      Data.sourceLines[12].substring(2) + "." + Data.sourceLines[13].substring(2);
+/* set global vars for mnc info */
+  let info = Data.getMNCinfo();
+  MNCData.CompileDate =  info.CompileDate;
+  MNCData.Note =         info.Note;
+  MNCData.Type =         info.Type;
+  MNCData.Release =      info.Release;
 }
 
 
@@ -59,7 +59,6 @@ function draw() {
   analyzeResults      (Data);
 
   /* handle warnings */
-  WarningLog = "";
   Warnings = checkWarnings(WarningLog);
   if (Warnings != null) {
     /* open state overlay in case of warnings */
@@ -70,7 +69,7 @@ function draw() {
   end = new Date().getTime();  MNCData.Time = (end - start);
 
   /* plot mnemonic info to DOM header & update overlay */
-  updateDOMheader();
+  updateDOMheader(MNCData);
   updateDOMinfo(Warnings, WarningLog, Data);
 
   /* Query to see all defined bits which are handled in Instructions */
@@ -145,25 +144,25 @@ function analyzeLogic(source) {
     if (NETWORK != null) {CurrentNetwork = NETWORK;}
     /* If both CurrentNetwork & CurrentModule aren't null, we can begin to check
     for operations */
-    if (CurrentModule != null && CurrentNetwork != null) {
-      let op = null;
-      /* Bitwise operations */
-      op = source.getReadBitOperation(lines[i]);
-      if (op != null) {source.bitReadOperations.push (new BitOperation(op.op, op.mem, CurrentModule, CurrentNetwork, i));}
-      op = source.getWriteBitOperation(lines[i]);
-      if (op != null) {source.bitWriteOperations.push(new BitOperation(op.op, op.mem, CurrentModule, CurrentNetwork, i));}
-      /* Instructions */
-      op = source.InstructionLogicData(lines, i);
-      if (op != null) {source.instructionOperations.push(new InstructionOperation(op.instruction,
-                                                                                  op.number,
-                                                                                  op.format,
-                                                                                  op.formatLength,
-                                                                                  op.reads,
-                                                                                  op.writes,
-                                                                                  CurrentModule,
-                                                                                  CurrentNetwork,
-                                                                                  i));}
-    }
+    if (CurrentModule == null) {CurrentModule = "None: Reversed MNC's don't yield Modules"}
+    if (CurrentNetwork == null) {CurrentNetwork = "None: Reversed MNC's don't yield Netoworks"} 
+    let op = null;
+    /* Bitwise operations */
+    op = source.getReadBitOperation(lines[i]);
+    if (op != null) {source.bitReadOperations.push (new BitOperation(op.op, op.mem, CurrentModule, CurrentNetwork, i));}
+    op = source.getWriteBitOperation(lines[i]);
+    if (op != null) {source.bitWriteOperations.push(new BitOperation(op.op, op.mem, CurrentModule, CurrentNetwork, i));}
+    /* Instructions */
+    op = source.InstructionLogicData(lines, i);
+    if (op != null) {source.instructionOperations.push(new InstructionOperation(op.instruction,
+                                                                                op.number,
+                                                                                op.format,
+                                                                                op.formatLength,
+                                                                                op.reads,
+                                                                                op.writes,
+                                                                                CurrentModule,
+                                                                                CurrentNetwork,
+                                                                                i));}
   }
   console.log("-- Found bitwise Read operations :");
   console.log(source.bitReadOperations);
@@ -271,22 +270,6 @@ function checkWarnings(warn) {
     console.log("%cNo Warnings overall", "color: " + green);
     return null;
   }
-}
-
-
-/*******************************************************************************
-** Action: Formats strings from YY/MM/DD HH:MM to DD.MMMM YYYY HH:MM
-** Return: Reformatted string
-*******************************************************************************/
-function formatDate(str) {
-  const monthNames = ["January", "February", "March", "April", "May", "June",
-                      "July", "August", "September", "October", "November", "December"];
-  let regexp = /^(\d\d)\/(\d\d)\/(\d\d)\s*(\d\d)\:(\d\d)/;
-  let Year  = str.match(regexp)[1];
-  let Month = monthNames[parseInt(str.match(regexp)[2], 10) - 1]
-  let Day =   str.match(regexp)[3];
-  let Time =  str.match(regexp)[4] + ":" + str.match(regexp)[5];
-  return Day + ". " + Month + " " + "20" + Year + ", " + Time; /* LOL */
 }
 
 
