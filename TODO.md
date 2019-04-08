@@ -10,9 +10,13 @@ I've decided to compile a ToDo List here.
 * [X] Center InstructionOperation table
 
 * [ ] Make overlay scrollable
-* [ ] Add %@1 to % compiler (reader) switch to get the MNC Data more reliably
-* [ ] Fix mnemonic input encodings -> Also when decompiling PMC's and mnc's
+* [X] Add %@1 to % compiler (reader) switch to get the MNC Data more reliably
+* [X] Fix compatility with decompiled MNC's **Attention: Check the README for instructions**
+
+# Sanity check
+* [ ] Check all regexes on single strings
+* [ ] Remove `$` sings to enhance compatibility
+* [ ] Add automated sanity checks (e.g. compare all RD, OR, ANDs to the amount of bitReadOps)
 
 
-
-Well that's a w̵̭͇̺̟̙̐̎̒̾̅̐͜e̵̪͕͚͇̘̩͇͍͜͝͝í̴̧̗͖̮̥̲̗̰͖͐̉̌́́̿ṟ̵̓̿̓̈̈́̉́d̸̺͚̥͇̟̮̥̈́̌ string
+Well that's a w̵̭͇̺̟̙̐̎̒̾̅̐͜e̵̪͕͚͇̘̩͇͍͜͝͝í̴̧̗͖̮̥̲̗̰͖͐̉̌́́̿ṟ̵̓̿̓̈̈́̉́d̸̺͚̥͇̟̮̥̈́̌ string this is...
