@@ -60,6 +60,10 @@ function draw() {
 
   /* handle warnings */
   Warnings = checkWarnings(WarningLog);
+  if (Warnings != null) {
+    /* open state overlay in case of warnings */
+    document.getElementById(stateOverlay).style.display = "block";
+  }
 
   /* stop timer */
   end = new Date().getTime();  MNCData.Time = (end - start);

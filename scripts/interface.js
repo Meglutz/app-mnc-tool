@@ -39,7 +39,6 @@ function showInstructionOperationTable(resultId) {
   if (MyQueries[MyQueries.length - 1].result[resultId] instanceof InstructionOperation == false) {
     return;
   }
-
   /* Clear all Elements containing [tableElementId] */
   removeDOMelements(tableElementId);
   addDOMoverlayTable(MyQueries[MyQueries.length - 1], resultId);
@@ -117,7 +116,6 @@ document.getElementById("query-submit").onclick = function() {
 
   /* update Warning state */
   updateDOMinfo(Warnings, WarningLog, Data);
-
 }
 
 
@@ -219,8 +217,6 @@ function getRowContent(bitIndex, byteOffset, bytes, actionName = "", query, styl
     rowContent.push("STYLE__" + styling)
 
     /* assemble bit string */
-    console.log(bytes[i]);
-    console.log(bytes);
     byteType =             bytes[i].match(regexp)[1];
     byteAddress = parseInt(bytes[i].match(regexp)[2], 10);
     bitString =   byteType + (byteAddress + byteOffset) + "." + bitIndex;
