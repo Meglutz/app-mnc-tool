@@ -1,7 +1,7 @@
-
 /*******************************************************************************
 ** Definitions
 *******************************************************************************/
+const tlElementLoc    =    "timeline_location";
 const tlElementId     =    "timeLine_element";
 const tlElementTitle  =    "timeline_title";
 const tableElementId  =    "table_element";
@@ -120,7 +120,7 @@ document.getElementById("query-submit").onclick = function() {
 
 
 /*******************************************************************************
-** Action: Adds a new DOM TimeLine Element  at timeline_location.
+** Action: Adds a new DOM TimeLine Element  at tlElementLoc.
 **         for a new result: title = lineString
 **                           content1 = actionString
 **                           content2 = operationString
@@ -130,13 +130,13 @@ document.getElementById("query-submit").onclick = function() {
 ** Return: null
 *******************************************************************************/
 function addDOMresult (title, content1, content2, content3, highlight = false, optAttr = null) {
-  let tlBody =      document.getElementById("timeline_location");
+  let tlBody =      document.getElementById(tlElementLoc);
   let h1Element =   addDOMelement("h1", tlElementId);
   let pElement =    addDOMelement("p", tlElementId);
   let divElement =  addDOMelement("div", tlElementId, "timeline-item");
 
   /* Assemble modal div */
-  divElement.setAttribute ("on-line", "MNC Line " + title);
+  divElement.setAttribute("on-line", "MNC Line " + title);
   if (optAttr != null || isIterable(optAttr)) {divElement.setAttribute(optAttr[0], optAttr[1]);}
 
   /* Add highlight if needed */
@@ -216,19 +216,25 @@ function getRowContent(bitIndex, byteOffset, bytes, actionName = "", query, styl
     /* add styling as the first entry of every new row addition */
     rowContent.push("STYLE__" + styling)
 
-    /* assemble bit string */
-    byteType =             bytes[i].match(regexp)[1];
-    byteAddress = parseInt(bytes[i].match(regexp)[2], 10);
-    bitString =   byteType + (byteAddress + byteOffset) + "." + bitIndex;
+    /* assemble bit string. check if it is a number (constant) */
+    if (isNaN(parseInt(bytes[i], 10)) == false) {
+      rowContent.push(bytes[i]);
+      rowContent.push("Constant");
 
-    /* if no definition has been found, make a dummy */
-    def = query.src.getBitDef(bitString);
-    if (def == undefined) {
-      rowContent.push(bitString);
-      rowContent.push("No Symbol");
     } else {
-      rowContent.push(def.byteType + def.byteAddress + "." + def.bitAddress)
-      rowContent.push(def.symbol);
+      byteType =             bytes[i].match(regexp)[1];
+      byteAddress = parseInt(bytes[i].match(regexp)[2], 10);
+      bitString =   byteType + (byteAddress + byteOffset) + "." + bitIndex;
+
+      /* if no definition has been found, make a dummy */
+      def = query.src.getBitDef(bitString);
+      if (def == undefined) {
+        rowContent.push(bitString);
+        rowContent.push("No Symbol");
+      } else {
+        rowContent.push(def.byteType + def.byteAddress + "." + def.bitAddress)
+        rowContent.push(def.symbol);
+      }
     }
   }
   return rowContent;

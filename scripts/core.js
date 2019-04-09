@@ -144,8 +144,8 @@ function analyzeLogic(source) {
     if (NETWORK != null) {CurrentNetwork = NETWORK;}
     /* If both CurrentNetwork & CurrentModule aren't null, we can begin to check
     for operations */
-    if (CurrentModule == null) {CurrentModule = "None: Reversed MNC's don't yield Modules"}
-    if (CurrentNetwork == null) {CurrentNetwork = "None: Reversed MNC's don't yield Netoworks"} 
+    if (CurrentModule == null) {CurrentModule = "This MNC didn't yield Module-Info"}
+    if (CurrentNetwork == null) {CurrentNetwork = "This MNC didn't yield Network-Info"} 
     let op = null;
     /* Bitwise operations */
     op = source.getReadBitOperation(lines[i]);

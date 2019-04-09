@@ -115,10 +115,11 @@ class Resource {
   getMultiBitDefinitions(str) {
     let match = multiBitDefinitionRegex.exec(str);
     if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
-      match[2] = this.removeByteLeadingZeros(match[2]);
+      match[2] = removeLeadingChar(match[2], "0");
       return new Memory(match[1], match[2], "", ">=8", match[4])
     } else {return null;}
   }
+
 
   /*******************************************************************************
   ** Action: Checks if string contains a SBD. Creates Memory Object
@@ -127,10 +128,11 @@ class Resource {
   getSingleBitDefinitions(str) {
     let match = singleBitDefinitionRegex.exec(str);
     if (match != null && match[1,2,4,6] != null && match[1,2,4,6] != "") {
-      match[2] = this.removeByteLeadingZeros(match[2]);
+      match[2] = removeLeadingChar(match[2], "0");
       return new Memory(match[1], match[2], match[4], 1, match[6])
     } else {return null;}
   }
+
 
   /*******************************************************************************
   ** Action: Checks if string contains a Module Definition. Creates Module Object
@@ -141,9 +143,10 @@ class Resource {
     if (match != null && match[1,2] != null && match[1,2] != "") {
       /* no need to remove leading zeros if the p number is defined as
       P0045 since the parseInt method will strip them */
-      return new Module(parseInt(match[1], 10), parseInt(match[2], 10));
+      return new Module(parseInt(match[1], 10), parseInt(match[2], 10), "No Moduletitle available");
     } else {return null;}
   }
+
 
   /*******************************************************************************
   ** Action: Checks if string Module title. Extends matching source.Modules Object
@@ -161,6 +164,7 @@ class Resource {
       }
     } else {return null;}
   }
+
 
   /*******************************************************************************
   ** Action: Checks if string contains Module call. Can differentiate Module calls
@@ -184,8 +188,8 @@ class Resource {
           return this.Modules[i];
         }
       }
-      /* Sourcenumber hasn't been used yet. */
-      return new Module(undefined , parseInt(match2[1], 10), match2[2]);
+      /* Sourcefilename hasn't been used yet. */
+      return new Module("No Modulenumber available" , parseInt(match2[1], 10), match2[2]);
     }
 
     /* does it match the Program Number? */
@@ -197,9 +201,10 @@ class Resource {
         }
       }
       /* Sourcenumber hasn't been used yet. */
-      return new Module(parseInt(match1[2], 10) , undefined, undefined);
+      return new Module(parseInt(match1[2], 10), "No Sourcefile info available", "No Moduletitle available");
     }
   }
+
 
   /*******************************************************************************
   ** Action: Checks if string contains a Network Name.
@@ -212,6 +217,7 @@ class Resource {
     } else {return null;}
   }
 
+
   /*******************************************************************************
   ** Action: Checks if string contains a BitRead Operation.
   ** Return: [op: String (Operation), String (Modifier)] [mem: String (Memory)]
@@ -223,6 +229,7 @@ class Resource {
     } else {return null;}
   }
 
+
   /*******************************************************************************
   ** Action: Checks if string contains a BitWrite Operation.
   ** Return: [op: String (Operation), String (Modifier)] [mem: String (Memory)]
@@ -233,6 +240,7 @@ class Resource {
       return {op: match[1] + match[2], mem: match[3]};
     } else {return null;}
   }
+
 
   /*******************************************************************************
   ** Action: Checks for defined bits. bit must be a string! ("E312.2" or "ELADGK")
@@ -264,14 +272,14 @@ class Resource {
     }
   }
 
+
   /*******************************************************************************
   ** Action: Gets the Info from the mnemonic file
   ** Return: Object: [CompileDate, Note, Type, Release]
   *******************************************************************************/
   getMNCinfo() {
     let inHeader = false;
-    let pos = 0;
-    let pos2 = 0;
+    let tempLine;
 
     /* return variables */
     let compileDate;
@@ -288,47 +296,31 @@ class Resource {
                                                             Note:        note,
                                                             Type:        type,
                                                             Release:     release};}
-        if (line.charAt(0) == "0") {
-          pos =  parseInt(line.substring(1, 2), 10);
-          pos2 = parseInt(line.substring(2, 3), 10);
-        } else {
-          pos =  parseInt(line.substring(0, 1), 10);
-          pos2 = parseInt(line.substring(1, 2), 10);
-        }
-        switch (pos) {
-          case 7:
-            compileDate =  formatDate(line.substring(2));
+        tempLine = removeLeadingChar(line,     "0");
+        tempLine = removeLeadingChar(tempLine, " ");
+        switch (true) {
+          case tempLine.charAt(0) == "7":
+            compileDate = formatDate(tempLine.substring(2));
             break;
-          case 1:
-            if (pos2 == 0) {note = line.substring(3);};
+          case tempLine.charAt(0) == "1" && tempLine.charAt(1) == "0":
+            note        = line.substring(3);
             break;
-          case 2:
-            type =         line.substring(2);
+          case tempLine.charAt(0) == "2":
+            type        = tempLine.substring(2);
             break;
-          case 4:
-            if (release == null) {release = line.substring(2);}
-            else {release = line.substring(2) + " " + release;};
+          case tempLine.charAt(0) == "4":
+            if (release == null) {release = tempLine.substring(2);}
+            else {release = tempLine.substring(2) + " " + release;};
             break;
-          case 5:
-            if (release == null) {release = line.substring(2);}
-            else {release = release + "." + line.substring(2);};
+          case tempLine.charAt(0) == "5":
+            if (release == null) {release = tempLine.substring(2);}
+            else {release = release + "." + tempLine.substring(2);};
         }
         console.log("Get MNC info missed exit!");
       }
     }
   }
 
-  /*******************************************************************************
-  ** Action: Formats byteString e.g. "0010" or "0000" to "10" and "0" respectively
-  ** Return: formated byteString
-  *******************************************************************************/
-  removeByteLeadingZeros(byteStr) {
-    while (byteStr.substring(0, 1) == "0") {
-      if (byteStr.length == 1) {return byteStr;}
-      byteStr = byteStr.substring(1)
-    }
-    return byteStr;
-  }
 
   /*******************************************************************************
   ** Action: Checks if string[index] contains a instruction.
@@ -797,4 +789,18 @@ function formatDate(str) {
   let Day =   str.match(regexp)[3];
   let Time =  str.match(regexp)[4] + ":" + str.match(regexp)[5];
   return Day + ". " + Month + " " + "20" + Year + ", " + Time; /* LOL */
+}
+
+
+/*******************************************************************************
+** Action: charToRemove = "0" -> Formats inputStr e.g. "0010" or "0000" to
+           "10" and "0" respectively
+** Return: formatted toFormat
+*******************************************************************************/
+function removeLeadingChar(inputStr, charToRemove) {
+  while (inputStr.substring(0, 1) == charToRemove) {
+    if (inputStr.length == 1) {return inputStr;}
+    inputStr = inputStr.substring(1)
+  }
+  return inputStr;
 }
