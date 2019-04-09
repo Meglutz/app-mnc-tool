@@ -12,6 +12,8 @@ I've decided to compile a ToDo List here.
 * [ ] Make overlay scrollable
 * [X] Add %@1 to % compiler (reader) switch to get the MNC Data more reliably
 * [X] Fix compatility with decompiled MNC's **Attention: Check the README for instructions**
+* [ ] Add sendable queries and Data files
+
 
 # Sanity check
 * [ ] Check all regexes on single strings

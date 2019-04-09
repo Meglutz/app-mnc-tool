@@ -1,32 +1,40 @@
 /*******************************************************************************
 ** Definitions
 *******************************************************************************/
-const tlElementLoc    =    "timeline_location";
-const tlElementId     =    "timeLine_element";
-const tlElementTitle  =    "timeline_title";
-const tableElementId  =    "table_element";
+const tlElementLoc     =    "timeline_location";
+const tlElementId      =    "timeLine_element";
+const tlElementTitle   =    "timeline_title";
 
-const stateButton     =    "status-button";
-const stateText       =    "status-label";
-const stateOverlay    =    "overlay-container-1";
-const stateClose      =    "overlay-close-button-1"
-const stateWarning    =    "overlay-warning";
-const stateWarningLog =    "overlay-warning-log";
-const stateLog        =    "overlay-info";
+const stateButton      =    "status-button";
+const stateText        =    "status-label";
+const stateOverlay     =    "overlay-container-1";
+const stateClose       =    "overlay-close-button-1"
+const stateWarning     =    "overlay-warning";
+const stateWarningLog  =    "overlay-warning-log";
+const stateLog         =    "overlay-info";
 
-const insOpOverlay    =    "overlay-container-2";
-const insOpTableLoc   =    "insop-table-location";
+const insOpOverlay     =    "overlay-container-2";
+const insOpTableLoc    =    "insop-table-location";
 const insOpTitleLoc    =    "insop-title-location";
-const insOpInfoLoc    =    "insop-info-location";
-const insOpClose      =    "overlay-close-button-2";
+const insOpInfoLoc     =    "insop-info-location";
+const insOpElementId   =    "insop-table_element";
+const insOpClose       =    "overlay-close-button-2";
 
-const stateRed        =    "#e74848";
-const stateGreen      =    "#53d467";
+
+const mncShowOverlay   =    "overlay-container-3";
+const mncShowLoc       =    "mncshow-location";
+const mncShowTitleLoc  =    "mncshow-title-location";
+const mncShowInfoLoc   =    "mncshow-info-location";
+const mncShowElementId =    "mncshow-element";
+const mncShowClose     =    "overlay-close-button-3";
+
+const stateRed         =    "#e74848";
+const stateGreen       =    "#53d467";
 
 /*******************************************************************************
-** Action: Event: onClick Status / Close Button. Open / Close Overlay
-** Return: null
+** DOM Query-Result Handlers
 *******************************************************************************/
+/* state / status overlay */
 document.getElementById(stateButton).onclick = function() {
   document.getElementById(stateOverlay).style.display = "block";
 }
@@ -34,19 +42,25 @@ document.getElementById(stateClose).onclick = function() {
   document.getElementById(stateOverlay).style.display = "none";
 }
 
-function showInstructionOperationTable(resultId) {
-  /* exit if the user didn't click an instruction operation */
+/* user-click events (DOM overlays) */
+function evaluateDOMUserClick(resultId) {
+  /* generate mncShow view if the user didn't click an instruction operation */
   if (MyQueries[MyQueries.length - 1].result[resultId] instanceof InstructionOperation == false) {
-    return;
+    removeDOMelements(mncShowElementId);
+    addDOMmncShowList(MyQueries[MyQueries.length - 1], resultId);
+    document.getElementById(mncShowOverlay).style.display = "block";
+  } else {
+    /* generate insOp table if the user did click on an instruction operation */
+    removeDOMelements(insOpElementId);
+    addDOMinsOpTable(MyQueries[MyQueries.length - 1], resultId);
+    document.getElementById(insOpOverlay).style.display = "block";
   }
-  /* Clear all Elements containing [tableElementId] */
-  removeDOMelements(tableElementId);
-  addDOMoverlayTable(MyQueries[MyQueries.length - 1], resultId);
-  document.getElementById(insOpOverlay).style.display = "block";
-}
-
+} /* close insOp Overlay */
 document.getElementById(insOpClose).onclick = function() {
   document.getElementById(insOpOverlay).style.display = "none";
+} /* close MNCShow Overlay */
+document.getElementById(mncShowClose).onclick = function() {
+  document.getElementById(mncShowOverlay).style.display = "none";
 }
 
 /*******************************************************************************
@@ -110,7 +124,7 @@ document.getElementById("query-submit").onclick = function() {
                      content.operationString,
                      content.moduleString,
                      content.highlight,
-                     ["onclick", ("showInstructionOperationTable(" + i + ")")]);
+                     ["onclick", ("evaluateDOMUserClick(" + i + ")")]);
     }
   }
 
@@ -163,7 +177,7 @@ function addDOMresult (title, content1, content2, content3, highlight = false, o
 ** Action: Adds new DOM table for instruction operation visualisation
 ** Return: null
 *******************************************************************************/
-function addDOMoverlayTable(query, resultIndex) {
+function addDOMinsOpTable(query, resultIndex) {
   let ins = query.result[resultIndex];
   let bitAmount = ins.formatLength * 8;
   let bitCount = 0; let byteCount = 0;
@@ -188,6 +202,39 @@ function addDOMoverlayTable(query, resultIndex) {
       bitCount = 0;
       byteCount += 1;
     }
+  }
+}
+
+
+/*******************************************************************************
+** Action: Adds new DOM table for instruction operation visualisation
+** Return: null
+*******************************************************************************/
+function addDOMmncShowList(query, resultIndex) {
+  let op = query.result[resultIndex];
+  let VIEW = 10;
+
+  let title = document.getElementById(mncShowTitleLoc);
+  let info =  document.getElementById(mncShowInfoLoc);
+  let list = document.getElementById(mncShowLoc);
+
+  title.innerHTML = op.operation + " " + op.memory + " at Line " + op.inLine;
+  if (op.inModule.sourceFile != null || op.inModule.sourceFile != "") {
+    info.innerHTML  = "This code is found in the Sourcefile <b>fc" + op.inModule.sourceFile + ".lad</b> (" + op.inModule.title + ")";
+  } else {
+    info.innerHTML  = "Coudldn't analyze in which Sourcefile this code is located."
+  }
+
+  let stopLine = op.inLine + VIEW;  if (stopLine > query.src.sourceLines.length - 1) {stopLine = query.src.sourceLines.length;}
+  let startLine = op.inLine - VIEW; if (startLine < 0) {startLine = 0;}
+
+  let mncLine;
+
+  for (let i = startLine; i < stopLine; i++) {
+    if (i == op.inLine) {mncLine = addDOMelement("a", mncShowElementId, "code-highlight")}
+    else                {mncLine = addDOMelement("a", mncShowElementId, "code")}
+    mncLine.innerHTML = (i).pad(5) + ": <b>" + query.src.sourceLines[i] + "</b>";
+    list.appendChild(mncLine);
   }
 }
 
@@ -246,7 +293,7 @@ function getRowContent(bitIndex, byteOffset, bytes, actionName = "", query, styl
 ** Return: DOM element
 *******************************************************************************/
 function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass = null) {
-  let row = addDOMelement("tr", tableElementId, optClass);
+  let row = addDOMelement("tr", insOpElementId, optClass);
   let temp; let text;
   let colType = "td";
   let texType = "p";
@@ -259,8 +306,8 @@ function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass =
     if (item.match(/^(STYLE__)(.*)$/) != null) {
       style = item.match(/^(STYLE__)(.*)$/)[2];
     } else {
-      temp = addDOMelement(colType, tableElementId, optClass);
-      text = addDOMelement(texType, tableElementId);
+      temp = addDOMelement(colType, insOpElementId, optClass);
+      text = addDOMelement(texType, insOpElementId);
       /* add style to text element, if the item before was a style definer */
       if (style != "") {text = appendDOMtag(text, "class", style); style = "";}
       text.innerHTML = item;

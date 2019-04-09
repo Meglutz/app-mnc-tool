@@ -147,18 +147,35 @@ header {
   color: #3d1518;
 }
 
-/* every 1st cell text */
-/* .insop-table td:nth-child(1) p {
+/* Style MNCshow Overlay */
+/******************************************************************************/
+.mncshow {
+  display: inline-block;
+  width: 20%;
+}
+
+.mncshow .code {
+  text-align: left;
+  letter-spacing: 2px;
+  margin: 0px;
+  font-family: "consolas";
+  padding: 5px;
+  background-color: var(--main-color);
+  color: var(--tone-1-color);
+  border-radius: 3px;
+}
+
+.mncshow .code-highlight {
+  text-align: left;
+  letter-spacing: 2px;
+  margin: 0px;
+  font-family: "consolas";
+  padding: 5px;
   background-color: #4e9455;
   color: #1f3c22;
-} */
-
-/* every 2nd last cell text */
-/* .insop-table td:nth-last-child(2) p {
-  background-color: #9e3841;
-  color: #3d1518;
-} */
-
+  border-radius: 3px;
+  font-weight: bold;
+}
 
 /* Style Status Bar */
 /******************************************************************************/
@@ -264,13 +281,13 @@ p {
 .timeline-item {
   padding: 3em 2em 2em;
   position: relative;
+  cursor: pointer;
   color: var(--tone-1-accent-color);
   border-left: 2px solid var(--tone-1-color);
 }
 
 .highlight-item {
   border-left: 2px solid var(--tone-4-color);
-  cursor: pointer;
 }
 
 .timeline-item p {

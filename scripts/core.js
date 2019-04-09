@@ -145,7 +145,7 @@ function analyzeLogic(source) {
     /* If both CurrentNetwork & CurrentModule aren't null, we can begin to check
     for operations */
     if (CurrentModule == null) {CurrentModule = "This MNC didn't yield Module-Info"}
-    if (CurrentNetwork == null) {CurrentNetwork = "This MNC didn't yield Network-Info"} 
+    if (CurrentNetwork == null) {CurrentNetwork = "This MNC didn't yield Network-Info"}
     let op = null;
     /* Bitwise operations */
     op = source.getReadBitOperation(lines[i]);
@@ -288,4 +288,28 @@ function addWarning(wLog, fName, desc, optData = null) {
     };
   }
   wLog.push(" ");
+}
+
+
+/*******************************************************************************
+** Action: Adds padding to number, (3).pad(4) = 0003.
+** Return: padded number 
+*******************************************************************************/
+Number.prototype.pad = function(size) {
+  var s = String(this);
+  while (s.length < (size || 2)) {s = "0" + s;}
+  return s;
+}
+
+
+/*******************************************************************************
+** Action: Checks if an object is iterable.
+** Return: false if null || string. "true" if anything else
+*******************************************************************************/
+function isIterable(obj) {
+  /* Checks for null and undefined or strings */
+  if (obj == null || typeof obj == "string") {
+    return false;
+  }
+  return typeof obj[Symbol.iterator] === 'function';
 }

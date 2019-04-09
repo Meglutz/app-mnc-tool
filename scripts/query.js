@@ -237,15 +237,3 @@ function checkInstructionByteRange(startByte, length, checkByteType, checkByteAd
     }
   }
 }
-
-/*******************************************************************************
-** Action: Checks if an object is iterable.
-** Return: false if null || string. "true" if anything else
-*******************************************************************************/
-function isIterable(obj) {
-  /* Checks for null and undefined or strings */
-  if (obj == null || typeof obj == "string") {
-    return false;
-  }
-  return typeof obj[Symbol.iterator] === 'function';
-}
