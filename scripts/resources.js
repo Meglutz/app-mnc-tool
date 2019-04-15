@@ -1,18 +1,18 @@
 
 
-const multiBitDefinitionRegex =      /^(T|D|E|F|G|R|X|Y)(\d+)(\s*)([\S]+)$/;
-const singleBitDefinitionRegex =     /^(T|D|E|F|G|R|X|Y)(\d+)(\.)(\d)(\s+)([\S]+)$/;
-const singleBitAddressRegex =        /^(T|D|E|F|G|R|X|Y)(\d+)(\.)(\d)(\s+|)$/;
-const moduleNumberDefinitionRegex =  /^[P](\d+)\s+C(\d+)$/;
-const moduleTitleDefinitionRegex =   /^;---------------\s*fc(\d+).lad\s*\(([^\)]*)\)$/i;
+const multiBitDefinitionRegex =      /^(T|D|E|F|G|R|X|Y)(\d+)(\s*)([\S]+)/;
+const singleBitDefinitionRegex =     /^(T|D|E|F|G|R|X|Y)(\d+)(\.)(\d)(\s+)([\S]+)/;
+const singleBitAddressRegex =        /^(T|D|E|F|G|R|X|Y)(\d+)(\.)(\d)(\s+|)/;
+const moduleNumberDefinitionRegex =  /^[P](\d+)\s+C(\d+)/;
+const moduleTitleDefinitionRegex =   /^;---------------\s*fc(\d+).lad\s*\(([^\)]*)\)/i;
 
 const currentModuleNumberRegex =     /^([P])(\d+)/;
 const currentModuleSourceRegex =     /^;---------------\s*fc(\d+).lad\s*\(([^\)]*)/i;
 const currentNetworkRegex =          /^N(\d\d\d\d\d)\:$/g;
-const readBitOperationsRegex =       /^(RD|OR|AND)(\.NOT\.STK|\.NOT|\.STK|)\s+(.+)$/;
-const writeBitOperationsRegex =      /^(WRT|SET|RST)(\.NOT|)\s+(.+)$/;
-const instructionOperationRegex =    /^(SUB)\s*(\d*)$/;
-const levelSubRegex =                /^(SUB)\s*(\d*)$/;
+const readBitOperationsRegex =       /^(RD|OR|AND)(\.NOT\.STK|\.NOT|\.STK|)\s+(.+)/;
+const writeBitOperationsRegex =      /^(WRT|SET|RST)(\.NOT|)\s+(.+)/;
+const instructionOperationRegex =    /^(SUB)\s*(\d*)/;
+const levelSubRegex =                /^(SUB)\s*(\d*)/;
 const instructionReadWriteRegex =    /^([A-Z])(\d*)$/;
 const instructionFormatRegex =       /^(\d|)(\d\d|)(\d|)$/;
 

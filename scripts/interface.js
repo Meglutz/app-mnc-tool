@@ -256,8 +256,8 @@ function getRowContent(bitIndex, byteOffset, bytes, actionName = "", query, styl
   }
 
   for (let i = 0; i < bytes.length; i++) {
-    /* exit directly if we encounter a dummy-array item */
-    if (bytes[i] == Exit) {return rowContent}
+    /* exit directly if we encounter a dummy-array item or an empty bytes[] index */
+    if (bytes[i] == Exit || bytes[i] == null) {return rowContent}
     if (i >= 1 ) {rowContent.push(actionName)}
 
     /* add styling as the first entry of every new row addition */
