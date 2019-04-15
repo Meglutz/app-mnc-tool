@@ -6,44 +6,31 @@
 const red   = "#b72828"
 const green = "#3bb728"
 
-let CurrentModule;
-let CurrentNetwork;
-
 let Source = "./mnemonic.mnc";
 
-let MNCData = {
-                Release: null,
-                CompileDate: null,
-                Type: null,
-                Note: null,
-                Time: null
-              }
+let MyQueries = [];
+let Data;
+let MNCData;
+
+let CurrentModule;
+let CurrentNetwork;
 
 let Warnings = null;
 let WarningLog = []; /* Contains html styled string array of all warnings
                         which occured during the sequences */
 
-
-let MyQueries = [];
-let Data;
-
 /*******************************************************************************
-** Main functions
+** p5 Main functions
 *******************************************************************************/
 function preload() {
-  /* The loadStrings function returns an array, indexed by the line count of the loaded file */
-  Data = new Resource(loadStrings(Source,
-                                  console.log("Mnemonic file loaded.")));
+  /* the loadStrings function returns an array, indexed by the line count of the loaded file */
+  Data = new Resource(loadStrings(Source, console.log("Mnemonic file loaded.")));
 }
 
 
 function setup() {
-/* set global vars for mnc info */
-  let info = Data.getMNCinfo();
-  MNCData.CompileDate =  info.CompileDate;
-  MNCData.Note =         info.Note;
-  MNCData.Type =         info.Type;
-  MNCData.Release =      info.Release;
+  /* set global vars for mnc info */
+  MNCData = Data.getMNCinfo();
 }
 
 
@@ -60,13 +47,16 @@ function draw() {
 
   /* handle warnings */
   Warnings = checkWarnings(WarningLog);
+
+
+  /* open state overlay if there are any warnings */
   if (Warnings != null) {
-    /* open state overlay in case of warnings */
     document.getElementById(stateOverlay).style.display = "block";
   }
 
   /* stop timer */
-  end = new Date().getTime();  MNCData.Time = (end - start);
+  end = new Date().getTime();
+  MNCData.Time = (end - start);
 
   /* plot mnemonic info to DOM header & update overlay */
   updateDOMheader(MNCData);
@@ -136,23 +126,20 @@ function analyzeLogic(source) {
   /* Get all logic events in the whole file */
   let lines = source.sourceLines;
   for (let i = 0; i < lines.length; i++) {
-    /* Update the current module */
+    /* Update current module */
     let MODULE = source.getCurrentModule(lines[i], lines[i+1], i);
     if (MODULE != null) {CurrentModule = MODULE;}
-    /* Update the current network */
+    /* Update current network */
     let NETWORK = source.getCurrentNetwork(lines[i]);
     if (NETWORK != null) {CurrentNetwork = NETWORK;}
-    /* If both CurrentNetwork & CurrentModule aren't null, we can begin to check
-    for operations */
-    if (CurrentModule == null) {CurrentModule = "This MNC didn't yield Module-Info"}
-    if (CurrentNetwork == null) {CurrentNetwork = "This MNC didn't yield Network-Info"}
+
     let op = null;
-    /* Bitwise operations */
+    /* bit operations */
     op = source.getReadBitOperation(lines[i]);
     if (op != null) {source.bitReadOperations.push (new BitOperation(op.op, op.mem, CurrentModule, CurrentNetwork, i));}
     op = source.getWriteBitOperation(lines[i]);
     if (op != null) {source.bitWriteOperations.push(new BitOperation(op.op, op.mem, CurrentModule, CurrentNetwork, i));}
-    /* Instructions */
+    /* instruction operations */
     op = source.InstructionLogicData(lines, i);
     if (op != null) {source.instructionOperations.push(new InstructionOperation(op.instruction,
                                                                                 op.number,
@@ -171,10 +158,11 @@ function analyzeLogic(source) {
   console.log("-- Found instruction operations  :");
   console.log(source.instructionOperations);
 
+  /* handle warnings of this sequence */
   let warnString = "";
-  if (source.bitReadOperations.length < 1)  {warnString = "There aren't any bit-read Operations in this MNC!";}
-  if (source.bitWriteOperations.length < 1)  {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any bit-write Operations in this MNC!";}
-  if (source.instructionOperations.length < 1)    {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any instruction Operations in this MNC!";}
+  if (source.bitReadOperations.length < 1)     {warnString = "Couldn't find any bit-read Operations in this MNC!";}
+  if (source.bitWriteOperations.length < 1)    {if (warnString != "") {warnString += "<br>"}; warnString += "Couldn't find any bit-write Operations in this MNC!";}
+  if (source.instructionOperations.length < 1) {if (warnString != "") {warnString += "<br>"}; warnString += "Couldn't find any instruction Operations in this MNC!";}
   if (warnString != "") {addWarning(WarningLog, analyzeLogic.name, warnString, null);}
 
   finishSequence(2);
@@ -190,7 +178,8 @@ function analyzeLogic(source) {
 *******************************************************************************/
 function analyzeDependencies(source) {
   console.log("Analyzing Dependencies...");
-  /* None */
+
+  /* Currently no dependencies */
 
   finishSequence(2);
 }
@@ -210,7 +199,7 @@ function analyzeDependencies(source) {
 function analyzeResults(source) {
   console.log("Analyzing Results...");
 
-  /* Check if all defined programs appear in the logic */
+  /* check if all defined programs appear in the mnc */
   console.log("-- Unused, but defined Modules:");
   let unused = [];
   for (let i = 0; i < source.Modules.length; i++) {
@@ -293,7 +282,7 @@ function addWarning(wLog, fName, desc, optData = null) {
 
 /*******************************************************************************
 ** Action: Adds padding to number, (3).pad(4) = 0003.
-** Return: padded number 
+** Return: padded number
 *******************************************************************************/
 Number.prototype.pad = function(size) {
   var s = String(this);
