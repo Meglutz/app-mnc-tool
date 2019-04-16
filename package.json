@@ -17,7 +17,7 @@
   "author": "WashirePie",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^4.1.1"
+    "electron": "^4.1.4"
   },
   "dependencies": {
     "iconv-lite": "^0.4.24"
