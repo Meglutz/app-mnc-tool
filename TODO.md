@@ -11,11 +11,18 @@
 * [X] Add "%@1" - "%" detection to get the MNC Data more reliably.
 * [X] Fix compatility with decompiled MNC's **Attention: Check the README for instructions**
 * [ ] Add sendable queries and Data files
-* [X] Fix COMPB Table
 
+* [ ] Fix COMPB Table
+* [X] Fix NUMEB Table (Example: C2EH04)
+* [ ] Fix Instruction Operation Text in result display (Only show reads / writes)
+* [ ] Fix Result sorting: lowest line count to highest line count.
+* [ ] Implement Module detection for decompiled MNCs: RD     PMCOM_XY
+                                                      OR.NOT PMCOM_XY
+                                                      WRT    PMCOM_XY
+* [ ] Visualize Submodules (Highlight them) / Full Make order
 
 # Prerequisities for stable release
 
-* [ ] Check all regexes on single strings
+* [X] Check all regexes on single strings
 * [X] Remove `$` (= assert position to end of line) regex-sings to enhance compatibility
 * [ ] Add automated sanity checks (e.g. compare all RD, OR, ANDs to the amount of bitReadOps)

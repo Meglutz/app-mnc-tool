@@ -566,7 +566,7 @@ class Resource {
           case 40: /* ☑️ */
             name = "NUMEB";
             format = this.instructionFormat(lines, index, 1);
-            reads = null;
+            reads =   this.instructionReads(lines, index, 2);
             writes = this.instructionWrites(lines, index, 3);
             break;
           case 49:
@@ -728,8 +728,8 @@ class Resource {
     if (match != null) {
       return startByte;
     } else {
-      return null;
-    } // TODO: Check older commit
+      return startByte;
+    }
   }
 
   /*******************************************************************************
@@ -743,7 +743,7 @@ class Resource {
     if (match != null) {
       return startByte;
     } else {
-      return null;
+      return startByte;
     }
   }
 
