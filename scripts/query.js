@@ -23,7 +23,7 @@ class Query {
     this.log = [];
     this.result = [];
 
-    this.handleQuery();
+    this.execute();
   }
 
 /*******************************************************************************
@@ -31,14 +31,12 @@ class Query {
 **         each query type.
 ** Return: null
 *******************************************************************************/
-  handleQuery() {
+  execute() {
     let query;
     let bit;
-    let byte;
-    let start, end;
 
     /* start timer */
-    start = new Date().getTime();
+    let start = new Date().getTime();
 
     switch (this.type) {
       /* ---------------------------------------------------------------------*/
@@ -162,7 +160,7 @@ class Query {
     }
 
     /* stop timer */
-    end = new Date().getTime();
+    let end = new Date().getTime();
     this.log.push("Query took " + (end - start) + " ms");
     this.log.push(" ");
 

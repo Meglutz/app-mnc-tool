@@ -35,9 +35,8 @@ function setup() {
 
 
 function draw() {
-  let start, end;
   /* start timer */
-  start = new Date().getTime();
+  let start = new Date().getTime();
 
   /* Run all sequences to analyze the mnemonic */
   getDefinitions      (Data);
@@ -48,14 +47,13 @@ function draw() {
   /* handle warnings */
   Warnings = checkWarnings(WarningLog);
 
-
   /* open state overlay if there are any warnings */
   if (Warnings != null) {
     document.getElementById(stateOverlay).style.display = "block";
   }
 
   /* stop timer */
-  end = new Date().getTime();
+  let end = new Date().getTime();
   MNCData.Time = (end - start);
 
   /* plot mnemonic info to DOM header & update overlay */

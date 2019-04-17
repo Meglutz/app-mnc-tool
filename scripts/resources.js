@@ -249,7 +249,7 @@ class Resource {
   getBitDef(bit) {
     for (let b of this.SBDMemory) {
       if (bit == b.byteType + b.byteAddress + "." + b.bitAddress || bit == b.symbol) {
-        return b
+        return b;
       }
     }
     return undefined;
@@ -728,8 +728,8 @@ class Resource {
     if (match != null) {
       return startByte;
     } else {
-      return startByte;
-    }
+      return null;
+    } // TODO: Check older commit
   }
 
   /*******************************************************************************
@@ -743,7 +743,7 @@ class Resource {
     if (match != null) {
       return startByte;
     } else {
-      return startByte;
+      return null;
     }
   }
 
