@@ -64,8 +64,8 @@ class Query {
 
         /* look for matching bitRead operations */
         this.log.push("Looking for read operations...");
-        for (let bitR of this.src.bitReadOperations) {
-          if (bitR.memory ==  bit.byteType  + bit.byteAddress  + "." + bit.bitAddress) {
+        for (let bitR of this.src.bitOperations) {
+          if (bitR.reads ==  bit.byteType  + bit.byteAddress  + "." + bit.bitAddress) {
             this.result.push(bitR);
           }
         }
@@ -108,8 +108,8 @@ class Query {
 
         /* look for matching bitWrite operations */
         this.log.push("Looking for write operations...");
-        for (let bitW of this.src.bitWriteOperations) {
-          if (bitW.memory ==  bit.byteType  + bit.byteAddress  + "." + bit.bitAddress) {
+        for (let bitW of this.src.bitOperations) {
+          if (bitW.writes ==  bit.byteType  + bit.byteAddress  + "." + bit.bitAddress) {
             this.result.push(bitW);
           }
         }

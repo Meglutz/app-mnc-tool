@@ -134,9 +134,9 @@ function analyzeLogic(source) {
     let op = null;
     /* bit operations */
     op = source.getReadBitOperation(lines[i]);
-    if (op != null) {source.bitReadOperations.push (new BitOperation(op.op, op.mem, CurrentModule, CurrentNetwork, i));}
+    if (op != null) {source.bitOperations.push (new BitOperation(op.op, op.mem, null, CurrentModule, CurrentNetwork, i));}
     op = source.getWriteBitOperation(lines[i]);
-    if (op != null) {source.bitWriteOperations.push(new BitOperation(op.op, op.mem, CurrentModule, CurrentNetwork, i));}
+    if (op != null) {source.bitOperations.push(new BitOperation(op.op, null, op.mem, CurrentModule, CurrentNetwork, i));}
     /* instruction operations */
     op = source.InstructionLogicData(lines, i);
     if (op != null) {source.instructionOperations.push(new InstructionOperation(op.instruction,
@@ -149,20 +149,27 @@ function analyzeLogic(source) {
                                                                                 CurrentNetwork,
                                                                                 i));}
   }
-  console.log("-- Found bitwise Read operations :");
-  console.log(source.bitReadOperations);
-  console.log("-- Found bitwise Write operations:");
-  console.log(source.bitWriteOperations);
-  console.log("-- Found instruction operations  :");
-  console.log(source.instructionOperations);
+
+  /* get bit read / write operation count */
+  let w = 0, r = 0;
+  for (let op of source.bitOperations) {
+    if (op.writes != null) {w += 1;};
+    if (op.reads !=  null) {r += 1;};
+  }
+
+  console.log("-- Found bitwise Read operations : " + r);
+  console.log("-- Found bitwise Write operations: " + w);
+  console.log("-- Found instruction operations  : " + source.instructionOperations.length);
 
   /* handle warnings of this sequence */
   let warnString = "";
-  if (source.bitReadOperations.length < 1)     {warnString = "Couldn't find any bit-read Operations in this MNC!";}
-  if (source.bitWriteOperations.length < 1)    {if (warnString != "") {warnString += "<br>"}; warnString += "Couldn't find any bit-write Operations in this MNC!";}
-  if (source.instructionOperations.length < 1) {if (warnString != "") {warnString += "<br>"}; warnString += "Couldn't find any instruction Operations in this MNC!";}
-  if (warnString != "") {addWarning(WarningLog, analyzeLogic.name, warnString, null);}
+  if (r < 1 || w < 1) {warnString = "Couldn't find any bit read or write Operations in this MNC! (read: " + r + ", write: " + w +")";};
+  if (source.instructionOperations.length < 1) {
+    if (warnString != "") {warnString += "<br>"};
+    warnString += "Couldn't find any instruction Operations in this MNC!";
+  };
 
+  if (warnString != "") {addWarning(WarningLog, analyzeLogic.name, warnString, null);};
   finishSequence(2);
 }
 

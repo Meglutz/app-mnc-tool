@@ -56,9 +56,10 @@ class Module {
 ** Properties:
 *******************************************************************************/
 class BitOperation {
-  constructor(op, mem, inMod, inNwk, inLine) {
+  constructor(op, rd, wrt, inMod, inNwk, inLine) {
     this.operation = op;    /*  =  String, operation Type one of: [readBitOperationsRegex] */
-    this.memory = mem;      /*  =  String, memory Address. e.g. [R3453.2] */
+    this.reads = rd;        /*  =  String, memory Address. e.g. [R3453.2] */
+    this.writes = wrt;
     this.inModule = inMod;  /*  =  Object of type [Module] */
     this.inNetwork = inNwk; /*  =  String, containing the network the parser is currently in. */
     this.inLine = inLine;   /*  =  String, Line index of the whole file. */
@@ -100,8 +101,7 @@ class Resource {
     this.Modules = [];                      /* Array of Module objects, holds module definitions */
     this.SBDMemory = [];                    /* Array of Memory objects, holds Single bit definitions */
     this.MBDMemory = [];                    /* Array of Memory objects, holds Multi bit definitions */
-    this.bitReadOperations = [];            /* Array of BitOperations, holds bit read operations */
-    this.bitWriteOperations = [];           /* Array of BitOperations, holds bit write operations */
+    this.bitOperations = [];                /* Array of BitOperations */
     this.instructionOperations = [];        /* Array of InstructionOperations, holds instruction operations */
 
     this.usedUndefinedInstructions = [];    /* Array of InstructionsOperations, holds unhandled Instructions */

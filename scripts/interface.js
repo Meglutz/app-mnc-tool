@@ -397,10 +397,8 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
   if (source != null) {
     aElement.info.innerHTML =  "<b>MNC Lines:</b> " +  source.sourceLines.length + " | " +
                                "<b>Bit Defs:</b> " +   source.SBDMemory.length +   " | " +
-                               "<b>Multi Defs:</b> " +  source.MBDMemory.length +   " | " +
-                               "<b>Total Ops:</b> " + (source.bitReadOperations.length +
-                                                source.bitWriteOperations.length +
-                                                source.instructionOperations.length)
+                               "<b>Multi Defs:</b> " + source.MBDMemory.length +   " | " +
+                               "<b>Total Ops:</b> " + (source.bitOperations.length + source.instructionOperations.length)
   } else {
     aElement.info.innerHTML = "No Source Data"
   }
