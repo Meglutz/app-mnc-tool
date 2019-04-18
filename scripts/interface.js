@@ -225,7 +225,7 @@ function addDOMmncShowList(query, resultIndex) {
     info.innerHTML  = "Coudldn't analyze in which Sourcefile this code is located."
   }
 
-  let stopLine = op.inLine + VIEW;  if (stopLine > query.src.sourceLines.length - 1) {stopLine = query.src.sourceLines.length;}
+  let stopLine = op.inLine + VIEW;  if (stopLine > query.src.source.lines.length - 1) {stopLine = query.src.source.lines.length;}
   let startLine = op.inLine - VIEW; if (startLine < 0) {startLine = 0;}
 
   let mncLine;
@@ -233,7 +233,7 @@ function addDOMmncShowList(query, resultIndex) {
   for (let i = startLine; i < stopLine; i++) {
     if (i == op.inLine) {mncLine = addDOMelement("a", mncShowElementId, "code-highlight")}
     else                {mncLine = addDOMelement("a", mncShowElementId, "code")}
-    mncLine.innerHTML = (i).pad(5) + ": <b>" + query.src.sourceLines[i] + "</b>";
+    mncLine.innerHTML = (i).pad(5) + ": <b>" + query.src.source.lines[i] + "</b>";
     list.appendChild(mncLine);
   }
 }
@@ -395,7 +395,7 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
 
   /* mnemonic statistics string */
   if (source != null) {
-    aElement.info.innerHTML =  "<b>MNC Lines:</b> " +  source.sourceLines.length + " | " +
+    aElement.info.innerHTML =  "<b>MNC Lines:</b> " +  source.source.lines.length + " | " +
                                "<b>Bit Defs:</b> " +   source.SBDMemory.length +   " | " +
                                "<b>Multi Defs:</b> " + source.MBDMemory.length +   " | " +
                                "<b>Total Ops:</b> " + (source.bitOperations.length + source.instructionOperations.length)

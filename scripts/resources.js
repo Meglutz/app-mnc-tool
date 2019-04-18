@@ -23,7 +23,6 @@ const headerMNCstopRegex =           /^\%$/;
 /*******************************************************************************
 ** Class - Memory
 ** Holds a memory definition
-** Properties:
 *******************************************************************************/
 class Memory {
   constructor(type, byteAddress, bitAddress, length, symbol) {
@@ -39,7 +38,6 @@ class Memory {
 /*******************************************************************************
 ** Class - Module
 ** Holds a module / program definition
-** Properties:
 *******************************************************************************/
 class Module {
   constructor(programNumber, sourceFile, title) {
@@ -53,16 +51,16 @@ class Module {
 /*******************************************************************************
 ** Class - BitOperation
 ** Holds a bit operation, read or write
-** Properties:
 *******************************************************************************/
 class BitOperation {
-  constructor(op, rd, wrt, inMod, inNwk, inLine) {
-    this.operation = op;    /*  =  String, operation Type one of: [readBitOperationsRegex] */
-    this.reads = rd;        /*  =  String, memory Address. e.g. [R3453.2] */
-    this.writes = wrt;
-    this.inModule = inMod;  /*  =  Object of type [Module] */
-    this.inNetwork = inNwk; /*  =  String, containing the network the parser is currently in. */
-    this.inLine = inLine;   /*  =  String, Line index of the whole file. */
+  constructor(op, rd, wrt, inMod, inNwk, inLine, inLevel) {
+    this.operation = op;                /*  =  String, operation Type one of: [readBitOperationsRegex] */
+    this.reads = rd;                    /*  =  String, memory Address. e.g. [R3453.2] */
+    this.writes = wrt;                  /*  =  String, memory Address. e.g. [R3453.3] */
+    this.inModule = inMod;              /*  =  Object of type [Module] */
+    this.inNetwork = inNwk;             /*  =  String, containing the network the parser is currently in. */
+    this.inLine = inLine;               /*  =  String, Line index of the whole file. */
+    this.inLevel = inLevel;             /*  =  Object of type [LineRange] */
   }
 }
 
@@ -70,10 +68,9 @@ class BitOperation {
 /*******************************************************************************
 ** Class - InstructionOperations
 ** Hold a bit operation, read or write
-** Properties:
 *******************************************************************************/
 class InstructionOperation {
-  constructor(instr, instrNbr, form, formLn, reads, writes, inMod, inNwk, inLine) {
+  constructor(instr, instrNbr, form, formLn, reads, writes, inMod, inNwk, inLine, inLevel) {
     this.instruction = instr;          /*  = String, Type of operation */
     this.instructionNumber = instrNbr; /*  = Numeric, Type number */
     this.format = form;                /*  = String, type of format (Normal, Const, Addr...) */
@@ -82,21 +79,80 @@ class InstructionOperation {
     this.writes = writes;              /*  = String, Beginnign Address of write range */
     this.inModule = inMod;             /*  = Object, of tyop [Module] */
     this.inNetwork = inNwk;            /*  = String, containing the network the parser is currently in. */
-    this.inLine = inLine;
+    this.inLine = inLine;              /*  =  String, Line index of the whole file. */
+    this.inLevel = inLevel;            /*  =  Object of type [LineRange] */
   }
 }
 
 
 /*******************************************************************************
+** Class - Mnemonic
+** Holds the source MNC as well as Line ranges for secotrs and levels
+*******************************************************************************/
+class Mnemonic {
+  constructor(lines) {
+    this.lines = lines;    /* = String Array, one index per mnc line */
+    this.levels = [];
+    this.structures = [];
+  }
+
+  /*******************************************************************************
+  ** Action: Loops trough both the levels and structures properties to get the
+  ** start value of the one with id "id"
+  ** Return: Number, start value
+  *******************************************************************************/
+  getStartOf(id) {
+    for (let el of this.levels)     {if (el.id == id) {return el.start;};};
+    for (let el of this.structures) {if (el.id == id) {return el.start;};};
+  }
+
+  /*******************************************************************************
+  ** Action: Loops trough both the levels and structures properties to get the
+  ** end value of the one with id "id"
+  ** Return: Number, end value
+  *******************************************************************************/
+  getEndOf(id) {
+    for (let el of this.levels)     {if (el.id == id) {return el.end;};};
+    for (let el of this.structures) {if (el.id == id) {return el.end;};};
+  }
+
+  /*******************************************************************************
+  ** Action: Checks if an [index] is in the correct range (>= start, <= end)
+  ** Return: LineRange Object
+  *******************************************************************************/
+  getLevelOf(index) {
+    for (let i = 0; i < this.levels.length; i++) {
+      if (this.levels[i].start <= index && this.levels[i].end >= index) {
+        return this.levels[i]
+      }
+    }
+  }
+}
+
+
+/*******************************************************************************
+** Class - LineRange
+** Holds a range which is found in a string array trough regexes
+** Used to define ranges for optimization and restriction in the Mnc class
+*******************************************************************************/
+class LineRange {
+  constructor(sArr, id, startRegex, endRegex) {
+    this.id = id;
+    this.start = 1 + sArr.findIndex(function checkStart(element) {
+                                return startRegex.test(element);});
+    this.end =   1 + sArr.findIndex(function checkEnd(element) {
+                                return endRegex.test(element);});
+  }
+}
+
+/*******************************************************************************
 ** Class - Resource
-** Holds the source MNC, all definitions, as well as logic data (ops)
+** Holds all definitions, as well as logic data (ops)
 ** and analyze-data
-** Properties:
 *******************************************************************************/
 class Resource {
-  constructor(sourceLines) {
-    this.sourceLines = sourceLines;         /* String array, each index holds 1 line */
-    this.sequenceLog = [];                  /* String array, containing analyze-log of mnc */
+  constructor(source) {
+    this.source = source;                   /* Object of type [Mnemonic] */
 
     this.Modules = [];                      /* Array of Module objects, holds module definitions */
     this.SBDMemory = [];                    /* Array of Memory objects, holds Single bit definitions */
@@ -106,7 +162,6 @@ class Resource {
 
     this.usedUndefinedInstructions = [];    /* Array of InstructionsOperations, holds unhandled Instructions */
   }
-
 
   /*******************************************************************************
   ** Action: Checks if string contains a MBD. Creates Memory Object
@@ -287,7 +342,7 @@ class Resource {
     let type;
     let release;
 
-    for (let line of this.sourceLines) {
+    for (let line of this.source.lines) {
       /* check if we are entering in the header portion */
       if (headerMNCstartRegex.exec(line) != null) {inHeader = true;}
       if (inHeader) {

@@ -9,13 +9,17 @@
 
 ## Prerequisities for stable release
 * [x] Add "%@1" - "%" detection to get the MNC Data more reliably.
-* [x] Fix compatility with decompiled MNC's **Attention: Check the README for instructions**
-* [ ] Make overlays scrollable
+* [x] Fix compatility with decompiled MNC's *Attention: Check the README for instructions*
+* [x] Make overlays scrollable *Just removed parsing of identical successive indexes in warningString arrays*
 * [ ] Add sendable queries and Data files
 
 * [x] Fix NUMEB Table (Example: C2EH04)
 * [ ] Fix COMPB Table
-* [ ] **Add level parser** including Level Tags & submodule Tags onn the "inLine" properties.
+* [ ] **Add level parser**
+    * [x] Add parser
+    * [ ] Add Level Tags to result visualisation
+    * [ ] Remove the `MNCData` global Variable and put it's keys as properties into the `Mnemonic` class
+    * [ ] Rework Module detection / definition strategy. There should be a better solution.
 * [x] Remove bitReadOps / bitWriteOps arrays -> replace with bitOps (branch: *newBitOpStructure*)
 * [ ] Fix Instruction Operation Text in result display (Only plot reads / writes)
 * [ ] Fix Result sorting: lowest line count to highest line count.

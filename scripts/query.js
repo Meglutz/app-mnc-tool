@@ -79,7 +79,6 @@ class Query {
           }
         }
 
-
         this.queryLogFooter(this.result);
         break;
 

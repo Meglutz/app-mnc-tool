@@ -10,6 +10,7 @@ let Source = "./mnemonic.mnc";
 
 let MyQueries = [];
 let Data;
+let MNC;
 let MNCData;
 
 let CurrentModule;
@@ -19,18 +20,34 @@ let Warnings = null;
 let WarningLog = []; /* Contains html styled string array of all warnings
                         which occured during the sequences */
 
+const HEAD = "HEAD";
+const DEFS = "DEFS";
+const LADR = "LADR";
+const MESG = "MESG";
 /*******************************************************************************
 ** p5 Main functions
 *******************************************************************************/
 function preload() {
   /* the loadStrings function returns an array, indexed by the line count of the loaded file */
-  Data = new Resource(loadStrings(Source, console.log("Mnemonic file loaded.")));
+  MNC = new Mnemonic(loadStrings(Source, console.log("Mnemonic file loaded correctly.")));
+  Data = new Resource(MNC);
 }
 
 
 function setup() {
   /* set global vars for mnc info */
   MNCData = Data.getMNCinfo();
+
+  /* pre-analyze mnemonic levels and structure */
+  MNC.levels.push(new LineRange(MNC.lines, "1", /^\%\@3/,   /^SUB\s1$/));
+  MNC.levels.push(new LineRange(MNC.lines, "2", /^SUB\s1$/, /^SUB\s2$/));
+  MNC.levels.push(new LineRange(MNC.lines, "SUB", /^SUB\s2$/, /^SUB\s64$/));
+  // MNC.levels.push(new Level("3", /^SUB\s2$/, /^SUB\s48$/));
+
+  MNC.structures.push(new LineRange(MNC.lines, "INFO", /^\%\@1/, /^\%\@2/));
+  MNC.structures.push(new LineRange(MNC.lines, "DEFS", /^\%\@2/, /^\%\@3/));
+  MNC.structures.push(new LineRange(MNC.lines, "LADR", /^\%\@3/, /^\%\@4/));
+  MNC.structures.push(new LineRange(MNC.lines, "MESG", /^\%\@4/, /^\%\@5/));
 }
 
 
@@ -70,41 +87,42 @@ function draw() {
 /*******************************************************************************
 ** Sequence 1 | get Definitions
 ********************************************************************************
-** Action: Loops trough each line in the source and gets all Definitions.
-**         Reads & Writes directly from / to the source
+** Action: Loops trough each line in the res and gets all Definitions.
+**         Reads & Writes directly from / to the res
 **         Gets SingleBitDefinitions, MultiBitDefinitions & Programnumbers.
 **         The "Modules" array is only partially filled after this method, the
 **         rest of it's data will be gathered in the getCurrentModule function.
 ** Return: [w] (Integer), amount of warnings
 *******************************************************************************/
-function getDefinitions(source) {
+function getDefinitions(res) {
   /* Get all definitions in the current file */
   console.log("Getting definitions...");
-  for (let line of source.sourceLines) {
+  let end = res.source.getEndOf(DEFS);
+  for (let i = res.source.getStartOf(DEFS); i < end; i++) {
     /* Check if line contains a multi bit definition */
-    let MBD = source.getMultiBitDefinitions(line);
-    if (MBD != null) {source.MBDMemory.push(MBD);}
+    let MBD = res.getMultiBitDefinitions(res.source.lines[i]);
+    if (MBD != null) {res.MBDMemory.push(MBD);}
     /* Check if line contains a single bit definition */
-    let SBD = source.getSingleBitDefinitions(line);
-    if (SBD != null) {source.SBDMemory.push(SBD);}
+    let SBD = res.getSingleBitDefinitions(res.source.lines[i]);
+    if (SBD != null) {res.SBDMemory.push(SBD);}
     /* Check if line contains a program number definition */
-    let PRGNBR = source.getModuleNumberDefinition(line);
-    if (PRGNBR != null) {source.Modules.push(PRGNBR);}
+    let PRGNBR = res.getModuleNumberDefinition(res.source.lines[i]);
+    if (PRGNBR != null) {res.Modules.push(PRGNBR);}
     /* Check if line contains a program title definition (they are only shown
     where the program is called in the file). Add to equally named existing module */
-    source.getModuleTitleDefinition(line);
+    res.getModuleTitleDefinition(res.source.lines[i]);
   }
   console.log("-- Multibit definitions  :");
-  console.log(source.MBDMemory);
+  console.log(res.MBDMemory);
   console.log("-- Singlebit definitions :");
-  console.log(source.SBDMemory);
+  console.log(res.SBDMemory);
   console.log("-- Module definitions    :");
-  console.log(source.Modules);
+  console.log(res.Modules);
 
   let warnString = "";
-  if (source.MBDMemory.length < 1)  {warnString = "There aren't any Multi bit definitions in this MNC!";}
-  if (source.SBDMemory.length < 1)  {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any Single bit definitions in this MNC!";}
-  if (source.Modules.length < 1)    {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any Modules defined in this MNC!";}
+  if (res.MBDMemory.length < 1)  {warnString = "There aren't any Multi bit definitions in this MNC!";}
+  if (res.SBDMemory.length < 1)  {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any Single bit definitions in this MNC!";}
+  if (res.Modules.length < 1)    {if (warnString != "") {warnString += "<br>"}; warnString += "There aren't any Modules defined in this MNC!";}
   if (warnString != "") {addWarning(WarningLog, getDefinitions.name, warnString, null);}
 
   finishSequence(2);
@@ -113,33 +131,34 @@ function getDefinitions(source) {
 /*******************************************************************************
 ** Sequence 2 | analyze Logic
 ********************************************************************************
-** Action: Loops trough each line in the source and gets the MNC Logic.
-**         Reads & Writes directly from / to the source
+** Action: Loops trough each line in the res and gets the MNC Logic.
+**         Reads & Writes directly from / to the res
 **         Gets currentModule, currentNetwork, read & write BitOperations.
 **         as well as instructionOperations
 ** Return: [w] (Integer), amount of warnings
 *******************************************************************************/
-function analyzeLogic(source) {
+function analyzeLogic(res) {
   console.log("Analyzing logic...");
   /* Get all logic events in the whole file */
-  let lines = source.sourceLines;
-  for (let i = 0; i < lines.length; i++) {
+  let lines = res.source.lines;
+  let end = res.source.getEndOf(LADR);
+  for (let i = res.source.getStartOf(LADR); i < end; i++) {
     /* Update current module */
-    let MODULE = source.getCurrentModule(lines[i], lines[i+1], i);
+    let MODULE = res.getCurrentModule(lines[i], lines[i+1], i);
     if (MODULE != null) {CurrentModule = MODULE;}
     /* Update current network */
-    let NETWORK = source.getCurrentNetwork(lines[i]);
+    let NETWORK = res.getCurrentNetwork(lines[i]);
     if (NETWORK != null) {CurrentNetwork = NETWORK;}
 
     let op = null;
     /* bit operations */
-    op = source.getReadBitOperation(lines[i]);
-    if (op != null) {source.bitOperations.push (new BitOperation(op.op, op.mem, null, CurrentModule, CurrentNetwork, i));}
-    op = source.getWriteBitOperation(lines[i]);
-    if (op != null) {source.bitOperations.push(new BitOperation(op.op, null, op.mem, CurrentModule, CurrentNetwork, i));}
+    op = res.getReadBitOperation(lines[i]);
+    if (op != null) {res.bitOperations.push (new BitOperation(op.op, op.mem, null, CurrentModule, CurrentNetwork, i, res.source.getLevelOf(i)));}
+    op = res.getWriteBitOperation(lines[i]);
+    if (op != null) {res.bitOperations.push(new BitOperation(op.op, null, op.mem, CurrentModule, CurrentNetwork, i, res.source.getLevelOf(i)));}
     /* instruction operations */
-    op = source.InstructionLogicData(lines, i);
-    if (op != null) {source.instructionOperations.push(new InstructionOperation(op.instruction,
+    op = res.InstructionLogicData(lines, i);
+    if (op != null) {res.instructionOperations.push(new InstructionOperation(op.instruction,
                                                                                 op.number,
                                                                                 op.format,
                                                                                 op.formatLength,
@@ -147,24 +166,25 @@ function analyzeLogic(source) {
                                                                                 op.writes,
                                                                                 CurrentModule,
                                                                                 CurrentNetwork,
-                                                                                i));}
+                                                                                i,
+                                                                                res.source.getLevelOf(i)));}
   }
 
   /* get bit read / write operation count */
   let w = 0, r = 0;
-  for (let op of source.bitOperations) {
+  for (let op of res.bitOperations) {
     if (op.writes != null) {w += 1;};
     if (op.reads !=  null) {r += 1;};
   }
 
   console.log("-- Found bitwise Read operations : " + r);
   console.log("-- Found bitwise Write operations: " + w);
-  console.log("-- Found instruction operations  : " + source.instructionOperations.length);
+  console.log("-- Found instruction operations  : " + res.instructionOperations.length);
 
   /* handle warnings of this sequence */
   let warnString = "";
   if (r < 1 || w < 1) {warnString = "Couldn't find any bit read or write Operations in this MNC! (read: " + r + ", write: " + w +")";};
-  if (source.instructionOperations.length < 1) {
+  if (res.instructionOperations.length < 1) {
     if (warnString != "") {warnString += "<br>"};
     warnString += "Couldn't find any instruction Operations in this MNC!";
   };
@@ -176,12 +196,12 @@ function analyzeLogic(source) {
 /*******************************************************************************
 ** Sequence 3 | analyze Dependencies
 ********************************************************************************
-** Action: Loops trough each line in the source and handles dependencies.
-**         Reads & Writes directly from / to the source
+** Action: Loops trough each line in the res and handles dependencies.
+**         Reads & Writes directly from / to the res
 **         -
 ** Return: [w] (Integer), amount of warnings
 *******************************************************************************/
-function analyzeDependencies(source) {
+function analyzeDependencies(res) {
   console.log("Analyzing Dependencies...");
 
   /* Currently no dependencies */
@@ -192,25 +212,25 @@ function analyzeDependencies(source) {
 /*******************************************************************************
 ** Sequence 4 | analyze Results
 ********************************************************************************
-** Action: Loops trough each line in the source and analyzes the results.
+** Action: Loops trough each line in the res and analyzes the results.
 **         trough some given patterns and tests.
-**         Reads & Writes directly from / to the source
+**         Reads & Writes directly from / to the res
 **         - Checks for Modules which are defined, but were not used in the MNC.
 **         - Checks for used, but not yet handled Instructions.
 **           This test is just to warn the user that these Instructions will
 **           not be accounted for.
 ** Return: [w] (Integer), amount of warnings
 *******************************************************************************/
-function analyzeResults(source) {
+function analyzeResults(res) {
   console.log("Analyzing Results...");
 
   /* check if all defined programs appear in the mnc */
   console.log("-- Unused, but defined Modules:");
   let unused = [];
-  for (let i = 0; i < source.Modules.length; i++) {
-    for (let j = 0; j < source.Modules[i].length; j++) {
-      if (source.Modules[i][j] == undefined) {
-        unused.push(source.Modules[i]);
+  for (let i = 0; i < res.Modules.length; i++) {
+    for (let j = 0; j < res.Modules[i].length; j++) {
+      if (res.Modules[i][j] == undefined) {
+        unused.push(res.Modules[i]);
       }
     }
   }
@@ -274,9 +294,16 @@ function checkWarnings(warn) {
 function addWarning(wLog, fName, desc, optData = null) {
   wLog.push("<h3>- Warning from <b>" + fName + ":</b></h3> ");
   wLog.push(desc);
+  let prevEl1 = "";
   if (optData != null) {
     if (isIterable(optData)) {
-      Object.entries(optData).forEach(el => {wLog.push(el[0] + ": " + el[1]);})
+      Object.entries(optData).forEach(el => {
+        /* only add to wLog if the entry value is unique compared to it's predecessor */
+        if (prevEl1 != el[1]) {
+          wLog.push(el[0] + ": " + el[1]);
+        };
+        prevEl1 = el[1];
+      });
     } else {
       wLog.push(optData)
     };
