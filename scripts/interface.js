@@ -28,6 +28,8 @@ const mncShowInfoLoc   =    "mncshow-info-location";
 const mncShowElementId =    "mncshow-element";
 const mncShowClose     =    "overlay-close-button-3";
 
+const styleDefRegex    =    /^(STYLE__)(.*)$/;
+
 const stateRed         =    "#e74848";
 const stateGreen       =    "#53d467";
 
@@ -117,12 +119,13 @@ document.getElementById("query-submit").onclick = function() {
 
   /* Add a new TimeLine "Modal" for each result */
   for (let i = 0; i < MyQueries[latestQuery].result.length; i++) {
-    content = parseToOutput(MyQueries[latestQuery].result[i], query, typeVal);
+    content = prepareDOMcontent(MyQueries[latestQuery].result[i], query);
     if (content != undefined) {
         addDOMresult(content.lineString,
                      content.actionString,
                      content.operationString,
                      content.moduleString,
+                     content.tagString,
                      content.highlight,
                      ["onclick", ("evaluateDOMUserClick(" + i + ")")]);
     }
@@ -139,21 +142,23 @@ document.getElementById("query-submit").onclick = function() {
 **                           content1 = actionString
 **                           content2 = operationString
 **                           content3 = moduleString
+**                           content4 = tagString
 **                           highlight = true if insOp,
 **                           optAttr = ["attrName", attrValue]
 ** Return: null
 *******************************************************************************/
-function addDOMresult (title, content1, content2, content3, highlight = false, optAttr = null) {
+function addDOMresult (title, content1, content2, content3, content4, highlight = false, optAttr = null) {
   let tlBody =      document.getElementById(tlElementLoc);
   let h1Element =   addDOMelement("h1", tlElementId);
   let pElement =    addDOMelement("p", tlElementId);
+  let tagElement =  addDOMelement("a", tlElementId);
   let divElement =  addDOMelement("div", tlElementId, "timeline-item");
 
-  /* Assemble modal div */
+  /* assemble modal div */
   divElement.setAttribute("on-line", "MNC Line " + title);
   if (optAttr != null || isIterable(optAttr)) {divElement.setAttribute(optAttr[0], optAttr[1]);}
 
-  /* Add highlight if needed */
+  /* add highlight if needed */
   if (highlight != false) {
     let currClass = divElement.getAttribute("class");
     if (currClass != null) {
@@ -163,9 +168,13 @@ function addDOMresult (title, content1, content2, content3, highlight = false, o
     }
   }
 
-  h1Element.innerHTML = content1;
-  pElement.innerHTML =  content2 + "<br>" + content3 + "<br>";
+  /* add style tag to level tag */
+  tagElement = appendDOMtag(tagElement, "class", "level-tag-" + content4);
+  tagElement.innerHTML = "Ladder-Level: " + content4;
+  h1Element.innerHTML =  content1;
+  pElement.innerHTML =   content2 + "<br>" + content3 + "<br>";
 
+  divElement.appendChild(tagElement);
   divElement.appendChild(h1Element);
   divElement.appendChild(pElement);
 
@@ -303,8 +312,8 @@ function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass =
   /* create new column */
   for (let item of rowContent) {
     /* check if the item is a style definer */
-    if (item.match(/^(STYLE__)(.*)$/) != null) {
-      style = item.match(/^(STYLE__)(.*)$/)[2];
+    if (item.match(styleDefRegex) != null) {
+      style = item.match(styleDefRegex)[2];
     } else {
       temp = addDOMelement(colType, insOpElementId, optClass);
       text = addDOMelement(texType, insOpElementId);
@@ -410,17 +419,17 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
 ** Action: Updates header string
 ** Return: null
 *******************************************************************************/
-function updateDOMheader(mncInfo) {
+function updateDOMheader(mnc) {
   let pElement = document.getElementById(stateText);
 
   /* mnemonic info string */
-  if (mncInfo != null) {
-    if (mncInfo.Time == undefined) {mncInfo.Time = 0}
-    pElement.innerHTML  =       mncInfo.Type + " | " +
-                                mncInfo.Release + " | " + "Compile Date: " +
-                                mncInfo.CompileDate + " | " +
-                                mncInfo.Note + " | " + "Analyze time: " +
-                                mncInfo.Time.toFixed(2) + " ms";
+  if (mnc.info != null) {
+    if (mnc.info.time == undefined) {mnc.info.time = 0}
+    pElement.innerHTML  =            mnc.info.type + " | " +
+                                     mnc.info.release + " | " + "Compile Date: " +
+                                     mnc.info.compileDate + " | " +
+                                     mnc.info.note + " | " + "Analyze time: " +
+                                     mnc.timer.total.toFixed(2) + " ms";
   } else {
     pElement.innerHTML = "No Source Data"
   }
@@ -429,45 +438,43 @@ function updateDOMheader(mncInfo) {
 ** Action: Formats query results into prepared Strings for the DOM Elements
 ** Return: action-, operation-, module- lineString
 *******************************************************************************/
-function parseToOutput(result, query, type) {
+function prepareDOMcontent(result, query) {
   /* These strings represent one column in the output table */
   let ActionString = query;
   let OperationString = "";
   let ModuleString = "";
   let LineString = "";
+  let TagString = "";
   let Highlight = false;
 
-  /* Loop trough each property of all objects in result array */
-  Object.entries(result).forEach(entry => {
-    let propt = entry[0]; let value = entry[1];
+  let type = query.type;
 
-    /* Pick out the relevant properties for the output */
-    switch (propt) {
-      case "operation":
-        if (value != null && OperationString == "") {OperationString = beautify(value);}
-        break;
-      case "writes": /* Only if query type is of bitWriteOps */
-        if (value != null && OperationString == "" && type == bitWriteOps) {
-          Highlight = true; /* Set highlight if it's an instruction */
-          OperationString = "(" + result.writes + ") " +
-                            "is overwritten by " + result.reads + " (via " + result.instruction + ")";
-        } break;
-      case "reads": /* Only if query type is of bitReadOps */
-        if (value != null && OperationString == "" && type == bitReadOps) {
-          Highlight = true; /* Set highlight if it's an instruction */
-          OperationString = "(" + result.reads + ") " +
-                            "is overriding " + result.writes + " (via " + result.instruction + ")";
-        } break;
-      case "inModule":
-        if (value != null && ModuleString == "") {
-          Object.entries(value).forEach(modAttr => {
-            if (modAttr[0] == "sourceFile") {ModuleString = "fc" + modAttr[1] + " | ";}
-            if (modAttr[0] == "title")      {ModuleString += modAttr[1];}
-          });
-        } break;
-      case "inLine":
-        if (value != null && LineString == "") {LineString = value + 1;} break;
+  if (result instanceof InstructionOperation) { /* evaluate strings for instruction operations */
+    /* get values from reads or writes property of instructionOperation Object, depending
+    on the type of query */
+    Highlight = true; /* turn highlight on if it's an instruction */
+    if (type == bitWriteOps) {
+      OperationString = "(" + result.writes + ") " + "is overwritten by " + result.reads + " (via " + result.instruction + ")";
+    } else if (type == bitReadOps) {
+      OperationString = "(" + result.reads +  ") " + "is overriding " + result.writes + " (via " + result.instruction + ")";
+    } else {console.log("Error: Couldn't assemble 'OperationString' for  " + result +
+                        "because this query type is not handled: " + type);
     }
+
+  } else if (result instanceof BitOperation) { /* evaluate strings for bit operations */
+    Highlight = false; /* turn highlight off if it's a bit operation  */
+    OperationString = beautify(result.operation);
+
+  } else { /* catch invalid result types */
+    console.error("Error: Invalid Object in query.result property: " + result);
+  }
+
+  /* set return strings which are identical wheter it's a bit- or instruction operation */
+  LineString = result.inLine + 1;
+  TagString =  result.inLevel.id;
+  Object.entries(result.inModule).forEach(modAttr => {
+    if (modAttr[0] == "sourceFile") {ModuleString = "fc" + modAttr[1] + " | ";}
+    if (modAttr[0] == "title")      {ModuleString += modAttr[1];}
   });
 
   return {
@@ -475,6 +482,7 @@ function parseToOutput(result, query, type) {
     operationString: OperationString,
     moduleString: ModuleString,
     lineString: LineString,
+    tagString: TagString,
     highlight: Highlight
   }
 }

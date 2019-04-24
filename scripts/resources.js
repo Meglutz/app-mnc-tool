@@ -87,43 +87,68 @@ class InstructionOperation {
 
 /*******************************************************************************
 ** Class - Mnemonic
-** Holds the source MNC as well as Line ranges for secotrs and levels
+** Holds the source MNC as well as Line ranges for secotors and levels
 *******************************************************************************/
 class Mnemonic {
   constructor(lines) {
-    this.lines = lines;    /* = String Array, one index per mnc line */
+    this.lines = lines;           /* = String Array, one index per MNC line */
+
     this.levels = [];
-    this.structures = [];
+
+    this.ranges = {head:  null,  /* = Object of Type [LineRange] */
+                   defs:  null,  /* = Object of Type [LineRange] */
+                   ladr:  null,  /* = Object of Type [LineRange] */
+                   mesg:  null}; /* = Object of Type [LineRange] */
+
+    this.info =   {compileDate: null,
+                   note:        null,
+                   type:        null,
+                   release:     null};
+
+    this.timer =  {start: 0,
+                   stop:  0,
+                   total: 0};
   }
 
-  /*******************************************************************************
-  ** Action: Loops trough both the levels and structures properties to get the
-  ** start value of the one with id "id"
-  ** Return: Number, start value
-  *******************************************************************************/
-  getStartOf(id) {
-    for (let el of this.levels)     {if (el.id == id) {return el.start;};};
-    for (let el of this.structures) {if (el.id == id) {return el.start;};};
-  }
-
-  /*******************************************************************************
-  ** Action: Loops trough both the levels and structures properties to get the
-  ** end value of the one with id "id"
-  ** Return: Number, end value
-  *******************************************************************************/
-  getEndOf(id) {
-    for (let el of this.levels)     {if (el.id == id) {return el.end;};};
-    for (let el of this.structures) {if (el.id == id) {return el.end;};};
-  }
 
   /*******************************************************************************
   ** Action: Checks if an [index] is in the correct range (>= start, <= end)
   ** Return: LineRange Object
   *******************************************************************************/
   getLevelOf(index) {
-    for (let i = 0; i < this.levels.length; i++) {
-      if (this.levels[i].start <= index && this.levels[i].end >= index) {
-        return this.levels[i]
+    for (let level of this.levels) {
+      if (level.start <= index && level.end >= index) {
+        return level;
+      }
+    }
+  }
+
+  /*******************************************************************************
+  ** Action: Gets the Info from the mnemonic file
+  ** Return: Object: [CompileDate, Note, Type, Release]
+  *******************************************************************************/
+  getMNCinfo() {
+    let tempLine;
+    for (let i = this.ranges.head.start; i < this.ranges.head.end; i++) {
+      tempLine = removeLeadingChar(this.lines[i], "0");
+      tempLine = removeLeadingChar(tempLine,      " ");
+      switch (true) {
+        case tempLine.charAt(0) == "7":
+          this.info.compileDate = formatDate(tempLine.substring(2));
+          break;
+        case tempLine.charAt(0) == "1" && tempLine.charAt(1) == "0":
+          this.info.note        = this.lines[i].substring(3);
+          break;
+        case tempLine.charAt(0) == "2":
+          this.info.type        = tempLine.substring(2);
+          break;
+        case tempLine.charAt(0) == "4":
+          if (this.info.release == null) {this.info.release = tempLine.substring(2);}
+          else {this.info.release = tempLine.substring(2) + " " + this.info.release;};
+          break;
+        case tempLine.charAt(0) == "5":
+          if (this.info.release == null) {this.info.release = tempLine.substring(2);}
+          else {this.info.release = this.info.release + "." + tempLine.substring(2);};
       }
     }
   }
@@ -324,55 +349,6 @@ class Resource {
       return new Memory(match[1], match[2], match[4], 1, "Undefined (dMem)");
     } else {
       return null;
-    }
-  }
-
-
-  /*******************************************************************************
-  ** Action: Gets the Info from the mnemonic file
-  ** Return: Object: [CompileDate, Note, Type, Release]
-  *******************************************************************************/
-  getMNCinfo() {
-    let inHeader = false;
-    let tempLine;
-
-    /* return variables */
-    let compileDate;
-    let note;
-    let type;
-    let release;
-
-    for (let line of this.source.lines) {
-      /* check if we are entering in the header portion */
-      if (headerMNCstartRegex.exec(line) != null) {inHeader = true;}
-      if (inHeader) {
-        /* if we hit the end of the header, return the info */
-        if (headerMNCstopRegex.exec(line) != null) {return {CompileDate: compileDate,
-                                                            Note:        note,
-                                                            Type:        type,
-                                                            Release:     release};}
-        tempLine = removeLeadingChar(line,     "0");
-        tempLine = removeLeadingChar(tempLine, " ");
-        switch (true) {
-          case tempLine.charAt(0) == "7":
-            compileDate = formatDate(tempLine.substring(2));
-            break;
-          case tempLine.charAt(0) == "1" && tempLine.charAt(1) == "0":
-            note        = line.substring(3);
-            break;
-          case tempLine.charAt(0) == "2":
-            type        = tempLine.substring(2);
-            break;
-          case tempLine.charAt(0) == "4":
-            if (release == null) {release = tempLine.substring(2);}
-            else {release = tempLine.substring(2) + " " + release;};
-            break;
-          case tempLine.charAt(0) == "5":
-            if (release == null) {release = tempLine.substring(2);}
-            else {release = release + "." + tempLine.substring(2);};
-        }
-        console.log("Get MNC info missed exit!");
-      }
     }
   }
 

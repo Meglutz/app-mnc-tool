@@ -17,8 +17,8 @@
 * [ ] Fix COMPB Table
 * [ ] **Add level parser**
     * [x] Add parser
-    * [ ] Add Level Tags to result visualisation
-    * [ ] Remove the `MNCData` global Variable and put it's keys as properties into the `Mnemonic` class
+    * [X] Add Level Tags to result visualisation
+    * [X] Remove the `MNCData` global Variable and put it's keys as properties into the `Mnemonic` class
     * [ ] Rework Module detection / definition strategy. There should be a better solution.
 * [x] Remove bitReadOps / bitWriteOps arrays -> replace with bitOps (branch: *newBitOpStructure*)
 * [ ] Fix Instruction Operation Text in result display (Only plot reads / writes)

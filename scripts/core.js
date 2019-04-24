@@ -20,10 +20,6 @@ let Warnings = null;
 let WarningLog = []; /* Contains html styled string array of all warnings
                         which occured during the sequences */
 
-const HEAD = "HEAD";
-const DEFS = "DEFS";
-const LADR = "LADR";
-const MESG = "MESG";
 /*******************************************************************************
 ** p5 Main functions
 *******************************************************************************/
@@ -35,25 +31,24 @@ function preload() {
 
 
 function setup() {
-  /* set global vars for mnc info */
-  MNCData = Data.getMNCinfo();
-
   /* pre-analyze mnemonic levels and structure */
-  MNC.levels.push(new LineRange(MNC.lines, "1", /^\%\@3/,   /^SUB\s1$/));
-  MNC.levels.push(new LineRange(MNC.lines, "2", /^SUB\s1$/, /^SUB\s2$/));
+  MNC.levels.push(new LineRange(MNC.lines, "1",   /^\%\@3/,   /^SUB\s1$/));
+  MNC.levels.push(new LineRange(MNC.lines, "2",   /^SUB\s1$/, /^SUB\s2$/));
   MNC.levels.push(new LineRange(MNC.lines, "SUB", /^SUB\s2$/, /^SUB\s64$/));
-  // MNC.levels.push(new Level("3", /^SUB\s2$/, /^SUB\s48$/));
+  // MNC.levels.three = new Level("3", /^SUB\s2$/, /^SUB\s48$/);
 
-  MNC.structures.push(new LineRange(MNC.lines, "INFO", /^\%\@1/, /^\%\@2/));
-  MNC.structures.push(new LineRange(MNC.lines, "DEFS", /^\%\@2/, /^\%\@3/));
-  MNC.structures.push(new LineRange(MNC.lines, "LADR", /^\%\@3/, /^\%\@4/));
-  MNC.structures.push(new LineRange(MNC.lines, "MESG", /^\%\@4/, /^\%\@5/));
+  MNC.ranges.head = new LineRange(MNC.lines, "HEAD", /^\%\@1/, /^\%\@2/);
+  MNC.ranges.defs = new LineRange(MNC.lines, "DEFS", /^\%\@2/, /^\%\@3/);
+  MNC.ranges.ladr = new LineRange(MNC.lines, "LADR", /^\%\@3/, /^\%\@4/);
+  MNC.ranges.mesg = new LineRange(MNC.lines, "MESG", /^\%\@4/, /^\%\@5/);
+
+  MNC.getMNCinfo();
 }
 
 
 function draw() {
   /* start timer */
-  let start = new Date().getTime();
+  MNC.timer.start = new Date().getTime();
 
   /* Run all sequences to analyze the mnemonic */
   getDefinitions      (Data);
@@ -70,11 +65,11 @@ function draw() {
   }
 
   /* stop timer */
-  let end = new Date().getTime();
-  MNCData.Time = (end - start);
+  MNC.timer.end   = new Date().getTime();
+  MNC.timer.total = MNC.timer.end - MNC.timer.start;
 
   /* plot mnemonic info to DOM header & update overlay */
-  updateDOMheader(MNCData);
+  updateDOMheader(MNC);
   updateDOMinfo(Warnings, WarningLog, Data);
 
   /* Query to see all defined bits which are handled in Instructions */
@@ -97,8 +92,7 @@ function draw() {
 function getDefinitions(res) {
   /* Get all definitions in the current file */
   console.log("Getting definitions...");
-  let end = res.source.getEndOf(DEFS);
-  for (let i = res.source.getStartOf(DEFS); i < end; i++) {
+  for (let i = res.source.ranges.defs.start; i < res.source.ranges.defs.end; i++) {
     /* Check if line contains a multi bit definition */
     let MBD = res.getMultiBitDefinitions(res.source.lines[i]);
     if (MBD != null) {res.MBDMemory.push(MBD);}
@@ -141,8 +135,7 @@ function analyzeLogic(res) {
   console.log("Analyzing logic...");
   /* Get all logic events in the whole file */
   let lines = res.source.lines;
-  let end = res.source.getEndOf(LADR);
-  for (let i = res.source.getStartOf(LADR); i < end; i++) {
+  for (let i = res.source.ranges.ladr.start; i < res.source.ranges.ladr.end; i++) {
     /* Update current module */
     let MODULE = res.getCurrentModule(lines[i], lines[i+1], i);
     if (MODULE != null) {CurrentModule = MODULE;}
@@ -170,20 +163,14 @@ function analyzeLogic(res) {
                                                                                 res.source.getLevelOf(i)));}
   }
 
-  /* get bit read / write operation count */
-  let w = 0, r = 0;
-  for (let op of res.bitOperations) {
-    if (op.writes != null) {w += 1;};
-    if (op.reads !=  null) {r += 1;};
-  }
-
-  console.log("-- Found bitwise Read operations : " + r);
-  console.log("-- Found bitwise Write operations: " + w);
-  console.log("-- Found instruction operations  : " + res.instructionOperations.length);
+  console.log("-- Found bitwise operations     : ");
+  console.log(res.bitOperations)
+  console.log("-- Found instruction operations : ");
+  console.log(res.instructionOperations);
 
   /* handle warnings of this sequence */
   let warnString = "";
-  if (r < 1 || w < 1) {warnString = "Couldn't find any bit read or write Operations in this MNC! (read: " + r + ", write: " + w +")";};
+  if (res.bitOperations.length < 1) {warnString = "Couldn't find any bit read or write Operations in this MNC! (read: " + r + ", write: " + w +")";};
   if (res.instructionOperations.length < 1) {
     if (warnString != "") {warnString += "<br>"};
     warnString += "Couldn't find any instruction Operations in this MNC!";
