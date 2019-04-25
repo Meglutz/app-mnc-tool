@@ -12,6 +12,8 @@ const stateClose       =    "overlay-close-button-1"
 const stateWarning     =    "overlay-warning";
 const stateWarningLog  =    "overlay-warning-log";
 const stateLog         =    "overlay-info";
+const stateRedClass    =    "state-circle-red";
+const stateGreenClass  =    "state-circle-green";
 
 const insOpOverlay     =    "overlay-container-2";
 const insOpTableLoc    =    "insop-table-location";
@@ -30,8 +32,6 @@ const mncShowClose     =    "overlay-close-button-3";
 
 const styleDefRegex    =    /^(STYLE__)(.*)$/;
 
-const stateRed         =    "#e74848";
-const stateGreen       =    "#53d467";
 
 /*******************************************************************************
 ** DOM Query-Result Handlers
@@ -200,8 +200,16 @@ function addDOMinsOpTable(query, resultIndex) {
   for (let i = 0; i < bitAmount; i++) {
 
     row = row.concat(formatToRow(bitCount, byteCount, ins.reads, ins.instruction, query, "green-cell"));
-    row.push("->");
-    row = row.concat(formatToRow(bitCount, byteCount, ins.writes, ins.instruction, query, "red-cell"));
+
+    /* there are instructions which only have .reads entries and write their result to
+    fanucs predefined result bits. For example "COMP" will do this. */
+    if (ins.writes == null) {
+      row.push("-> FANUC Predefined Resultbyte: R9000");
+    } else {
+      row.push("->");
+      row = row.concat(formatToRow(bitCount, byteCount, ins.writes, ins.instruction, query, "red-cell"));
+    }
+
     addDOMtableColumn(document.getElementById(insOpTableLoc), row, false)
     row = [];
 
@@ -357,6 +365,26 @@ function appendDOMtag(el, type, addVal) {
 }
 
 /*******************************************************************************
+** Action: Replaces value of DOM tag of a specified DOM element.
+** if the tag is empty, it will just add the newVal to it
+** Return: DOM element
+*******************************************************************************/
+function replaceDOMtagValue(el, type, prevVal, newVal) {
+  let curr = el.getAttribute(type);
+  if (curr != null) {
+    /* replace old with new and store new string to temp, so we can compare it with the old one */
+    let temp = curr.replace(prevVal, newVal);
+    if (temp == curr) {
+      console.error("Error: couldn't find old value '" + prevVal + "' in html tag '" + type + "'")
+    } else {
+      el.setAttribute(type, temp);
+    }
+  } else {
+    el.setAttribute(type, newVal);
+  }
+  return el;
+}
+/*******************************************************************************
 ** Action: Removes all DOM Elements which are of the ID "id"
 ** Return: null
 *******************************************************************************/
@@ -372,16 +400,19 @@ function removeDOMelements(id) {
 ** Return: null
 *******************************************************************************/
 function updateDOMinfo(warningStr, warningLog = null, source) {
+
   let circleElement = document.getElementById(stateButton);
+  /* initialize state circle, otherwise replaceDOMtagValue will throw an error */
+  circleElement = appendDOMtag(circleElement, "class", stateRedClass);
+
   let aElement      = {warn:    document.getElementById(stateWarning),
                        warnLog: document.getElementById(stateWarningLog),
                        info:    document.getElementById(stateLog)};
 
   /* update overlay elements: */
-
   /* warning string */
   if (warningStr != null) {
-    circleElement.setAttribute("fill", stateRed);
+    circleElement = replaceDOMtagValue(circleElement, "class", stateGreenClass, stateRedClass);
     aElement.warn.innerHTML = warningStr;
 
     /* if the warning log isn't empty, then add it to the overlay string */
@@ -397,7 +428,7 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
     }
 
   } else {
-    circleElement.setAttribute("fill", stateGreen);
+    circleElement = replaceDOMtagValue(circleElement, "class", stateRedClass, stateGreenClass);
     aElement.warn.innerHTML = "No Warnings - All Good!";
     aElement.warnLog.innerHTML  = "---";
   }
@@ -440,55 +471,55 @@ function updateDOMheader(mnc) {
 *******************************************************************************/
 function prepareDOMresult(result, query, type) {
   /* These strings represent one column in the output table */
-  let ActionString = query;
-  let OperationString = "";
-  let ModuleString = "";
-  let LineString = "";
-  let TagString = "";
-  let Highlight = false;
+  let actionString = query;
+  let operationString = "";
+  let moduleString = "";
+  let lineString = "";
+  let tagString = "";
+  let highlight = false;
 
   if (result instanceof InstructionOperation) { /* evaluate strings for instruction operations */
     /* get values from reads or writes property of instructionOperation Object, depending
     on the type of query */
-    Highlight = true; /* turn highlight on if it's an instruction */
+    highlight = true; /* turn highlight on if it's an instruction */
     if (type == bitWriteOps) {
-      OperationString = result.writes + " is overwritten by " + result.reads + " (via " + result.instruction + ")";
+      operationString = result.writes + " is overwritten by " + result.reads + " (via " + result.instruction + ")";
     } else if (type == bitReadOps) {
-      OperationString = result.reads + " is overriding " + result.writes + " (via " + result.instruction + ")";
-    } else {console.error("Error: Couldn't assemble 'OperationString' for  " + result +
+      operationString = result.reads + " is overriding " + result.writes + " (via " + result.instruction + ")";
+    } else {console.error("Error: Couldn't assemble 'operationString' for  " + result +
                           "because this query type is not handled: " + type);
     }
 
   } else if (result instanceof BitOperation) { /* evaluate strings for bit operations */
-    Highlight = false; /* turn highlight off if it's a bit operation  */
-    OperationString = beautify(result.operation);
+    highlight = false; /* turn highlight off if it's a bit operation  */
+    operationString = beautify(result.operation);
 
   } else { /* catch invalid result types */
     console.error("Error: Invalid Object in query.result property: " + result);
   }
 
   /* set return strings which are identical wheter it's a bit- or instruction operation */
-  LineString = result.inLine + 1;
-  TagString =  result.inLevel.id;
+  lineString = result.inLine + 1;
+  tagString =  result.inLevel.id;
   Object.entries(result.inModule).forEach(modAttr => {
-    if (modAttr[0] == "sourceFile") {ModuleString = "fc" + modAttr[1] + " | ";}
-    if (modAttr[0] == "title")      {ModuleString += modAttr[1];}
+    if (modAttr[0] == "sourceFile") {moduleString = "fc" + modAttr[1] + " | ";}
+    if (modAttr[0] == "title")      {moduleString += modAttr[1];}
   });
 
   return {
-    actionString: ActionString,
-    operationString: OperationString,
-    moduleString: ModuleString,
-    lineString: LineString,
-    tagString: TagString,
-    highlight: Highlight
+    actionString: actionString,
+    operationString: operationString,
+    moduleString: moduleString,
+    lineString: lineString,
+    tagString: tagString,
+    highlight: highlight
   }
 }
 
 
 /*******************************************************************************
-** Action: Formats the OperationString according to it's content
-** Return: Formatted OperationString
+** Action: Formats the operationString according to it's content
+** Return: Formatted operationString
 *******************************************************************************/
 function beautify(op) {
   let r = "is ";

@@ -1,20 +1,29 @@
 @import "font-faces.css";
 
 :root {
+  /* Anthracite && Darker Anthracite*/
   --main-color:           #313131;
   --main-accent-color:    #515151;
 
+  /* Offwhite && Darker Offwhite */
   --tone-1-color:         #eeeeee;
   --tone-1-accent-color:  #e4e4e4;
 
+  /* Black Anthracite */
   --tone-2-color:         #212121;
   --tone-2-accent-color:  #212121;
 
+  /* Light Gray */
   --tone-3-color:         #a2a2a2;
   --tone-3-accent-color:  #a2a2a2;
 
+  /* Red && Dark Red */
   --tone-4-color:         #b34b4b;
-  --tone-4-accent:        #b34b4b; /* unused*/
+  --tone-4-accent:        #632b2b;
+
+  /* Green && Dark Green */
+  --tone-5-color:         #4e9455;
+  --tone-5-accent:        #1f3c22;
 
   --overlay-background:   rgba(40, 40, 40, 0.8);
   --box-shadow:           rgba(33, 33, 33, 0.5);
@@ -138,13 +147,13 @@ header {
 
 /* cell styles */
 .insop-table .green-cell {
-  background-color: #4e9455;
-  color: #1f3c22;
+  background-color: var(--tone-4-color);
+  color: var(--tone-4-accent);
 }
 /* every 2nd last cell text */
 .insop-table .red-cell  {
-  background-color: #9e3841;
-  color: #3d1518;
+  background-color: var(--tone-5-color);
+  color: var(--tone-5-accent);
 }
 
 /* Style MNCshow Overlay */
@@ -208,6 +217,14 @@ header {
 
 .status-button {
   cursor: pointer;
+}
+
+.state-circle-red {
+  fill: var(--tone-4-color);
+}
+
+.state-circle-green {
+  fill: var(--tone-5-color);
 }
 
 /* Style Controls */
@@ -334,18 +351,19 @@ p {
   position: absolute;
   display: block;
   left: 2em;
-  font-weight: bold;
   top: 3em;
   display: block;
-  font-family: "Roboto";
-  font-weight: 700;
+  font-family: "consolas";
   font-size: 0.785rem;
   padding: 5px;
   border-radius: 3px;
-  color: var(--tone-1-color);
 }
 
-.level-tag-1   {background-color: #33a5b0;}
-.level-tag-2   {background-color: #4e9455;}
-.level-tag-3   {background-color: #a1266f;}
-.level-tag-SUB {background-color: var(--tone-4-color);}
+.level-tag-1   {background-color: #33a5b0;
+                color: #1f3c22;}
+.level-tag-2   {background-color: #4e9455;
+                color: #1f3c22;}
+.level-tag-3   {background-color: #a1266f;
+                color: #1f3c22;}
+.level-tag-SUB {background-color: var(--tone-4-color);
+                color: var(--tone-4-accent);}
