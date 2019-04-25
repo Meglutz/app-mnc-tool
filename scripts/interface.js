@@ -119,7 +119,7 @@ document.getElementById("query-submit").onclick = function() {
 
   /* Add a new TimeLine "Modal" for each result */
   for (let i = 0; i < MyQueries[latestQuery].result.length; i++) {
-    content = prepareDOMcontent(MyQueries[latestQuery].result[i], query);
+    content = prepareDOMresult(MyQueries[latestQuery].result[i], query, typeVal);
     if (content != undefined) {
         addDOMresult(content.lineString,
                      content.actionString,
@@ -199,9 +199,9 @@ function addDOMinsOpTable(query, resultIndex) {
 
   for (let i = 0; i < bitAmount; i++) {
 
-    row = row.concat(getRowContent(bitCount, byteCount, ins.reads, ins.instruction, query, "green-cell"));
+    row = row.concat(formatToRow(bitCount, byteCount, ins.reads, ins.instruction, query, "green-cell"));
     row.push("->");
-    row = row.concat(getRowContent(bitCount, byteCount, ins.writes, ins.instruction, query, "red-cell"));
+    row = row.concat(formatToRow(bitCount, byteCount, ins.writes, ins.instruction, query, "red-cell"));
     addDOMtableColumn(document.getElementById(insOpTableLoc), row, false)
     row = [];
 
@@ -252,9 +252,9 @@ function addDOMmncShowList(query, resultIndex) {
 ** Action: Generates row content for the given parameters
 ** Return: Array of row cells [bit, address, bit, address, ...]
 *******************************************************************************/
-function getRowContent(bitIndex, byteOffset, bytes, actionName = "", query, styling) {
-  let regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
-  let Exit = "EXIT";
+function formatToRow(bitIndex, byteOffset, bytes, actionName = "", query, styling) {
+  const regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
+  const Exit = "EXIT";
   let rowContent = [];
   let byteType, byteAddress, bitString, def;
 
@@ -438,7 +438,7 @@ function updateDOMheader(mnc) {
 ** Action: Formats query results into prepared Strings for the DOM Elements
 ** Return: action-, operation-, module- lineString
 *******************************************************************************/
-function prepareDOMcontent(result, query) {
+function prepareDOMresult(result, query, type) {
   /* These strings represent one column in the output table */
   let ActionString = query;
   let OperationString = "";
@@ -447,18 +447,16 @@ function prepareDOMcontent(result, query) {
   let TagString = "";
   let Highlight = false;
 
-  let type = query.type;
-
   if (result instanceof InstructionOperation) { /* evaluate strings for instruction operations */
     /* get values from reads or writes property of instructionOperation Object, depending
     on the type of query */
     Highlight = true; /* turn highlight on if it's an instruction */
     if (type == bitWriteOps) {
-      OperationString = "(" + result.writes + ") " + "is overwritten by " + result.reads + " (via " + result.instruction + ")";
+      OperationString = result.writes + " is overwritten by " + result.reads + " (via " + result.instruction + ")";
     } else if (type == bitReadOps) {
-      OperationString = "(" + result.reads +  ") " + "is overriding " + result.writes + " (via " + result.instruction + ")";
-    } else {console.log("Error: Couldn't assemble 'OperationString' for  " + result +
-                        "because this query type is not handled: " + type);
+      OperationString = result.reads + " is overriding " + result.writes + " (via " + result.instruction + ")";
+    } else {console.error("Error: Couldn't assemble 'OperationString' for  " + result +
+                          "because this query type is not handled: " + type);
     }
 
   } else if (result instanceof BitOperation) { /* evaluate strings for bit operations */
@@ -505,7 +503,7 @@ function beautify(op) {
     case op.includes("WRT"):       r = r + "written (" + op + ")"; break;
     case op.includes("RST"):       r = r + "reset (" + op + ")"; break;
     case op.includes("SET"):       r = r + "set (" + op + ")";  break;
-    default: console.log("Couldn't find " + op + " in beautify Cases");
+    default: console.log("Couldn't find " + op + " in 'beautify' Cases");
   }
   r = r + " in";
   return r;

@@ -345,7 +345,7 @@ p {
   color: var(--tone-1-color);
 }
 
-.level-tag-1   {background-color: #3ca64c;}
-.level-tag-2   {background-color: #89ab41;}
-.level-tag-3   {background-color: #a8873d;}
+.level-tag-1   {background-color: #33a5b0;}
+.level-tag-2   {background-color: #4e9455;}
+.level-tag-3   {background-color: #a1266f;}
 .level-tag-SUB {background-color: var(--tone-4-color);}
