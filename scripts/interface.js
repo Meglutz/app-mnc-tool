@@ -375,7 +375,7 @@ function replaceDOMtagValue(el, type, prevVal, newVal) {
     /* replace old with new and store new string to temp, so we can compare it with the old one */
     let temp = curr.replace(prevVal, newVal);
     if (temp == curr) {
-      console.error("Error: couldn't find old value '" + prevVal + "' in html tag '" + type + "'")
+      /* was already right */
     } else {
       el.setAttribute(type, temp);
     }

@@ -15,6 +15,7 @@ const instructionOperationRegex =    /^(SUB)\s*(\d*)/;
 const levelSubRegex =                /^(SUB)\s*(\d*)/;
 const instructionReadWriteRegex =    /^([A-Z])(\d*)$/;
 const instructionFormatRegex =       /^(\d|)(\d\d|)(\d|)$/;
+const instructionDependencyRegex =   /^(RD|OR|AND)(\.NOT\.STK|\.NOT|\.STK|)\s+(.+)/;
 
 const headerMNCstartRegex =          /^\%\@1$/;
 const headerMNCstopRegex =           /^\%$/;
@@ -70,17 +71,19 @@ class BitOperation {
 ** Hold a bit operation, read or write
 *******************************************************************************/
 class InstructionOperation {
-  constructor(instr, instrNbr, form, formLn, reads, writes, inMod, inNwk, inLine, inLevel) {
+  constructor(instr, instrNbr, form, formLn, formMod, reads, writes, dep, inMod, inNwk, inLine, inLevel) {
     this.instruction = instr;          /*  = String, Type of operation */
     this.instructionNumber = instrNbr; /*  = Numeric, Type number */
     this.format = form;                /*  = String, type of format (Normal, Const, Addr...) */
     this.formatLength = formLn;        /*  = Numeric, length of it's actions (in bytes) */
+    this.formatMultiplier = formMod;     /*  = String, contains an address or constant which the format length is multiplied by */
     this.reads = reads;                /*  = String, Beginning Address of read range */
-    this.writes = writes;              /*  = String, Beginnign Address of write range */
+    this.writes = writes;              /*  = String, Beginning Address of write range */
+    this.dependency = dep;             /*  = InstructionDependency Object */
     this.inModule = inMod;             /*  = Object, of tyop [Module] */
     this.inNetwork = inNwk;            /*  = String, containing the network the parser is currently in. */
-    this.inLine = inLine;              /*  =  String, Line index of the whole file. */
-    this.inLevel = inLevel;            /*  =  Object of type [LineRange] */
+    this.inLine = inLine;              /*  = String, Line index of the whole file. */
+    this.inLevel = inLevel;            /*  = Object of type [LineRange] */
   }
 }
 
@@ -300,7 +303,7 @@ class Resource {
 
   /*******************************************************************************
   ** Action: Checks if string contains a BitRead Operation.
-  ** Return: [op: String (Operation), String (Modifier)] [mem: String (Memory)]
+  ** Return: [op: String (Operation), String (multiplier)] [mem: String (Memory)]
   *******************************************************************************/
   getReadBitOperation(str) {
     let match = readBitOperationsRegex.exec(str);
@@ -312,7 +315,7 @@ class Resource {
 
   /*******************************************************************************
   ** Action: Checks if string contains a BitWrite Operation.
-  ** Return: [op: String (Operation), String (Modifier)] [mem: String (Memory)]
+  ** Return: [op: String (Operation), String (multiplier)] [mem: String (Memory)]
   *******************************************************************************/
   getWriteBitOperation(str) {
     let match = writeBitOperationsRegex.exec(str);
@@ -367,7 +370,8 @@ class Resource {
         let number = parseInt(match[2], 10);
         let reads = null;
         let writes = null;
-        let format = {kind: "-", length: 0};
+        let format = {kind: "-", length: 0, multiplier: null};
+        let dependency = null;
         switch (number) {
           case 1: /* ☑️ */
             name = "END1";
@@ -548,11 +552,10 @@ class Resource {
             break;
           case 35:
             name = "XMOVB";
-            format = this.instructionFormat(lines, index, 1);
-            let temp = format.length; format.length = [];
-            format.length.push(temp); format.length.push(lines[2]);
-            reads = [this.instructionReads(lines, index, 3), this.instructionReads(lines, index, 4)];
-            writes = [this.instructionWrites(lines, index, 4), this.instructionWrites(lines, index, 3)];
+            format =     this.instructionFormat(lines, index, 1, 2); /* define multiplier at offset 2... it multiplies the format */
+            reads =      this.instructionReads(lines, index, 3);
+            writes =     this.instructionWrites(lines, index, 4);
+            dependency = this.instructionDep(lines, index, -3);
             break;
           case 19:
             name = "ADD";
@@ -745,12 +748,14 @@ class Resource {
         }
 
         return  {
-                  instruction: name,
-                  number: number,
-                  reads: reads,
-                  writes: writes,
-                  format: format.kind,
-                  formatLength : format.length
+                  instruction      : name,
+                  number           : number,
+                  reads            : reads,
+                  writes           : writes,
+                  dependency       : dependency,
+                  format           : format.kind,
+                  formatLength     : format.length,
+                  formatMultiplier : format.multiplier
                 };
     }
   }
@@ -791,13 +796,16 @@ class Resource {
   **         instuctions range.
   **         Also gets the type (kind) of Format
   ** Return:  [kind: String (Kind)] [length: Numeric (Length in Bytes)]
+  **          [multiplier: String (Address, or constant with which "length"
+  **          is multiplied by)]
   *******************************************************************************/
-  instructionFormat(lines, index, offset) {
+  instructionFormat(lines, index, offset, multiplierOffset = null) {
     let format = lines[index + offset];
     let match = instructionFormatRegex.exec(format);
     let kind = "Normal";
+    let multiplier = null;
     let length = parseInt(match[1], 10);
-    /* Change kind / length if it's not a normal format */
+    /* change kind / length if it's not a normal format */
     if (match[2] && match[3] != null) {
       length = parseInt(match[3], 10);
       switch (match[1]) {
@@ -809,10 +817,28 @@ class Resource {
           break;
       }
     }
+    /* return with multiplier, if multiplierOffset wasn't left "null" */
+    if (multiplierOffset != null) {
+      multiplier = lines[index + multiplierOffset];
+      return {kind: kind, length: length, multiplier: multiplier};
+    }
     return {kind: kind, length: length};
+
+  }
+
+  /*******************************************************************************
+  ** Action: Gets constant / address which is at the offset
+  ** Return:  dep(endency), String
+  *******************************************************************************/
+  instructionDep(lines, index, offset) {
+    let dep = lines[index + offset];
+    let match = instructionDependencyRegex.exec(dep);
+    let depMem = match[3];
+    return depMem;
   }
 
 }
+
 
 /*******************************************************************************
 ** Action: Formats strings from YY/MM/DD HH:MM to DD.MMMM YYYY HH:MM
