@@ -548,7 +548,11 @@ class Resource {
             break;
           case 35:
             name = "XMOVB";
-            this.usedUndefinedInstructions.push(name);
+            format = this.instructionFormat(lines, index, 1);
+            let temp = format.length; format.length = [];
+            format.length.push(temp); format.length.push(lines[2]);
+            reads = [this.instructionReads(lines, index, 3), this.instructionReads(lines, index, 4)];
+            writes = [this.instructionWrites(lines, index, 4), this.instructionWrites(lines, index, 3)];
             break;
           case 19:
             name = "ADD";
@@ -732,6 +736,9 @@ class Resource {
             name = "PID";
             this.usedUndefinedInstructions.push(name);
             break;
+          case 219:
+            name = "RNGW";
+            this.usedUndefinedInstructions.push(name);
           default:
             /* Collect Subs which appear in the mnemonic and are defined but aren't
             handled in code */
@@ -779,7 +786,7 @@ class Resource {
   }
 
   /*******************************************************************************
-  ** Action: Checks the format length of instruction. Measured in bytes
+  ** Action: Checks the format length of instruction. Measured in bytes.
   **         Add the format length to the starting adress and you get the
   **         instuctions range.
   **         Also gets the type (kind) of Format

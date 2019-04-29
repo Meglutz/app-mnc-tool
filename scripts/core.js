@@ -241,6 +241,25 @@ function analyzeResults(res) {
               "Query results will be missing instruction Operations of :",
                Data.usedUndefinedInstructions);
   }
+
+  /* Check if there are undefined instructions found */
+  console.log("-- Undefined Instructions (Unknown instructions):");
+  let undefIns = [];
+  for (let ins of res.instructionOperations) {
+    if (ins.instruction == undefined) {
+      undefIns.push(ins.instructionNumber);
+    }
+  }
+  if (undefIns.length == 0) {
+    console.log("%c--- None. There are no unknown instructions", "color: " + green);
+  } else {
+    console.log("%c--- There are some...", "color: " + red);
+    console.log(Data.usedUndefinedInstructions);
+    addWarning(WarningLog, analyzeResults.name,
+              "Undefined / unknown instructions found.<br>" +
+              "Query results will be missing instruction Operations with the following SUB number :",
+               undefIns);
+  }
   finishSequence(2);
 }
 
