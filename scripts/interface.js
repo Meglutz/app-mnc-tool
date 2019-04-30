@@ -30,6 +30,12 @@ const mncShowInfoLoc   =    "mncshow-info-location";
 const mncShowElementId =    "mncshow-element";
 const mncShowClose     =    "overlay-close-button-3";
 
+const Exit             =    "EXIT";
+const Style            =    "STYLE__";
+const StyleRedCell     =    Style + "red-cell";
+const StyleGreenCell   =    Style + "green-cell";
+const StyleYellowCell  =    Style + "yellow-cell";
+const Definition       =    "DEF__";
 const styleDefRegex    =    /^(STYLE__)(.*)$/;
 
 
@@ -119,10 +125,10 @@ document.getElementById("query-submit").onclick = function() {
 
   /* Add a new TimeLine "Modal" for each result */
   for (let i = 0; i < MyQueries[latestQuery].result.length; i++) {
-    content = prepareDOMresult(MyQueries[latestQuery].result[i], query, typeVal);
+    content = prepareDOMresult(MyQueries[latestQuery].result[i], typeVal);
     if (content != undefined) {
         addDOMresult(content.lineString,
-                     content.actionString,
+                     query + content.actionString,
                      content.operationString,
                      content.moduleString,
                      content.tagString,
@@ -187,7 +193,9 @@ function addDOMresult (title, content1, content2, content3, content4, highlight 
 ** Return: null
 *******************************************************************************/
 function addDOMinsOpTable(query, resultIndex) {
+  const regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
   let ins = query.result[resultIndex];
+  let byteType, byteAddress, def;
   let bitAmount = ins.formatLength * 8;
   let bitCount = 0; let byteCount = 0;
   let row = [];
@@ -197,17 +205,37 @@ function addDOMinsOpTable(query, resultIndex) {
   title.innerHTML = ins.instruction + " | SUB" + ins.instructionNumber;
   info.innerHTML  = "Range: " + bitAmount + " bits (" + ins.formatLength + " byte(s))";
 
+  /* if the instructions graphicalData has something to append to the info label, append it here. */
+  if (ins.graphicalData.tableExtraDescription != null) {
+    info.innerHTML += "<br> <b>" + ins.graphicalData.tableExtraDescription + "</b>";
+  }
+
   for (let i = 0; i < bitAmount; i++) {
+    /* loop trough the .tableRows property of the instrution (= cell) */
+    row = ins.graphicalData.tableRows;
+    for (let i  = 0; i < row.length; i++) {
 
-    row = row.concat(formatToRow(bitCount, byteCount, ins.reads, ins.instruction, query, "green-cell"));
+      if (row[i].match(regexp) != null) {
 
-    /* there are instructions which only have .reads entries and write their result to
-    fanucs predefined result bits. For example "COMP" will do this. */
-    if (ins.writes == null) {
-      row.push("-> FANUC Predefined Resultbyte: R9000");
-    } else {
-      row.push("->");
-      row = row.concat(formatToRow(bitCount, byteCount, ins.writes, ins.instruction, query, "red-cell"));
+        /* disassemble content to it's separate parts, convert to numbers */
+        byteType =             row[i].match(regexp)[1];
+        byteAddress = parseInt(row[i].match(regexp)[2], 10);
+
+        /* replace cell content with the new bit address */
+        row[i] =   byteType + (byteAddress + byteCount) + "." + bitCount;
+
+        /* check for definition-tag in the next cell. if available, look for definition.
+        if no definition has been found, make a dummy */
+        if (row[i + 1] == Definition) {
+          def = query.src.getBitDef(row[i]);
+          if (def == undefined) {
+            row[i + 1] = "No Symbol";
+          } else {
+            row[i + 1] = def.symbol;
+          }
+          def = undefined; /* reset for next definition */
+        }
+      }
     }
 
     addDOMtableColumn(document.getElementById(insOpTableLoc), row, false)
@@ -253,55 +281,6 @@ function addDOMmncShowList(query, resultIndex) {
     mncLine.innerHTML = (i).pad(5) + ": <b>" + query.src.source.lines[i] + "</b>";
     list.appendChild(mncLine);
   }
-}
-
-
-/*******************************************************************************
-** Action: Generates row content for the given parameters
-** Return: Array of row cells [bit, address, bit, address, ...]
-*******************************************************************************/
-function formatToRow(bitIndex, byteOffset, bytes, actionName = "", query, styling) {
-  const regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
-  const Exit = "EXIT";
-  let rowContent = [];
-  let byteType, byteAddress, bitString, def;
-
-  /* add a dummy to make every input iterable */
-  if (isIterable(bytes) != true) {
-    let temp = bytes; bytes = [];
-    bytes.push(temp); bytes.push(Exit);
-  }
-
-  for (let i = 0; i < bytes.length; i++) {
-    /* exit directly if we encounter a dummy-array item or an empty bytes[] index */
-    if (bytes[i] == Exit || bytes[i] == null) {return rowContent}
-    if (i >= 1 ) {rowContent.push(actionName)}
-
-    /* add styling as the first entry of every new row addition */
-    rowContent.push("STYLE__" + styling)
-
-    /* assemble bit string. check if it is a number (constant) */
-    if (isNaN(parseInt(bytes[i], 10)) == false) {
-      rowContent.push(bytes[i]);
-      rowContent.push("Constant");
-
-    } else {
-      byteType =             bytes[i].match(regexp)[1];
-      byteAddress = parseInt(bytes[i].match(regexp)[2], 10);
-      bitString =   byteType + (byteAddress + byteOffset) + "." + bitIndex;
-
-      /* if no definition has been found, make a dummy */
-      def = query.src.getBitDef(bitString);
-      if (def == undefined) {
-        rowContent.push(bitString);
-        rowContent.push("No Symbol");
-      } else {
-        rowContent.push(def.byteType + def.byteAddress + "." + def.bitAddress)
-        rowContent.push(def.symbol);
-      }
-    }
-  }
-  return rowContent;
 }
 
 
@@ -469,9 +448,9 @@ function updateDOMheader(mnc) {
 ** Action: Formats query results into prepared Strings for the DOM Elements
 ** Return: action-, operation-, module- lineString
 *******************************************************************************/
-function prepareDOMresult(result, query, type) {
+function prepareDOMresult(result, type) {
   /* These strings represent one column in the output table */
-  let actionString = query;
+  let actionString = "";
   let operationString = "";
   let moduleString = "";
   let lineString = "";
@@ -479,20 +458,14 @@ function prepareDOMresult(result, query, type) {
   let highlight = false;
 
   if (result instanceof InstructionOperation) { /* evaluate strings for instruction operations */
-    /* get values from reads or writes property of instructionOperation Object, depending
-    on the type of query */
+    actionString = " | " + result.instruction;
     highlight = true; /* turn highlight on if it's an instruction */
-    if (type == bitWriteOps) {
-      operationString = result.writes + " is overwritten by " + result.reads + " (via " + result.instruction + ")";
-    } else if (type == bitReadOps) {
-      operationString = result.reads + " is overriding " + result.writes + " (via " + result.instruction + ")";
-    } else {console.error("Error: Couldn't assemble 'operationString' for  " + result +
-                          "because this query type is not handled: " + type);
-    }
+    operationString = result.graphicalData.operationString;
 
   } else if (result instanceof BitOperation) { /* evaluate strings for bit operations */
     highlight = false; /* turn highlight off if it's a bit operation  */
-    operationString = beautify(result.operation);
+    if (type == bitReadOps)  {operationString = result.reads  + " " + beautifyBitOpString(result.operation);};
+    if (type == bitWriteOps) {operationString = result.writes + " " + beautifyBitOpString(result.operation);};
 
   } else { /* catch invalid result types */
     console.error("Error: Invalid Object in query.result property: " + result);
@@ -521,7 +494,7 @@ function prepareDOMresult(result, query, type) {
 ** Action: Formats the operationString according to it's content
 ** Return: Formatted operationString
 *******************************************************************************/
-function beautify(op) {
+function beautifyBitOpString(op) {
   let r = "is ";
   switch (true) {
     case op.includes("RD.NOT")  ||
@@ -538,4 +511,14 @@ function beautify(op) {
   }
   r = r + " in";
   return r;
+}
+
+/*******************************************************************************
+** Action: Gets value of a CSS variable
+** Return: Defined value of variable as String
+*******************************************************************************/
+function getCSSvar(name, value) {
+    if(name[0]!='-') name = '--'+name //allow passing with or without --
+    if(value) document.documentElement.style.setProperty(name, value)
+    return getComputedStyle(document.documentElement).getPropertyValue(name);
 }

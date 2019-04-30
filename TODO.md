@@ -9,6 +9,10 @@
 
 ## Nice-to-have
 * [ ] Add sendable queries and Data files
+* [ ] **Interactive COP (Contact-plan)**
+    * [ ] Add MNC to COP interpreter
+    * [ ] Add visualisation
+    * [ ] Add simulation
 
 ## Prerequisities for stable release
 * [x] Add "%@1" - "%" detection to get the MNC Data more reliably.
@@ -16,7 +20,7 @@
 * [x] Make overlays scrollable *Just removed parsing of identical successive indexes in warningString arrays*
 
 * [x] Fix NUMEB Table (Example: C2EH04)
-* [ ] Fix COMPB Table
+* [x] Fix COMPB Table
 * [x] **Add level parser**
     * [x] Add parser
     * [x] Add Level Tags to result visualisation
@@ -24,10 +28,19 @@
 * [x] Remove bitReadOps / bitWriteOps arrays -> replace with bitOps (branch: *newBitOpStructure*)
 * [ ] Rework Module detection / definition strategy. There should be a better solution.
 * [x] Fix Instruction Operation Text in result display (Only plot reads / writes)
-* [ ] Fix Result sorting: lowest line count to highest line count.
-* [ ] Implement Module detection for decompiled MNCs: RD     PMCOM_XY
-                                                      OR.NOT PMCOM_XY
-                                                      WRT    PMCOM_XY
+* [ ] Fix Result sorting: lowest line count to highest line count. (Or by level?)
+* [ ] Only parse lines which are in the same network as the selected Op to MNCshow
+* [ ] Check for defines before drawing MNCshow
+* [ ] Finally implement XMOVB instructions
+* [ ] Find a better solution to the issue with the Operation strings and preparation of the InsOp table data. Maybe include it in the Switch statement in the Resource class? Obviously with a few new properties for the InstructionOperation class
+* [ ] Make sure "Dependency" Bits are being tagged when being a dependency for example for RW / ACT / RST.
+* [ ] Implement Module detection for decompiled MNCs:
+
+```
+RD     PMCOM_XY
+OR.NOT PMCOM_XY
+WRT    PMCOM_XY
+```
 
 ## Nice-to-have
 * [x] Check all regexes on single strings

@@ -159,6 +159,7 @@ function analyzeLogic(res) {
                                                                                 op.reads,
                                                                                 op.writes,
                                                                                 op.dependency,
+                                                                                op.graphicalData,
                                                                                 CurrentModule,
                                                                                 CurrentNetwork,
                                                                                 i,

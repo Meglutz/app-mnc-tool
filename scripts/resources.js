@@ -71,22 +71,48 @@ class BitOperation {
 ** Hold a bit operation, read or write
 *******************************************************************************/
 class InstructionOperation {
-  constructor(instr, instrNbr, form, formLn, formMod, reads, writes, dep, inMod, inNwk, inLine, inLevel) {
-    this.instruction = instr;          /*  = String, Type of operation */
-    this.instructionNumber = instrNbr; /*  = Numeric, Type number */
+  constructor(ins, insNbr, form, formLn, formMod,  reads, writes, dep, uiDat, inMod, inNwk, inLine, inLvl) {
+    this.instruction = ins;            /*  = String, Type of operation */
+    this.instructionNumber = insNbr;   /*  = Numeric, Type number */
     this.format = form;                /*  = String, type of format (Normal, Const, Addr...) */
     this.formatLength = formLn;        /*  = Numeric, length of it's actions (in bytes) */
-    this.formatMultiplier = formMod;     /*  = String, contains an address or constant which the format length is multiplied by */
+    this.formatModifier = formMod;     /*  = String, modifier for the format property */
     this.reads = reads;                /*  = String, Beginning Address of read range */
     this.writes = writes;              /*  = String, Beginning Address of write range */
-    this.dependency = dep;             /*  = InstructionDependency Object */
-    this.inModule = inMod;             /*  = Object, of tyop [Module] */
+    this.dependency = dep;             /*  = Object of type [InstructionDependency] */
+    this.graphicalData = uiDat;        /*  = Object of type [GraphicalData]  */
+    this.inModule = inMod;             /*  = Object of type [Module] */
     this.inNetwork = inNwk;            /*  = String, containing the network the parser is currently in. */
     this.inLine = inLine;              /*  = String, Line index of the whole file. */
-    this.inLevel = inLevel;            /*  = Object of type [LineRange] */
+    this.inLevel = inLvl;              /*  = Object of type [LineRange] */
+  }
+
+}
+
+class InstructionDependency {
+  constructor(mem) {
+    this.dependentOf = mem;
   }
 }
 
+class ReadWriteDependency extends InstructionDependency {
+  constructor(mem) {
+    super(instructionDependencyRegex.exec(mem)[3]);
+  }
+}
+class ActivationDependency extends InstructionDependency {
+  constructor(mem) {
+    super(instructionDependencyRegex.exec(mem)[3]);
+  }
+}
+
+class GraphicalData {
+  constructor(oStr, t, texD = null) {
+    this.operationString = oStr;
+    this.tableRows = t;
+    this.tableExtraDescription = texD;
+  }
+}
 
 /*******************************************************************************
 ** Class - Mnemonic
@@ -370,8 +396,9 @@ class Resource {
         let number = parseInt(match[2], 10);
         let reads = null;
         let writes = null;
-        let format = {kind: "-", length: 0, multiplier: null};
         let dependency = null;
+        let format = {kind: "-", length: 0, modifier: null};
+        let graphicalData =    {opStr: null, tableRows: null, tableExtraDescription: null};
         switch (number) {
           case 1: /* ☑️ */
             name = "END1";
@@ -393,16 +420,19 @@ class Resource {
             name = "SUBCALL";
             format.length = 1;
             reads = this.instructionReads(lines, index, 1);
+            graphicalData.opStr = "Starts the Subprogram " + reads ;
             break;
           case 66: /* ☑️ */
             name = "SUBCALLU";
             format.length = 1;
             reads = this.instructionReads(lines, index, 1);
+            graphicalData.opStr = "Starts the Subprogram " + reads ;
             break;
           case 71: /* ☑️ */
             name = "SUBPRG";
             format.length = 1;
             reads = this.instructionReads(lines, index, 1);
+            graphicalData.opStr = "Header of the Subprogram " + reads ;
             break;
           case 72: /* ☑️ */
             name = "SUBE";
@@ -433,6 +463,8 @@ class Resource {
             format = this.instructionFormat(lines, index, 1);
             reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = this.instructionWrites(lines, index, 4);
+            graphicalData.opStr = "Reads for " + format.length + " byte(s) " + format.kind + " starting at " + reads[0] + " & " + reads[1] + " and writes the decoded result to " + writes
+            graphicalData.tableRows = [StyleGreenCell, reads[0], Definition, "DECB", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 5: /* ☑️ */
             name = "CTR";
@@ -444,14 +476,17 @@ class Resource {
             name = "CTRC";
             format.length = 2;
             reads = this.instructionReads(lines, index, 1);
-            format.length = 4;
             writes = this.instructionWrites(lines, index, 1);
+            graphicalData.opStr = "Reads counter initialization value from " + reads + " and handles the counter register " + writes;
+            graphicalData.tabeRows = [StyleGreenCell, reads, Definition, StyleRedCell, writes, Definition, "CTRC"];
             break;
           case 56: /* ☑️ */
             name = "CTRB";
             format.length = 1;
             reads = "CTR_" + this.instructionReads(lines, index, 1);
             writes = "CTR_" + this.instructionWrites(lines, index, 1);
+            graphicalData.opStr = "Reads counter initialization value from " + reads + " and handles the counter register " + writes;
+            graphicalData.tabeRows = [StyleGreenCell, reads, Definition, StyleRedCell, writes, Definition, "CTRB"];
             break;
           case 6:
             name = "ROT";
@@ -470,6 +505,8 @@ class Resource {
             format = this.instructionFormat(lines, index, 1);
             reads = this.instructionReads(lines, index, 3);
             writes = this.instructionWrites(lines, index, 4);
+            graphicalData.opStr = "Reads counter initialization value from " + reads + " and handles the counter register " + writes;
+            graphicalData.tabeRows = [StyleGreenCell, reads, Definition, "CODB", StyleRedCell, writes, Definition];
             break;
           case 8:
             name = "MOVE";
@@ -480,7 +517,8 @@ class Resource {
             format.length = 1;
             reads = [this.instructionReads(lines, index, 1), this.instructionReads(lines, index, 2)];
             writes = this.instructionWrites(lines, index, 3);
-
+            graphicalData.opStr = "Writes the logical OR product of " + reads[0] + " & " + reads[1] + " to " + writes;
+            graphicalData.tabeRows = [StyleGreenCell, reads[0], Definition, "MOVOR", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 9:
             name = "COM";
@@ -519,6 +557,8 @@ class Resource {
             format = this.instructionFormat(lines, index, 1);
             reads = this.instructionReads(lines, index, 2);
             writes = this.instructionWrites(lines, index, 3);
+            graphicalData.opStr = "Converts " + reads + " from binary to BCD and writes it to " + writes;
+            graphicalData.tabeRows = [StyleGreenCell, reads, Definition, "DCNVB", StyleRedCell, writes, Definition];
             break;
           case 15:
             name = "COMP";
@@ -529,6 +569,8 @@ class Resource {
             format = this.instructionFormat(lines, index, 1);
             reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = null;
+            graphicalData.opStr = "Compares " + reads[0] + " to " + reads[1] + ". Uses internal evaluation register to store the result";
+            graphicalData.tabeRows = [StyleGreenCell, reads[0], Definition, "COMPB", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, "R9000", Definition];
             break;
           case 16:
             name = "COIN";
@@ -552,10 +594,18 @@ class Resource {
             break;
           case 35:
             name = "XMOVB";
-            format =     this.instructionFormat(lines, index, 1, 2); /* define multiplier at offset 2... it multiplies the format */
-            reads =      this.instructionReads(lines, index, 3);
-            writes =     this.instructionWrites(lines, index, 4);
-            dependency = this.instructionDep(lines, index, -3);
+            format = this.instructionFormat(lines, index, 1);
+            format.modifier = [];
+            format.modifier.push("*");
+            format.modifier.push(lines[index + 2]);
+            reads =  [this.instructionReads(lines, index,  3), this.instructionWrites(lines, index, 4)];
+            writes = [this.instructionWrites(lines, index, 4), this.instructionReads(lines, index,  3)];
+            dependency = new ReadWriteDependency(lines[index  - 3]);
+            graphicalData.opStr = "If <b>" + dependency.dependentOf + "</b> is true, it will read " + reads[0] + " and write it to " + writes[0] +
+                           ".<br>If <b>" + dependency.dependentOf + "</b> is false, it will read " + writes[0] + " and write it to " + reads[0] +
+                           ".<br>The length is defined by it's format (" + format.length + " byte(s), " + format.kind + ") multiplied by the value of <b>" + format.modifier[1] + "</b>";
+            graphicalData.tableExtraDescription = "Read / Write depends on the state of " + dependency.dependentOf;
+            graphicalData.tableRows = [StyleYellowCell, reads[0], Definition, "XMOVB", StyleYellowCell, writes[0], Definition];
             break;
           case 19:
             name = "ADD";
@@ -566,6 +616,8 @@ class Resource {
             format = this.instructionFormat(lines, index, 1);
             reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = this. instructionWrites(lines, index, 4);
+            graphicalData.opStr = "Adds " + reads[0] + " to " + reads[1] + " and writes it to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads[0], Definition, "+", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 20:
             name = "SUB";
@@ -576,6 +628,8 @@ class Resource {
             format = this.instructionFormat(lines, index, 1);
             reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = this. instructionWrites(lines, index, 4);
+            graphicalData.opStr = "Subtracts " + reads[1] + " from " + reads[0] + " and writes it to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads[0], Definition, "-", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 21:
             name = "MUL";
@@ -586,6 +640,8 @@ class Resource {
             format = this.instructionFormat(lines, index, 1);
             reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = this. instructionWrites(lines, index, 4);
+            graphicalData.opStr = "Multiplies " + reads[0] + " by " + reads[1] + " and writes it to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads[0], Definition, "x", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 22:
             name = "DIV";
@@ -596,6 +652,8 @@ class Resource {
             format = this.instructionFormat(lines, index, 1);
             reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = this. instructionWrites(lines, index, 4);
+            graphicalData.opStr = "Divides " + reads[1] + " trough " + reads[0] + " and writes it to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads[0], Definition, "/", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 23: /* ❎ */
             name = "NUME";
@@ -604,8 +662,10 @@ class Resource {
           case 40: /* ☑️ */
             name = "NUMEB";
             format = this.instructionFormat(lines, index, 1);
-            reads =   this.instructionReads(lines, index, 2);
+            reads =  this.instructionReads (lines, index, 2);
             writes = this.instructionWrites(lines, index, 3);
+            graphicalData.opStr = "Defines " + reads + " as a constant and stores it to " + writes;
+            graphicalData.tableRows = ["define", StyleGreenCell, reads, Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 49:
             name = "DISP";
@@ -620,44 +680,62 @@ class Resource {
             format.length = 5;
             reads = this.instructionReads(lines, index, 1);
             writes = this.instructionWrites(lines, index, 1);
+            graphicalData.opStr = "TEXT TO DO";
+            graphicalData.tableRows = ["EXIN", StyleGreenCell, reads, Definition, StyleRedCell, writes, Definition];
             break;
           case 43: /* ☑️ */
             name = "MOVB";
             format.length = 1;
             reads = this.instructionReads(lines, index, 1);
             writes = this.instructionWrites(lines, index, 2);
+            graphicalData.opStr = "Moves one byte, " + reads + " to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads, Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 44: /* ☑️ */
             name = "MOVW";
             format.length = 2;
             reads = this.instructionReads(lines, index, 1);
             writes = this.instructionWrites(lines, index, 2);
+            graphicalData.opStr = "Moves one word, " + reads + " to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads, Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 45: /* ☑️ */
             name = "MOVN";
             format = this.instructionFormat(lines, index, 1);
             reads = this.instructionReads(lines, index, 2);
             writes = this. instructionWrites(lines, index, 3);
+            graphicalData.opStr = "Moves n-bytes, (" + format.length + " " + format.kind + ") " + reads + " to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads, Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 51: /* ☑️ */
             name = "WINDR";
             format.length = 1;
             writes = this.instructionWrites(lines, index, 1);
+            graphicalData.opStr = "Reads dataelements from the PMC / CNC window and writes it to " + writes;
+            graphicalData.tableRows = ["WINDR", StyleRedCell, writes, Definition];
             break;
           case 52:
             name = "WINDW";
             format.length = 1;
             writes = this.instructionWrites(lines, index, 1);
+            graphicalData.opStr = "Reads dataelements from the PMC / CNC window and writes it to " + writes;
+            graphicalData.tableRows = ["WINDR", StyleRedCell, writes, Definition];
             break;
           case 57: /* ☑️ */
             name = "DIFU";
             format.length = 1;
             reads = "DIFU_" + this.instructionReads(lines, index, 1);
+            dependency = new ActivationDependency(lines[index - 1]);
+            graphicalData.opStr = "Generates a positive impulse of the signal " + dependency.dependentOf + ". DIFU Number: " + reads;
+            graphicalData.tableRows = null;
             break;
           case 58: /* ☑️ */
             name = "DIFD";
             format.length = 1;
             reads = "DIFD_" + this.instructionReads(lines, index, 1);
+            dependency = new ActivationDependency(lines[index - 1]);
+            graphicalData.opStr = "Generates a negative impulse of the signal " + dependency.dependentOf + ". DIFD Number: " + reads;
+            graphicalData.tableRows = null;
             break;
           case 53: /* ☑️ */
             name = "AXCTL";
@@ -668,24 +746,32 @@ class Resource {
             format = this.instructionFormat(lines, index, 1);
             reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = this. instructionWrites(lines, index, 4);
+            graphicalData.opStr = "Bitwise EXOR links " + reads[0] + " to " + reads[1] + " and writes it to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads[0], Definition, "EXOR", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 60: /* ☑️ */
             name = "LOGAND";
             format = this.instructionFormat(lines, index, 1);
             reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = this. instructionWrites(lines, index, 4);
+            graphicalData.opStr = "Bitwise AND links " + reads[0] + " and " + reads[1] + " and writes it to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads[0], Definition, "&&", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 61: /* ☑️ */
             name = "LOGOR";
             format = this.instructionFormat(lines, index, 1);
             reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
             writes = this. instructionWrites(lines, index, 4);
+            graphicalData.opStr = "Bitwise OR links " + reads[0] + " to " + reads[1] + " and writes it to " + writes;
+            graphicalData.tableRows = [StyleGreenCell, reads[0], Definition, "OR", StyleGreenCell, reads[1], Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 62: /* ☑️ */
             name = "LOGNOT";
             format = this.instructionFormat(lines, index, 1);
             reads = this.instructionReads(lines, index, 2);
             writes = this. instructionWrites(lines, index, 3);
+            graphicalData.opStr = "Bitwise negates " + reads + " and writes it to " + writes;
+            graphicalData.tableRows = ["NOT", StyleGreenCell, reads, Definition, "->", StyleRedCell, writes, Definition];
             break;
           case 90:
             name = "FNC90";
@@ -753,9 +839,10 @@ class Resource {
                   reads            : reads,
                   writes           : writes,
                   dependency       : dependency,
+                  graphicalData    : new GraphicalData(graphicalData.opStr, graphicalData.tableRows, graphicalData.tableExtraDescription),
                   format           : format.kind,
                   formatLength     : format.length,
-                  formatMultiplier : format.multiplier
+                  formatModifier   : format.modifier
                 };
     }
   }
@@ -796,14 +883,11 @@ class Resource {
   **         instuctions range.
   **         Also gets the type (kind) of Format
   ** Return:  [kind: String (Kind)] [length: Numeric (Length in Bytes)]
-  **          [multiplier: String (Address, or constant with which "length"
-  **          is multiplied by)]
   *******************************************************************************/
-  instructionFormat(lines, index, offset, multiplierOffset = null) {
+  instructionFormat(lines, index, offset) {
     let format = lines[index + offset];
     let match = instructionFormatRegex.exec(format);
     let kind = "Normal";
-    let multiplier = null;
     let length = parseInt(match[1], 10);
     /* change kind / length if it's not a normal format */
     if (match[2] && match[3] != null) {
@@ -817,26 +901,8 @@ class Resource {
           break;
       }
     }
-    /* return with multiplier, if multiplierOffset wasn't left "null" */
-    if (multiplierOffset != null) {
-      multiplier = lines[index + multiplierOffset];
-      return {kind: kind, length: length, multiplier: multiplier};
-    }
     return {kind: kind, length: length};
-
   }
-
-  /*******************************************************************************
-  ** Action: Gets constant / address which is at the offset
-  ** Return:  dep(endency), String
-  *******************************************************************************/
-  instructionDep(lines, index, offset) {
-    let dep = lines[index + offset];
-    let match = instructionDependencyRegex.exec(dep);
-    let depMem = match[3];
-    return depMem;
-  }
-
 }
 
 

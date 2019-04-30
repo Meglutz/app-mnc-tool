@@ -25,6 +25,10 @@
   --tone-5-color:         #4e9455;
   --tone-5-accent:        #1f3c22;
 
+  /* Yellow && Dark Yellow */
+  --tone-6-color:         #a88d39;
+  --tone-6-accent:        #3c3a1f;
+
   --overlay-background:   rgba(40, 40, 40, 0.8);
   --box-shadow:           rgba(33, 33, 33, 0.5);
 }
@@ -154,6 +158,11 @@ header {
 .insop-table .red-cell  {
   background-color: var(--tone-5-color);
   color: var(--tone-5-accent);
+}
+/* every 2nd last cell text */
+.insop-table .yellow-cell  {
+  background-color: var(--tone-6-color);
+  color: var(--tone-6-accent);
 }
 
 /* Style MNCshow Overlay */
