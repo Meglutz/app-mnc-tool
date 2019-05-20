@@ -229,7 +229,7 @@ function addDOMinsOpTable(query, resultIndex)
 {
   const regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
   let ins = query.result[resultIndex];
-  let byteType, byteAddress, def;
+  let def;
   let bitAmount = ins.formatLength * 8;
   let bitCount = 0; let byteCount = 0;
   let row = [];
@@ -239,7 +239,7 @@ function addDOMinsOpTable(query, resultIndex)
   title.innerHTML = ins.instruction + " | SUB" + ins.instructionNumber;
   info.innerHTML  = "Range: " + bitAmount + " bits (" + ins.formatLength + " byte(s))";
 
-  /* if the instructions graphicalData has something to append to the info label, append it here. */
+  /* if the instructions graphicalData has something to append to the info label, do it here. */
   if (ins.graphicalData.tableExtraDescription != null)
   {
     info.innerHTML += "<br> <b>" + ins.graphicalData.tableExtraDescription + "</b>";
@@ -247,24 +247,24 @@ function addDOMinsOpTable(query, resultIndex)
 
   for (let i = 0; i < bitAmount; i++)
   {
-    /* loop trough the .tableRows property of the instrution (= cell) */
-    row = ins.graphicalData.tableRows;
-    for (let i  = 0; i < row.length; i++)
+    /* loop trough the .tableRows property of the instruction (= cell) */
+    row = ins.graphicalData.tableRows.concat();
+
+    /* loop trough each cell of the row */
+    for (let i = 0; i < row.length; i++)
     {
-      if (row[i].match(regexp) != null)
+      let match = row[i].match(regexp);
+      if (match != null)
       {
-        /* disassemble content to it's separate parts, convert to numbers */
-        byteType =             row[i].match(regexp)[1];
-        byteAddress = parseInt(row[i].match(regexp)[2], 10);
+        /* replace current cell content with the new bit address */
+        row[i] = match[1] + (parseInt(row[i].match(regexp)[2], 10) + byteCount) + "." + bitCount;
 
-        /* replace cell content with the new bit address */
-        row[i] =   byteType + (byteAddress + byteCount) + "." + bitCount;
-
-        /* check for definition-tag in the next cell. if available, look for definition.
+        /* check for def-tag in the next cell. if there is one, look for definition.
         if no definition has been found, make a dummy */
         if (row[i + 1] == Definition)
         {
           def = query.src.getBitDef(row[i]);
+
           if (def == undefined)
           {
             row[i + 1] = "No Symbol";
@@ -273,8 +273,8 @@ function addDOMinsOpTable(query, resultIndex)
           {
             row[i + 1] = def.symbol;
           }
-          def = undefined; /* reset for next definition */
         }
+        def = undefined; /* reset for next definition */
       }
     }
 
