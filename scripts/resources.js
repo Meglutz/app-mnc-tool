@@ -25,8 +25,10 @@ const headerMNCstopRegex =           /^\%$/;
 ** Class - Memory
 ** Holds a memory definition
 *******************************************************************************/
-class Memory {
-  constructor(type, byteAddress, bitAddress, length, symbol) {
+class Memory
+{
+  constructor(type, byteAddress, bitAddress, length, symbol)
+  {
     this.byteType = type;            /*  =  Memory Letter, e.g. "R" */
     this.byteAddress = byteAddress;  /*  =  Numeric, byte Address */
     this.bitAddress = bitAddress;    /*  =  Numeric, bit Address */
@@ -40,8 +42,10 @@ class Memory {
 ** Class - Module
 ** Holds a module / program definition
 *******************************************************************************/
-class Module {
-  constructor(programNumber, sourceFile, title) {
+class Module
+{
+  constructor(programNumber, sourceFile, title)
+  {
     this.programNumber = programNumber /*  =  Numeric, "P" number */
     this.sourceFile = sourceFile;      /*  =  String, sourcefile Name */
     this.title = title;                /*  =  String, Module title */
@@ -53,8 +57,10 @@ class Module {
 ** Class - BitOperation
 ** Holds a bit operation, read or write
 *******************************************************************************/
-class BitOperation {
-  constructor(op, rd, wrt, inMod, inNwk, inLine, inLevel) {
+class BitOperation
+{
+  constructor(op, rd, wrt, inMod, inNwk, inLine, inLevel)
+  {
     this.operation = op;                /*  =  String, operation Type one of: [readBitOperationsRegex] */
     this.reads = rd;                    /*  =  String, memory Address. e.g. [R3453.2] */
     this.writes = wrt;                  /*  =  String, memory Address. e.g. [R3453.3] */
@@ -70,8 +76,10 @@ class BitOperation {
 ** Class - InstructionOperations
 ** Hold a bit operation, read or write
 *******************************************************************************/
-class InstructionOperation {
-  constructor(ins, insNbr, form, formLn, formMod,  reads, writes, dep, uiDat, inMod, inNwk, inLine, inLvl) {
+class InstructionOperation
+{
+  constructor(ins, insNbr, form, formLn, formMod,  reads, writes, dep, uiDat, inMod, inNwk, inLine, inLvl)
+  {
     this.instruction = ins;            /*  = String, Type of operation */
     this.instructionNumber = insNbr;   /*  = Numeric, Type number */
     this.format = form;                /*  = String, type of format (Normal, Const, Addr...) */
@@ -89,25 +97,34 @@ class InstructionOperation {
 
 }
 
-class InstructionDependency {
-  constructor(mem) {
+class InstructionDependency
+{
+  constructor(mem)
+  {
     this.dependentOf = mem;
   }
 }
 
-class ReadWriteDependency extends InstructionDependency {
-  constructor(mem) {
-    super(instructionDependencyRegex.exec(mem)[3]);
-  }
-}
-class ActivationDependency extends InstructionDependency {
-  constructor(mem) {
+class ReadWriteDependency extends InstructionDependency
+{
+  constructor(mem)
+  {
     super(instructionDependencyRegex.exec(mem)[3]);
   }
 }
 
-class GraphicalData {
-  constructor(oStr, t, texD = null) {
+class ActivationDependency extends InstructionDependency
+{
+  constructor(mem)
+  {
+    super(instructionDependencyRegex.exec(mem)[3]);
+  }
+}
+
+class GraphicalData
+{
+  constructor(oStr, t, texD = null)
+  {
     this.operationString = oStr;
     this.tableRows = t;
     this.tableExtraDescription = texD;
@@ -118,12 +135,12 @@ class GraphicalData {
 ** Class - Mnemonic
 ** Holds the source MNC as well as Line ranges for secotors and levels
 *******************************************************************************/
-class Mnemonic {
-  constructor(lines) {
+class Mnemonic
+{
+  constructor(lines)
+  {
     this.lines = lines;           /* = String Array, one index per MNC line */
-
     this.levels = [];
-
     this.ranges = {head:  null,  /* = Object of Type [LineRange] */
                    defs:  null,  /* = Object of Type [LineRange] */
                    ladr:  null,  /* = Object of Type [LineRange] */
@@ -144,9 +161,12 @@ class Mnemonic {
   ** Action: Checks if an [index] is in the correct range (>= start, <= end)
   ** Return: LineRange Object
   *******************************************************************************/
-  getLevelOf(index) {
-    for (let level of this.levels) {
-      if (level.start <= index && level.end >= index) {
+  getLevelOf(index)
+  {
+    for (let level of this.levels)
+    {
+      if (level.start <= index && level.end >= index)
+      {
         return level;
       }
     }
@@ -156,12 +176,15 @@ class Mnemonic {
   ** Action: Gets the Info from the mnemonic file
   ** Return: Object: [CompileDate, Note, Type, Release]
   *******************************************************************************/
-  getMNCinfo() {
+  getMNCinfo()
+  {
     let tempLine;
-    for (let i = this.ranges.head.start; i < this.ranges.head.end; i++) {
+    for (let i = this.ranges.head.start; i < this.ranges.head.end; i++)
+    {
       tempLine = removeLeadingChar(this.lines[i], "0");
       tempLine = removeLeadingChar(tempLine,      " ");
-      switch (true) {
+      switch (true)
+      {
         case tempLine.charAt(0) == "7":
           this.info.compileDate = formatDate(tempLine.substring(2));
           break;
@@ -172,12 +195,24 @@ class Mnemonic {
           this.info.type        = tempLine.substring(2);
           break;
         case tempLine.charAt(0) == "4":
-          if (this.info.release == null) {this.info.release = tempLine.substring(2);}
-          else {this.info.release = tempLine.substring(2) + " " + this.info.release;};
+          if (this.info.release == null)
+          {
+            this.info.release = tempLine.substring(2);
+          }
+          else
+          {
+            this.info.release = tempLine.substring(2) + " " + this.info.release;
+          }
           break;
         case tempLine.charAt(0) == "5":
-          if (this.info.release == null) {this.info.release = tempLine.substring(2);}
-          else {this.info.release = this.info.release + "." + tempLine.substring(2);};
+          if (this.info.release == null)
+          {
+            this.info.release = tempLine.substring(2);
+          }
+          else
+          {
+            this.info.release = this.info.release + "." + tempLine.substring(2);
+          }
       }
     }
   }
@@ -189,13 +224,19 @@ class Mnemonic {
 ** Holds a range which is found in a string array trough regexes
 ** Used to define ranges for optimization and restriction in the Mnc class
 *******************************************************************************/
-class LineRange {
-  constructor(sArr, id, startRegex, endRegex) {
+class LineRange
+{
+  constructor(sArr, id, startRegex, endRegex)
+  {
     this.id = id;
-    this.start = 1 + sArr.findIndex(function checkStart(element) {
-                                return startRegex.test(element);});
-    this.end =   1 + sArr.findIndex(function checkEnd(element) {
-                                return endRegex.test(element);});
+    this.start = 1 + sArr.findIndex(function checkStart(element)
+    {
+      return startRegex.test(element);
+    })
+    this.end =   1 + sArr.findIndex(function checkEnd(element)
+    {
+      return endRegex.test(element);
+    })
   }
 }
 
@@ -204,10 +245,11 @@ class LineRange {
 ** Holds all definitions, as well as logic data (ops)
 ** and analyze-data
 *******************************************************************************/
-class Resource {
-  constructor(source) {
+class Resource
+{
+  constructor(source)
+  {
     this.source = source;                   /* Object of type [Mnemonic] */
-
     this.Modules = [];                      /* Array of Module objects, holds module definitions */
     this.SBDMemory = [];                    /* Array of Memory objects, holds Single bit definitions */
     this.MBDMemory = [];                    /* Array of Memory objects, holds Multi bit definitions */
@@ -221,12 +263,18 @@ class Resource {
   ** Action: Checks if string contains a MBD. Creates Memory Object
   ** Return: Memory Object [definition]
   *******************************************************************************/
-  getMultiBitDefinitions(str) {
+  getMultiBitDefinitions(str)
+  {
     let match = multiBitDefinitionRegex.exec(str);
-    if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
+    if (match != null && match[1,2,4] != null && match[1,2,4] != "")
+    {
       match[2] = removeLeadingChar(match[2], "0");
       return new Memory(match[1], match[2], "", ">=8", match[4])
-    } else {return null;}
+    }
+    else
+    {
+      return null;
+    }
   }
 
 
@@ -234,12 +282,18 @@ class Resource {
   ** Action: Checks if string contains a SBD. Creates Memory Object
   ** Return: Memory Object [definition]
   *******************************************************************************/
-  getSingleBitDefinitions(str) {
+  getSingleBitDefinitions(str)
+  {
     let match = singleBitDefinitionRegex.exec(str);
-    if (match != null && match[1,2,4,6] != null && match[1,2,4,6] != "") {
+    if (match != null && match[1,2,4,6] != null && match[1,2,4,6] != "")
+    {
       match[2] = removeLeadingChar(match[2], "0");
       return new Memory(match[1], match[2], match[4], 1, match[6])
-    } else {return null;}
+    }
+    else
+    {
+      return null;
+    }
   }
 
 
@@ -247,13 +301,19 @@ class Resource {
   ** Action: Checks if string contains a Module Definition. Creates Module Object
   ** Return: Module Object [mod]
   *******************************************************************************/
-  getModuleNumberDefinition(str) {
+  getModuleNumberDefinition(str)
+  {
     let match = moduleNumberDefinitionRegex.exec(str);
-    if (match != null && match[1,2] != null && match[1,2] != "") {
+    if (match != null && match[1,2] != null && match[1,2] != "")
+    {
       /* no need to remove leading zeros if the p number is defined as
       P0045 since the parseInt method will strip them */
       return new Module(parseInt(match[1], 10), parseInt(match[2], 10), "No Moduletitle available");
-    } else {return null;}
+    }
+    else
+    {
+      return null;
+    }
   }
 
 
@@ -262,16 +322,24 @@ class Resource {
   **         with the found title
   ** Return: true: If a defined module was extended with the found title, else: false
   *******************************************************************************/
-  getModuleTitleDefinition(str) {
+  getModuleTitleDefinition(str)
+  {
     let match = moduleTitleDefinitionRegex.exec(str);
-    if (match != null && match[1,2] != null && match[1,2] != "") {
-      for (let i = 0; i < this.Modules.length; i++) {
-        if (match[1].includes(this.Modules[i].sourceFile)) { /* If the module was found in the defined modules... */
+    if (match != null && match[1,2] != null && match[1,2] != "")
+    {
+      for (let i = 0; i < this.Modules.length; i++)
+      {
+        if (match[1].includes(this.Modules[i].sourceFile))
+        { /* If the module was found in the defined modules... */
           this.Modules[i].title = match[2]; /* ..add the found title to it */
           return true;
         }
       }
-    } else {return null;}
+    }
+    else
+    {
+      return null;
+    }
   }
 
 
@@ -284,15 +352,19 @@ class Resource {
   **         not a definition if it get found in this method. It's just a call.
   ** Return: Module Object. Either the found one or a new one.
   *******************************************************************************/
-  getCurrentModule(str1, str2, lineNumber) {
+  getCurrentModule(str1, str2, lineNumber)
+  {
     let match1 = currentModuleNumberRegex.exec(str1);
     let match2 = currentModuleSourceRegex.exec(str2);
 
     /* does it match the Source file name? */
-    if (match2 != null && match2[1,2] != null && match2[1,2] != "") {
-      for (let i = 0; i < this.Modules.length; i++) {
+    if (match2 != null && match2[1,2] != null && match2[1,2] != "")
+    {
+      for (let i = 0; i < this.Modules.length; i++)
+      {
         /* Check if the sourcefile is already defined */
-        if (match2.includes(this.Modules[i].sourceFile)) {
+        if (match2.includes(this.Modules[i].sourceFile))
+        {
           this.Modules[i].fromLine = lineNumber;
           return this.Modules[i];
         }
@@ -302,10 +374,13 @@ class Resource {
     }
 
     /* does it match the Program Number? */
-    if (match1 != null && match1[1,2] != null && match1[1,2] != "") {
-      for (let i = 0; i < this.Modules.length; i++) {
+    if (match1 != null && match1[1,2] != null && match1[1,2] != "")
+    {
+      for (let i = 0; i < this.Modules.length; i++)
+      {
         /* Check if the P Number is already defined */
-        if (parseInt(match1[2], 10) == this.Modules[i].programNumber) {
+        if (parseInt(match1[2], 10) == this.Modules[i].programNumber)
+        {
           return this.Modules[i];
         }
       }
@@ -321,9 +396,14 @@ class Resource {
   *******************************************************************************/
   getCurrentNetwork(str) {
     let match = currentNetworkRegex.exec(str);
-    if (match != null && match[1] != null && match[1] != "") {
+    if (match != null && match[1] != null && match[1] != "")
+    {
       return match[1];
-    } else {return null;}
+    }
+    else
+    {
+      return null;
+    }
   }
 
 
@@ -331,11 +411,18 @@ class Resource {
   ** Action: Checks if string contains a BitRead Operation.
   ** Return: [op: String (Operation), String (multiplier)] [mem: String (Memory)]
   *******************************************************************************/
-  getReadBitOperation(str) {
+  getReadBitOperation(str)
+  {
     let match = readBitOperationsRegex.exec(str);
-    if (match != null && match[1,3] != null && match[1,3] != "") {
-      return {op: match[1] + match[2], mem: match[3]};
-    } else {return null;}
+    if (match != null && match[1,3] != null && match[1,3] != "")
+    {
+      return {op: match[1] + match[2],
+              mem: match[3]};
+    }
+    else
+    {
+      return null;
+    }
   }
 
 
@@ -343,11 +430,18 @@ class Resource {
   ** Action: Checks if string contains a BitWrite Operation.
   ** Return: [op: String (Operation), String (multiplier)] [mem: String (Memory)]
   *******************************************************************************/
-  getWriteBitOperation(str) {
+  getWriteBitOperation(str)
+  {
     let match = writeBitOperationsRegex.exec(str);
-    if (match != null && match[1,3] != null && match[1,3] != "") {
-      return {op: match[1] + match[2], mem: match[3]};
-    } else {return null;}
+    if (match != null && match[1,3] != null && match[1,3] != "")
+    {
+      return {op: match[1] + match[2],
+              mem: match[3]};
+    }
+    else
+    {
+      return null;
+    }
   }
 
 
@@ -355,9 +449,12 @@ class Resource {
   ** Action: Checks for defined bits. bit must be a string! ("E312.2" or "ELADGK")
   ** Return: SBDMemory Object
   *******************************************************************************/
-  getBitDef(bit) {
-    for (let b of this.SBDMemory) {
-      if (bit == b.byteType + b.byteAddress + "." + b.bitAddress || bit == b.symbol) {
+  getBitDef(bit)
+  {
+    for (let b of this.SBDMemory)
+    {
+      if (bit == b.byteType + b.byteAddress + "." + b.bitAddress || bit == b.symbol)
+      {
         return b;
       }
     }
@@ -371,12 +468,16 @@ class Resource {
   **         ATTENTION: gets not stored in SBDMemory Array!
   ** Return: Dummy Memory Object of type [Memory]
   *******************************************************************************/
-  makeDummyDefinition(bit) {
+  makeDummyDefinition(bit)
+  {
     let match = singleBitAddressRegex.exec(bit);
 
-    if (match != null && match[1,2,4] != null && match[1,2,4] != "") {
+    if (match != null && match[1,2,4] != null && match[1,2,4] != "")
+    {
       return new Memory(match[1], match[2], match[4], 1, "Undefined (dMem)");
-    } else {
+    }
+    else
+    {
       return null;
     }
   }
@@ -389,17 +490,20 @@ class Resource {
   **         to look ahead / behind to get some necessary Data for the found instruction.
   ** Return: All Data to create a new InstructionOperation Object
   *******************************************************************************/
-  InstructionLogicData(lines, index) {
+  InstructionLogicData(lines, index)
+  {
     let match = instructionOperationRegex.exec(lines[index]);
-    if (match != null && match[1,2] != null && match[1,2] != "") {
-        let name;
-        let number = parseInt(match[2], 10);
-        let reads = null;
-        let writes = null;
-        let dependency = null;
-        let format = {kind: "-", length: 0, modifier: null};
-        let graphicalData =    {opStr: null, tableRows: null, tableExtraDescription: null};
-        switch (number) {
+    if (match != null && match[1,2] != null && match[1,2] != "")
+    {
+      let name;
+      let number = parseInt(match[2], 10);
+      let reads = null;
+      let writes = null;
+      let dependency = null;
+      let format = {kind: "-", length: 0, modifier: null};
+      let graphicalData = {opStr: null, tableRows: null, tableExtraDescription: null};
+        switch (number)
+        {
           case 1: /* ☑️ */
             name = "END1";
             /* Needs nothing */
@@ -851,13 +955,17 @@ class Resource {
   ** Action: Checks which Memory gets read by an instruction
   ** Return: String, containing Starting memory [startByte]
   *******************************************************************************/
-  instructionReads(lines, index, offset) {
+  instructionReads(lines, index, offset)
+  {
     let startByte = lines[index + offset];
     let match = instructionReadWriteRegex.exec(startByte);
     /* If match is null then it's a constant, not a memory definition */
-    if (match != null) {
+    if (match != null)
+    {
       return startByte;
-    } else {
+    }
+    else
+    {
       return startByte;
     }
   }
@@ -866,13 +974,17 @@ class Resource {
   ** Action: Checks which Memory gets written by an instruction
   ** Return: String, containing Starting memory [startByte]
   *******************************************************************************/
-  instructionWrites(lines, index, offset) {
+  instructionWrites(lines, index, offset)
+  {
     let startByte = lines[index + offset];
     let match = instructionReadWriteRegex.exec(startByte);
     /* If match is null then it's a constant, not a memory definition */
-    if (match != null) {
+    if (match != null)
+    {
       return startByte;
-    } else {
+    }
+    else
+    {
       return startByte;
     }
   }
@@ -884,15 +996,18 @@ class Resource {
   **         Also gets the type (kind) of Format
   ** Return:  [kind: String (Kind)] [length: Numeric (Length in Bytes)]
   *******************************************************************************/
-  instructionFormat(lines, index, offset) {
+  instructionFormat(lines, index, offset)
+  {
     let format = lines[index + offset];
     let match = instructionFormatRegex.exec(format);
     let kind = "Normal";
     let length = parseInt(match[1], 10);
     /* change kind / length if it's not a normal format */
-    if (match[2] && match[3] != null) {
+    if (match[2] && match[3] != null)
+    {
       length = parseInt(match[3], 10);
-      switch (match[1]) {
+      switch (match[1])
+      {
         case "0":
           kind = "Constant";
           break;
@@ -910,7 +1025,8 @@ class Resource {
 ** Action: Formats strings from YY/MM/DD HH:MM to DD.MMMM YYYY HH:MM
 ** Return: Reformatted string
 *******************************************************************************/
-function formatDate(str) {
+function formatDate(str)
+{
   const monthNames = ["January", "February", "March", "April", "May", "June",
                       "July", "August", "September", "October", "November", "December"];
   let regexp = /^(\d\d)\/(\d\d)\/(\d\d)\s*(\d\d)\:(\d\d)/;
@@ -927,9 +1043,14 @@ function formatDate(str) {
            "10" and "0" respectively
 ** Return: formatted toFormat
 *******************************************************************************/
-function removeLeadingChar(inputStr, charToRemove) {
-  while (inputStr.substring(0, 1) == charToRemove) {
-    if (inputStr.length == 1) {return inputStr;}
+function removeLeadingChar(inputStr, charToRemove)
+{
+  while (inputStr.substring(0, 1) == charToRemove)
+  {
+    if (inputStr.length == 1)
+    {
+      return inputStr;
+    }
     inputStr = inputStr.substring(1)
   }
   return inputStr;
