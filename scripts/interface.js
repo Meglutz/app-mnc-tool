@@ -43,31 +43,43 @@ const styleDefRegex    =    /^(STYLE__)(.*)$/;
 ** DOM Query-Result Handlers
 *******************************************************************************/
 /* state / status overlay */
-document.getElementById(stateButton).onclick = function() {
+document.getElementById(stateButton).onclick = function()
+{
   document.getElementById(stateOverlay).style.display = "block";
 }
-document.getElementById(stateClose).onclick = function() {
+document.getElementById(stateClose).onclick = function()
+{
   document.getElementById(stateOverlay).style.display = "none";
 }
 
 /* user-click events (DOM overlays) */
-function evaluateDOMUserClick(resultId) {
+function evaluateDOMUserClick(resultId)
+{
   /* generate mncShow view if the user didn't click an instruction operation */
-  if (MyQueries[MyQueries.length - 1].result[resultId] instanceof InstructionOperation == false) {
+  if (MyQueries[MyQueries.length - 1].result[resultId] instanceof InstructionOperation == false)
+  {
     removeDOMelements(mncShowElementId);
     addDOMmncShowList(MyQueries[MyQueries.length - 1], resultId);
     document.getElementById(mncShowOverlay).style.display = "block";
-  } else {
+  }
+  else
+  {
     /* generate insOp table if the user did click on an instruction operation */
     removeDOMelements(insOpElementId);
     addDOMinsOpTable(MyQueries[MyQueries.length - 1], resultId);
     document.getElementById(insOpOverlay).style.display = "block";
   }
-} /* close insOp Overlay */
-document.getElementById(insOpClose).onclick = function() {
+}
+
+/* close insOp Overlay */
+document.getElementById(insOpClose).onclick = function()
+{
   document.getElementById(insOpOverlay).style.display = "none";
-} /* close MNCShow Overlay */
-document.getElementById(mncShowClose).onclick = function() {
+}
+
+/* close MNCShow Overlay */
+document.getElementById(mncShowClose).onclick = function()
+{
   document.getElementById(mncShowOverlay).style.display = "none";
 }
 
@@ -78,7 +90,8 @@ document.getElementById(mncShowClose).onclick = function() {
            - Creates a DOM TimeLine and a "Modal" for each result
 ** Return: null
 *******************************************************************************/
-document.getElementById("query-submit").onclick = function() {
+document.getElementById("query-submit").onclick = function()
+{
   /* Clear all Elements containing [tlElementId] */
   removeDOMelements(tlElementId);
 
@@ -91,15 +104,20 @@ document.getElementById("query-submit").onclick = function() {
   let latestQuery = MyQueries.length - 1;
 
   /* Make result array iterable, if there's only one result it's not iterable */
-  if (isIterable(MyQueries[latestQuery].result) == false) {
+  if (isIterable(MyQueries[latestQuery].result) == false)
+  {
     MyQueries[latestQuery].result.push("dummy");
   }
 
   /* Prepare Memory definition string (If the query bit has a Definition) */
   let memDefString = "";
-  if (MyQueries[latestQuery].memoryDefinition != null || undefined) {
-      Object.entries(MyQueries[latestQuery].memoryDefinition).forEach(memDefAttr => {
-          switch (memDefAttr[0]) {
+
+  if (MyQueries[latestQuery].memoryDefinition != null || undefined)
+  {
+      Object.entries(MyQueries[latestQuery].memoryDefinition).forEach(memDefAttr =>
+        {
+          switch (memDefAttr[0])
+          {
               case "byteType":    memDefString += "<b>Address:</b> " + memDefAttr[1]; break;
               case "byteAddress": memDefString += memDefAttr[1]; break;
               case "bitAddress":  memDefString += "." + memDefAttr[1]; break;
@@ -108,7 +126,11 @@ document.getElementById("query-submit").onclick = function() {
               case "symbol":      memDefString += "<br><b>" + "Symbol:</b> " + memDefAttr[1]; break;
           }
       })
-  } else {memDefString = "<b>No definition was found</b>"}
+  }
+  else
+  {
+    memDefString = "<b>No definition was found</b>";
+  }
 
 
   /* Add TimeLine title */
@@ -119,14 +141,17 @@ document.getElementById("query-submit").onclick = function() {
   pElement.innerHTML += MyQueries[latestQuery].type + " for " +
                         MyQueries[latestQuery].memory + "<br><br>" +
                         memDefString + " &rarr;";
+
   divElement.appendChild(pElement);
   titleSection.appendChild(divElement);
 
 
   /* Add a new TimeLine "Modal" for each result */
-  for (let i = 0; i < MyQueries[latestQuery].result.length; i++) {
+  for (let i = 0; i < MyQueries[latestQuery].result.length; i++)
+  {
     content = prepareDOMresult(MyQueries[latestQuery].result[i], typeVal);
-    if (content != undefined) {
+    if (content != undefined)
+    {
         addDOMresult(content.lineString,
                      query + content.actionString,
                      content.operationString,
@@ -153,7 +178,8 @@ document.getElementById("query-submit").onclick = function() {
 **                           optAttr = ["attrName", attrValue]
 ** Return: null
 *******************************************************************************/
-function addDOMresult (title, content1, content2, content3, content4, highlight = false, optAttr = null) {
+function addDOMresult (title, content1, content2, content3, content4, highlight = false, optAttr = null)
+{
   let tlBody =      document.getElementById(tlElementLoc);
   let h1Element =   addDOMelement("h1", tlElementId);
   let pElement =    addDOMelement("p", tlElementId);
@@ -162,14 +188,21 @@ function addDOMresult (title, content1, content2, content3, content4, highlight 
 
   /* assemble modal div */
   divElement.setAttribute("on-line", "MNC Line " + title);
-  if (optAttr != null || isIterable(optAttr)) {divElement.setAttribute(optAttr[0], optAttr[1]);}
+  if (optAttr != null || isIterable(optAttr))
+  {
+    divElement.setAttribute(optAttr[0], optAttr[1]);
+  }
 
   /* add highlight if needed */
-  if (highlight != false) {
+  if (highlight != false)
+  {
     let currClass = divElement.getAttribute("class");
-    if (currClass != null) {
+    if (currClass != null)
+    {
       divElement.setAttribute("class", currClass + " highlight-item");
-    } else {
+    }
+    else
+    {
       divElement.setAttribute("class", "highlight-item");
     }
   }
@@ -192,7 +225,8 @@ function addDOMresult (title, content1, content2, content3, content4, highlight 
 ** Action: Adds new DOM table for instruction operation visualisation
 ** Return: null
 *******************************************************************************/
-function addDOMinsOpTable(query, resultIndex) {
+function addDOMinsOpTable(query, resultIndex)
+{
   const regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
   let ins = query.result[resultIndex];
   let byteType, byteAddress, def;
@@ -206,17 +240,19 @@ function addDOMinsOpTable(query, resultIndex) {
   info.innerHTML  = "Range: " + bitAmount + " bits (" + ins.formatLength + " byte(s))";
 
   /* if the instructions graphicalData has something to append to the info label, append it here. */
-  if (ins.graphicalData.tableExtraDescription != null) {
+  if (ins.graphicalData.tableExtraDescription != null)
+  {
     info.innerHTML += "<br> <b>" + ins.graphicalData.tableExtraDescription + "</b>";
   }
 
-  for (let i = 0; i < bitAmount; i++) {
+  for (let i = 0; i < bitAmount; i++)
+  {
     /* loop trough the .tableRows property of the instrution (= cell) */
     row = ins.graphicalData.tableRows;
-    for (let i  = 0; i < row.length; i++) {
-
-      if (row[i].match(regexp) != null) {
-
+    for (let i  = 0; i < row.length; i++)
+    {
+      if (row[i].match(regexp) != null)
+      {
         /* disassemble content to it's separate parts, convert to numbers */
         byteType =             row[i].match(regexp)[1];
         byteAddress = parseInt(row[i].match(regexp)[2], 10);
@@ -226,11 +262,15 @@ function addDOMinsOpTable(query, resultIndex) {
 
         /* check for definition-tag in the next cell. if available, look for definition.
         if no definition has been found, make a dummy */
-        if (row[i + 1] == Definition) {
+        if (row[i + 1] == Definition)
+        {
           def = query.src.getBitDef(row[i]);
-          if (def == undefined) {
+          if (def == undefined)
+          {
             row[i + 1] = "No Symbol";
-          } else {
+          }
+          else
+          {
             row[i + 1] = def.symbol;
           }
           def = undefined; /* reset for next definition */
@@ -243,7 +283,8 @@ function addDOMinsOpTable(query, resultIndex) {
 
     /* increment bit & byte offset */
     bitCount += 1;
-    if (bitCount == 8) {
+    if (bitCount == 8)
+    {
       bitCount = 0;
       byteCount += 1;
     }
@@ -255,7 +296,8 @@ function addDOMinsOpTable(query, resultIndex) {
 ** Action: Adds new DOM table for instruction operation visualisation
 ** Return: null
 *******************************************************************************/
-function addDOMmncShowList(query, resultIndex) {
+function addDOMmncShowList(query, resultIndex)
+{
   let op = query.result[resultIndex];
   let VIEW = 10;
 
@@ -264,9 +306,13 @@ function addDOMmncShowList(query, resultIndex) {
   let list = document.getElementById(mncShowLoc);
 
   title.innerHTML = op.operation + " " + op.memory + " at Line " + op.inLine;
-  if (op.inModule.sourceFile != null || op.inModule.sourceFile != "") {
+
+  if (op.inModule.sourceFile != null || op.inModule.sourceFile != "")
+  {
     info.innerHTML  = "This code is found in the Sourcefile <b>fc" + op.inModule.sourceFile + ".lad</b> (" + op.inModule.title + ")";
-  } else {
+  }
+  else
+  {
     info.innerHTML  = "Coudldn't analyze in which Sourcefile this code is located."
   }
 
@@ -275,9 +321,16 @@ function addDOMmncShowList(query, resultIndex) {
 
   let mncLine;
 
-  for (let i = startLine; i < stopLine; i++) {
-    if (i == op.inLine) {mncLine = addDOMelement("a", mncShowElementId, "code-highlight")}
-    else                {mncLine = addDOMelement("a", mncShowElementId, "code")}
+  for (let i = startLine; i < stopLine; i++)
+  {
+    if (i == op.inLine)
+    {
+      mncLine = addDOMelement("a", mncShowElementId, "code-highlight")
+    }
+    else
+    {
+      mncLine = addDOMelement("a", mncShowElementId, "code")
+    }
     mncLine.innerHTML = (i).pad(5) + ": <b>" + query.src.source.lines[i] + "</b>";
     list.appendChild(mncLine);
   }
@@ -288,24 +341,34 @@ function addDOMmncShowList(query, resultIndex) {
 ** Action: Adds DOM table cloumn element to specified parent element
 ** Return: DOM element
 *******************************************************************************/
-function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass = null) {
+function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass = null)
+{
   let row = addDOMelement("tr", insOpElementId, optClass);
   let temp; let text;
   let colType = "td";
   let texType = "p";
   let style = "";
-  if (isHead) {colType = "th"; texType = "h1";}
+  if (isHead) {
+    colType = "th"; texType = "h1";
+  }
 
   /* create new column */
-  for (let item of rowContent) {
+  for (let item of rowContent)
+  {
     /* check if the item is a style definer */
-    if (item.match(styleDefRegex) != null) {
+    if (item.match(styleDefRegex) != null)
+    {
       style = item.match(styleDefRegex)[2];
-    } else {
+    }
+    else
+    {
       temp = addDOMelement(colType, insOpElementId, optClass);
       text = addDOMelement(texType, insOpElementId);
       /* add style to text element, if the item before was a style definer */
-      if (style != "") {text = appendDOMtag(text, "class", style); style = "";}
+      if (style != "")
+      {
+        text = appendDOMtag(text, "class", style); style = "";
+      }
       text.innerHTML = item;
       temp.appendChild(text);
       row.appendChild(temp);
@@ -319,10 +382,12 @@ function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass =
 ** Action: Adds new DOM element of type [type]
 ** Return: DOM element
 *******************************************************************************/
-function addDOMelement(type, id, addClass = null) {
+function addDOMelement(type, id, addClass = null)
+{
   let el = document.createElement(type);
   el.setAttribute("id", id);
-  if (addClass != null) {
+  if (addClass != null)
+  {
     el = appendDOMtag(el, "class", addClass);
   }
   return el;
@@ -333,11 +398,15 @@ function addDOMelement(type, id, addClass = null) {
 ** Action: Appends DOM tag to DOM element
 ** Return: DOM element
 *******************************************************************************/
-function appendDOMtag(el, type, addVal) {
+function appendDOMtag(el, type, addVal)
+{
   let curr = el.getAttribute(type);
-  if (curr != null) {
+  if (curr != null)
+  {
     el.setAttribute(type, curr + " " + addVal);
-  } else {
+  }
+  else
+  {
     el.setAttribute(type, addVal);
   }
   return el;
@@ -350,15 +419,21 @@ function appendDOMtag(el, type, addVal) {
 *******************************************************************************/
 function replaceDOMtagValue(el, type, prevVal, newVal) {
   let curr = el.getAttribute(type);
-  if (curr != null) {
+  if (curr != null)
+  {
     /* replace old with new and store new string to temp, so we can compare it with the old one */
     let temp = curr.replace(prevVal, newVal);
-    if (temp == curr) {
+    if (temp == curr)
+    {
       /* was already right */
-    } else {
+    }
+    else
+    {
       el.setAttribute(type, temp);
     }
-  } else {
+  }
+  else
+  {
     el.setAttribute(type, newVal);
   }
   return el;
@@ -368,7 +443,8 @@ function replaceDOMtagValue(el, type, prevVal, newVal) {
 ** Return: null
 *******************************************************************************/
 function removeDOMelements(id) {
-  while (document.getElementById(id) != null) {
+  while (document.getElementById(id) != null)
+  {
     let elem = document.getElementById(id);
     elem.parentNode.removeChild(elem);
   }
@@ -390,35 +466,46 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
 
   /* update overlay elements: */
   /* warning string */
-  if (warningStr != null) {
+  if (warningStr != null)
+  {
     circleElement = replaceDOMtagValue(circleElement, "class", stateGreenClass, stateRedClass);
     aElement.warn.innerHTML = warningStr;
 
     /* if the warning log isn't empty, then add it to the overlay string */
-    if (warningLog != null) {
+    if (warningLog != null)
+    {
       aElement.warnLog.innerHTML = "<br>";
-      if (isIterable(warningLog)) {
-        for (let str of warningLog) {
+      if (isIterable(warningLog))
+      {
+        for (let str of warningLog)
+        {
           aElement.warnLog.innerHTML += str + "<br>";
         }
-      } else {
+      }
+      else
+      {
         aElement.warnLog.innerHTML += warningLog;
       }
     }
 
-  } else {
+  }
+  else
+  {
     circleElement = replaceDOMtagValue(circleElement, "class", stateRedClass, stateGreenClass);
     aElement.warn.innerHTML = "No Warnings - All Good!";
     aElement.warnLog.innerHTML  = "---";
   }
 
   /* mnemonic statistics string */
-  if (source != null) {
+  if (source != null)
+  {
     aElement.info.innerHTML =  "<b>MNC Lines:</b> " +  source.source.lines.length + " | " +
                                "<b>Bit Defs:</b> " +   source.SBDMemory.length +   " | " +
                                "<b>Multi Defs:</b> " + source.MBDMemory.length +   " | " +
                                "<b>Total Ops:</b> " + (source.bitOperations.length + source.instructionOperations.length)
-  } else {
+  }
+  else
+  {
     aElement.info.innerHTML = "No Source Data"
   }
 
@@ -429,18 +516,25 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
 ** Action: Updates header string
 ** Return: null
 *******************************************************************************/
-function updateDOMheader(mnc) {
+function updateDOMheader(mnc)
+{
   let pElement = document.getElementById(stateText);
 
   /* mnemonic info string */
-  if (mnc.info != null) {
-    if (mnc.info.time == undefined) {mnc.info.time = 0}
-    pElement.innerHTML  =            mnc.info.type + " | " +
-                                     mnc.info.release + " | " + "Compile Date: " +
-                                     mnc.info.compileDate + " | " +
-                                     mnc.info.note + " | " + "Analyze time: " +
-                                     mnc.timer.total.toFixed(2) + " ms";
-  } else {
+  if (mnc.info != null)
+  {
+    if (mnc.info.time == undefined)
+    {
+      mnc.info.time = 0
+    }
+    pElement.innerHTML = mnc.info.type + " | " +
+                         mnc.info.release + " | " + "Compile Date: " +
+                         mnc.info.compileDate + " | " +
+                         mnc.info.note + " | " + "Analyze time: " +
+                         mnc.timer.total.toFixed(2) + " ms";
+  }
+  else
+  {
     pElement.innerHTML = "No Source Data"
   }
 }
@@ -448,7 +542,8 @@ function updateDOMheader(mnc) {
 ** Action: Formats query results into prepared Strings for the DOM Elements
 ** Return: action-, operation-, module- lineString
 *******************************************************************************/
-function prepareDOMresult(result, type) {
+function prepareDOMresult(result, type)
+{
   /* These strings represent one column in the output table */
   let actionString = "";
   let operationString = "";
@@ -457,17 +552,29 @@ function prepareDOMresult(result, type) {
   let tagString = "";
   let highlight = false;
 
-  if (result instanceof InstructionOperation) { /* evaluate strings for instruction operations */
+  if (result instanceof InstructionOperation)
+  {
+    /* evaluate strings for instruction operations */
     actionString = " | " + result.instruction;
     highlight = true; /* turn highlight on if it's an instruction */
     operationString = result.graphicalData.operationString;
-
-  } else if (result instanceof BitOperation) { /* evaluate strings for bit operations */
+  }
+  else if (result instanceof BitOperation)
+  {
+    /* evaluate strings for bit operations */
     highlight = false; /* turn highlight off if it's a bit operation  */
-    if (type == bitReadOps)  {operationString = result.reads  + " " + beautifyBitOpString(result.operation);};
-    if (type == bitWriteOps) {operationString = result.writes + " " + beautifyBitOpString(result.operation);};
-
-  } else { /* catch invalid result types */
+    if (type == bitReadOps)
+    {
+      operationString = result.reads  + " " + beautifyBitOpString(result.operation);
+    }
+    if (type == bitWriteOps)
+    {
+      operationString = result.writes + " " + beautifyBitOpString(result.operation);
+    }
+  }
+  else
+  {
+    /* catch invalid result types */
     console.error("Error: Invalid Object in query.result property: " + result);
   }
 
@@ -475,8 +582,14 @@ function prepareDOMresult(result, type) {
   lineString = result.inLine + 1;
   tagString =  result.inLevel.id;
   Object.entries(result.inModule).forEach(modAttr => {
-    if (modAttr[0] == "sourceFile") {moduleString = "fc" + modAttr[1] + " | ";}
-    if (modAttr[0] == "title")      {moduleString += modAttr[1];}
+    if (modAttr[0] == "sourceFile")
+    {
+      moduleString = "fc" + modAttr[1] + " | ";
+    }
+    if (modAttr[0] == "title")
+    {
+      moduleString += modAttr[1];
+    }
   });
 
   return {
@@ -494,9 +607,11 @@ function prepareDOMresult(result, type) {
 ** Action: Formats the operationString according to it's content
 ** Return: Formatted operationString
 *******************************************************************************/
-function beautifyBitOpString(op) {
+function beautifyBitOpString(op)
+{
   let r = "is ";
-  switch (true) {
+  switch (true)
+  {
     case op.includes("RD.NOT")  ||
          op.includes("AND.NOT") ||
          op.includes("OR.NOT"):    r = r + "negated-read (" + op + ")"; break;
@@ -511,14 +626,4 @@ function beautifyBitOpString(op) {
   }
   r = r + " in";
   return r;
-}
-
-/*******************************************************************************
-** Action: Gets value of a CSS variable
-** Return: Defined value of variable as String
-*******************************************************************************/
-function getCSSvar(name, value) {
-    if(name[0]!='-') name = '--'+name //allow passing with or without --
-    if(value) document.documentElement.style.setProperty(name, value)
-    return getComputedStyle(document.documentElement).getPropertyValue(name);
 }
