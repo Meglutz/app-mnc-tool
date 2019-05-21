@@ -32,9 +32,9 @@ const mncShowClose     =    "overlay-close-button-3";
 
 const Exit             =    "EXIT";
 const Style            =    "STYLE__";
-const StyleRedCell     =    Style + "red-cell";
-const StyleGreenCell   =    Style + "green-cell";
-const StyleYellowCell  =    Style + "yellow-cell";
+const StyleNextCellRed     =    Style + "red-cell";
+const StyleNextCellGreen   =    Style + "green-cell";
+const StyleNextCellYellow  =    Style + "yellow-cell";
 const Definition       =    "DEF__";
 const styleDefRegex    =    /^(STYLE__)(.*)$/;
 
@@ -118,12 +118,30 @@ document.getElementById("query-submit").onclick = function()
         {
           switch (memDefAttr[0])
           {
-              case "byteType":    memDefString += "<b>Address:</b> " + memDefAttr[1]; break;
-              case "byteAddress": memDefString += memDefAttr[1]; break;
-              case "bitAddress":  memDefString += "." + memDefAttr[1]; break;
-              case "length":      let bitStr = " bits"; if (memDefAttr[1] == 1) {bitStr = " bit"};
-                                  memDefString += " | <b>length:</b> " + memDefAttr[1] + bitStr; break;
-              case "symbol":      memDefString += "<br><b>" + "Symbol:</b> " + memDefAttr[1]; break;
+              case "byteType":
+                memDefString += "<b>Address:</b> " + memDefAttr[1];
+              break;
+
+              case "byteAddress":
+                memDefString += memDefAttr[1];
+              break;
+
+              case "bitAddress":
+                memDefString += "." + memDefAttr[1];
+              break;
+
+              case "length":
+                let bitStr = " bits";
+                if (memDefAttr[1] == 1)
+                {
+                  bitStr = " bit"
+                };
+                memDefString += " | <b>length:</b> " + memDefAttr[1] + bitStr;
+              break;
+
+              case "symbol":
+                memDefString += "<br><b>" + "Symbol:</b> " + memDefAttr[1];
+              break;
           }
       })
   }
@@ -183,6 +201,7 @@ function addDOMresult (title, content1, content2, content3, content4, highlight 
   let tlBody =      document.getElementById(tlElementLoc);
   let h1Element =   addDOMelement("h1", tlElementId);
   let pElement =    addDOMelement("p", tlElementId);
+  let p2Element =   addDOMelement("p", tlElementId);
   let tagElement =  addDOMelement("a", tlElementId);
   let divElement =  addDOMelement("div", tlElementId, "timeline-item");
 
@@ -211,11 +230,14 @@ function addDOMresult (title, content1, content2, content3, content4, highlight 
   tagElement = appendDOMtag(tagElement, "class", "level-tag-" + content4);
   tagElement.innerHTML = "Ladder-Level: " + content4;
   h1Element.innerHTML =  content1;
-  pElement.innerHTML =   content2 + "<br>" + content3 + "<br>";
+  pElement.innerHTML =   content2 + "<br>";
+  p2Element = appendDOMtag(p2Element, "class", "module-string");
+  p2Element.innerHTML = content3;
 
   divElement.appendChild(tagElement);
   divElement.appendChild(h1Element);
   divElement.appendChild(pElement);
+  divElement.appendChild(p2Element);
 
   tlBody.appendChild(divElement);
 }
@@ -227,7 +249,7 @@ function addDOMresult (title, content1, content2, content3, content4, highlight 
 *******************************************************************************/
 function addDOMinsOpTable(query, resultIndex)
 {
-  const regexp = /^(T|D|E|F|G|R|X|Y)(\d*)/;
+  const regexp = /^(T|D|E|F|G|R|X|Y)(\d*)$/;
   let ins = query.result[resultIndex];
   let def;
   let bitAmount = ins.formatLength * 8;
@@ -247,7 +269,10 @@ function addDOMinsOpTable(query, resultIndex)
 
   for (let i = 0; i < bitAmount; i++)
   {
-    /* loop trough the .tableRows property of the instruction (= cell) */
+    /* loop trough the .tableRows property of the instruction.
+    this array needs to be concatenated (new copy). if not,
+    the ins.graphicalData.tableRows reference will be affected when changing
+    the "row" variable, since "row" will then only be a reference to .tableRows.. */
     row = ins.graphicalData.tableRows.concat();
 
     /* loop trough each cell of the row */
@@ -299,13 +324,13 @@ function addDOMinsOpTable(query, resultIndex)
 function addDOMmncShowList(query, resultIndex)
 {
   let op = query.result[resultIndex];
-  let VIEW = 10;
+  let VIEW_RANGE = 10;
 
   let title = document.getElementById(mncShowTitleLoc);
   let info =  document.getElementById(mncShowInfoLoc);
   let list = document.getElementById(mncShowLoc);
 
-  title.innerHTML = op.operation + " " + op.memory + " at Line " + op.inLine;
+  title.innerHTML = op.operation + " " + query.memory + " at Line " + op.inLine;
 
   if (op.inModule.sourceFile != null || op.inModule.sourceFile != "")
   {
@@ -316,8 +341,17 @@ function addDOMmncShowList(query, resultIndex)
     info.innerHTML  = "Coudldn't analyze in which Sourcefile this code is located."
   }
 
-  let stopLine = op.inLine + VIEW;  if (stopLine > query.src.source.lines.length - 1) {stopLine = query.src.source.lines.length;}
-  let startLine = op.inLine - VIEW; if (startLine < 0) {startLine = 0;}
+  let stopLine = op.inLine + VIEW_RANGE;
+  if (stopLine > query.src.source.lines.length - 1)
+  {
+    stopLine = query.src.source.lines.length;
+  }
+
+  let startLine = op.inLine - VIEW_RANGE;
+  if (startLine < 0)
+  {
+    startLine = 0;
+  }
 
   let mncLine;
 
@@ -348,7 +382,8 @@ function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass =
   let colType = "td";
   let texType = "p";
   let style = "";
-  if (isHead) {
+  if (isHead)
+  {
     colType = "th"; texType = "h1";
   }
 
@@ -624,6 +659,5 @@ function beautifyBitOpString(op)
     case op.includes("SET"):       r = r + "set (" + op + ")";  break;
     default: console.log("Couldn't find " + op + " in 'beautify' Cases");
   }
-  r = r + " in";
   return r;
 }
