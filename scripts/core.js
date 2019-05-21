@@ -149,7 +149,8 @@ function getDefinitions(res)
 
   if (res.Modules.length < 1)
   {
-    if (warnString != "") {
+    if (warnString != "")
+    {
       warnString += "<br>"
     }
     warnString += "There aren't any Modules defined in this MNC!";
