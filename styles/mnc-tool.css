@@ -150,16 +150,14 @@ header {
 }
 
 /* cell styles */
-.insop-table .green-cell {
+.insop-table .red-cell {
   background-color: var(--tone-4-color);
   color: var(--tone-4-accent);
 }
-/* every 2nd last cell text */
-.insop-table .red-cell  {
+.insop-table .green-cell  {
   background-color: var(--tone-5-color);
   color: var(--tone-5-accent);
 }
-/* every 2nd last cell text */
 .insop-table .yellow-cell  {
   background-color: var(--tone-6-color);
   color: var(--tone-6-accent);
@@ -322,6 +320,19 @@ p {
 .timeline-item p {
   font-size: 1rem;
   color:  var(--tone-1-color);
+}
+
+.module-string {
+  float: left;
+  width: 50px;
+  font-size: 0.7rem !important;
+  font-family: "Roboto";
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--tone-3-color) !important;
+  padding-top: 6px;
+  margin: 0px !important;
+  white-space: nowrap;
 }
 
 .timeline-item::before {
