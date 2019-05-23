@@ -1,7 +1,13 @@
 {
   "-99999" : {
-    "0" : "Array elements are targeted with .N instead of [N]",
-    "1" : ""
+    "0" : "JSON-Info",
+    "1" : "opStr placeholders: $xyz.0 or xyz.n   -> n-th element of [xyz]. used if [xyz] is an array",
+    "2" : "                    $reads or $writes -> value of [reads] or [writes]",
+    "3" : "                    $depOf            -> value of dependecy.dependentOf",
+    "4" : "                    $frmLen           -> value of format.length",
+    "5" : "                    $frmKin           -> value of format.kind",
+    "6" : "                    $frmMod           -> value of format.modifier"
+
   },
 
   "1" : {
@@ -81,7 +87,7 @@
     "readsOffset" : [2, 3],
     "writesOffset" : 4,
     "graphicalData" : {
-      "opStr" : "Reads for $format.length byte(s) $format.kind starting at $reads.0 & $reads.1 and writes the decoded result to $writes",
+      "opStr" : "Reads for $frmLen byte(s) $frmKin starting at $reads.0 & $reads.1 and writes the decoded result to $writes",
       "tableRows" : ["$StyleNextCellGreen", "$reads.0", "$Definition", "DECB", "$StyleNextCellRed", "$reads.1", "$Definition", "->", "$StyleNextCellRed", "$writes", "Definition"]
     }
   },
@@ -248,13 +254,13 @@
   "35" : {
     "name" : "XMOVB",
     "format" : 1,
-    "format.modifier" : ["*", "lines[index + 2]"],
+    "format.modifier" : ["*", 2],
     "readsOffset" :  [3, 4],
     "writesOffset" : [4, 3],
-    "dependency" : "new ReadWriteDependency(lines[index  - 3])",
+    "dependency" : ["ReadWriteDependency", -3],
     "graphicalData" : {
-      "opStr" : "If <b> $dependency.dependentOf</b> is true, it will read $reads.0 and write it to $writes.0. <br>If <b> $dependency.dependentOf </b> is false, it will read $writes.0 and write it to $reads.0.<br> The length is defined by it's format ($format.length byte(s), $format.kind) multiplied by the value of <b>$format.modifier.1</b>",
-      "tableExtraDescription" : "Read / Write depends on the state of $dependency.dependentOf",
+      "opStr" : "If <b> $depOf</b> is true, it will read $reads.0 and write it to $writes.0. <br>If <b> $depOf </b> is false, it will read $writes.0 and write it to $reads.0.<br> The length is defined by it's format ($frmLen byte(s), $frmKin) multiplied by the value of <b>$frmMod.1</b>",
+      "tableExtraDescription" : "Read / Write depends on the state of $depOf",
       "tableRows" : ["$StyleNextCellYellow",  "$reads.0", "$Definition", "XMOVB", "$StyleNextCellYellow",  "$writes.0", "$Definition"]
     }
   },
@@ -387,7 +393,7 @@
     "readsOffset" : 2,
     "writesOffset" : 3,
     "graphicalData" : {
-      "opStr" : "Moves n-bytes, ($format.length $format.kind) $reads to $writes",
+      "opStr" : "Moves n-bytes, ($frmLen $frmKin) $reads to $writes",
       "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
     }
   },
@@ -416,9 +422,9 @@
     "name" : "DIFU",
     "format.length" : 1,
     "readsOffset" : 1,
-    "dependency" : "new ActivationDependency(lines[index - 1])",
+    "dependency" : ["ActivationDependency", -1],
     "graphicalData" : {
-      "opStr" : "Generates a positive impulse of the signal $dependency.dependentOf. DIFU Number: $reads",
+      "opStr" : "Generates a positive impulse of the signal $depOf. DIFU Number: $reads",
       "tableRows" : null
     }
   },
@@ -427,9 +433,9 @@
     "name" : "DIFD",
     "format.length" : 1,
     "readsOffset" : 1,
-    "dependency" : "new ActivationDependency(lines[index - 1])",
+    "dependency" : ["ActivationDependency", -1],
     "graphicalData" : {
-      "opStr" : "Generates a negative impulse of the signal $dependency.dependentOf. DIFD Number: $reads",
+      "opStr" : "Generates a negative impulse of the signal $depOf. DIFD Number: $reads",
       "tableRows" : null
     }
   },

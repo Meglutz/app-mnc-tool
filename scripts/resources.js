@@ -501,6 +501,12 @@ class Resource
     let match = instructionOperationRegex.exec(lines[index]);
     if (match != null && match[1,2] != null && match[1,2] != "")
     {
+      /* DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG */
+      console.log(index + " | " + parseInt(match[2], 10));
+      let a = this.instructionParseJSON(index, parseInt(match[2], 10));
+      return a
+      /* DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG */
+
       let name;
       let number = parseInt(match[2], 10);
       let reads = null;
@@ -1063,18 +1069,16 @@ class Resource
 
 
   instructionParseJSON(index, subNumber) {
-
-    /* TODO: XMOVB format.modifier!!!
-      test format.Length
-      test format.kind
-    */
-
     let name = null;
     let reads = null;
     let writes = null;
-    let dependency = null;
+    let dependency = {dependentOf: null};
     let format = {kind: "-", length: 0, modifier: null};
-    let graphicalData = {opStr: null, tableRows: null, tableExtraDescription: null};
+    let graphicalData = {opStr: "-", tableRows: "-", tableExtraDescription: "-"};
+
+    if (InstructionData[subNumber] == undefined) {
+      console.error("Error: The instruction with the number: " + subNumber + " is inexistent in this JSON data.");
+    }
 
     Object.entries(InstructionData[subNumber]).forEach(key =>
       {
@@ -1100,8 +1104,24 @@ class Resource
             format.kind = key[1];
           break;
 
+          case "format.modifier":
+            format.modifier = [];
+            for (let item of key[1])
+            {
+              /* if it's a number it must be an offset of the current index, pointing to a line */
+              if (isNaN(item) != true)
+              {
+                format.modifier.push(this.source.lines[index + item]);
+              }
+              else
+              {
+                format.modifier.push(item)
+              }
+            }
+          break;
+
           case "readsOffset":
-            /* if there are multiple reads for an ins, then loop trough them */
+            /* if there are multiple "reads" for an ins, then loop trough them */
             if (isIterable(key[1]))
             {
               reads = [];
@@ -1117,7 +1137,7 @@ class Resource
           break;
 
           case "writesOffset":
-            /* if there are multiple writes for an ins, then loop trough them */
+            /* if there are multiple "writes" for an ins, then loop trough them */
             if (isIterable(key[1]))
             {
               writes = [];
@@ -1132,13 +1152,54 @@ class Resource
             }
           break;
 
+          case "dependency":
+            switch (key[1][0])
+            {
+              case "ReadWriteDependency":
+                dependency = new ReadWriteDependency(this.source.lines[index + key[1][1]]);
+              break;
+
+              case "ActivationDependency":
+                dependency = new ActivationDependency(this.source.lines[index  + key[1][1]]);
+              break;
+            }
+          break;
+
           case "graphicalData":
             graphicalData.opStr = key[1].opStr;
             graphicalData.tableRows = key[1].tableRows;
             graphicalData.tableExtraDescription = key[1].tableExtraDescription;
 
-          default:
+            /* replace placeholders in graphicalData */
+            let keywords = ["StyleNextCellRed", "StyleNextCellGreen", "StyleNextCellYellow", "Definition", "reads", "writes", "frmLen",      "frmKin",    "frmMod",        "depOf"];
+            let values   = [ StyleNextCellRed,   StyleNextCellGreen,   StyleNextCellYellow,   Definition,   reads ,  writes ,  format.length, format.kind, format.modifier, dependency.dependentOf];
+            for (let i = 0; i < keywords.length; i++)
+            {
+              /* only replace if the value isn't null. not all instruction have e.g. the "dependency.dependentOf" property */
+              if (values[i] != null) {
+                if (graphicalData.opStr != null)
+                {
+                  graphicalData.opStr = replaceInString(graphicalData.opStr, "$", keywords[i], ".", values[i]);
+                }
 
+                if (graphicalData.tableExtraDescription != null)
+                {
+                  graphicalData.tableExtraDescription = replaceInString(graphicalData.tableExtraDescription, "$", keywords[i], ".", values[i]);
+                }
+
+                for (let j = 0; j < graphicalData.tableRows.length; j++)
+                {
+                  if (graphicalData.tableRows[j] != null)
+                  {
+                    graphicalData.tableRows[j]= replaceInString(graphicalData.tableRows[j], "$", keywords[i], ".", values[i]);
+                  }
+                }
+
+              }
+            }
+          break;
+
+          default:
         }
       }
     );
@@ -1155,6 +1216,7 @@ class Resource
               formatModifier   : format.modifier
             };
   }
+
 
   /*******************************************************************************
   ** Action: Checks which Memory gets read by an instruction
@@ -1260,4 +1322,56 @@ function removeLeadingChar(inputStr, charToRemove)
     inputStr = inputStr.substring(1)
   }
   return inputStr;
+}
+
+
+/*******************************************************************************
+** Action: Replaces any placholders of [prefix] + [keyword] in [str]
+**         with the value(s) of [value]. [value] can be an array. If an array,
+**         it will check for all [value.length] references where [delimiter]
+**         represents the char to announce th array index.
+**         e.g. "$test.1": "$" = [prefix], "test" = [keyword], "." = [delimiter]
+** Return: string with all placeholders replaced
+*******************************************************************************/
+function replaceInString(str, prefix, keyword, delimiter, value)
+{
+  let rep
+
+  /* make sure only strings get passed into this method */
+  if (typeof str != "string")
+  {
+    console.error("Error: " + replaceInString.name + " 'str' arg must be typeof string. Now it's: " + typeof str);
+  }
+
+  /* if [value] is an array, loop [value.length] times to be sure to replace all
+  array placeholders in the string */
+  if (isIterable(value))
+  {
+    for (let i = 0; i < value.length; i++)
+    {
+      /* assemble regular expression according to keyword and current index */
+      rep = prefix + keyword + delimiter + i;
+      new RegExp(rep)
+
+      /* repeate replacing until the string has no more of the current
+      placeholders (rep) */
+      while (str != str.replace(rep, value[i]))
+      {
+        str = str.replace(rep, value[i]);
+      }
+    }
+  }
+  else
+  {
+    rep = prefix + keyword;
+    new RegExp(rep);
+    /* repeate replacing until the string has no more of the current
+    placeholders (rep) */
+    while (str != str.replace(rep, value))
+    {
+      str = str.replace(rep, value);
+    }
+  }
+
+  return str
 }

@@ -385,6 +385,7 @@ function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass =
   let colType = "td";
   let texType = "p";
   let style = "";
+  
   if (isHead)
   {
     colType = "th"; texType = "h1";
