@@ -1,4 +1,7 @@
 # To Do List
+
+**Now over 2500SLOC!**
+
 ## General
 * [x] Change DOMTable generation for InstructionOperations so that it can take more
       than two inputs (e.g. EXOR uses 2 read- and 1 write-input)
@@ -10,7 +13,7 @@
 ## Nice-to-have
 * [ ] Add sendable queries and Data files
 * [ ] **Interactive COP (Contact-plan)**
-    * [ ] Add MNC to COP interpreter
+    * [ ] Add MNC-to-COP interpreter
     * [ ] Add visualisation
     * [ ] Add simulation
 
@@ -31,8 +34,8 @@
 * [ ] Fix Result sorting: lowest line count to highest line count. (Or by level?)
 * [ ] Only parse lines which are in the same network as the selected Op to MNCshow
 * [ ] Check for defines before drawing MNCshow
-* [ ] Finally implement XMOVB instructions
-* [ ] Find a better solution to the issue with the Operation strings and preparation of the InsOp table data. Maybe include it in the Switch statement in the Resource class? Obviously with a few new properties for the InstructionOperation class
+* [x] Finally implement XMOVB instructions
+* [x] Find a better solution to the issue with the Operation strings and preparation of the InsOp table data. Maybe include it in the Switch statement in the Resource class? Obviously with a few new properties for the InstructionOperation class
 * [ ] Make sure "Dependency" Bits are being tagged when being a dependency for example for RW / ACT / RST.
 * [ ] Implement Module detection for decompiled MNCs:
 
@@ -44,5 +47,5 @@ WRT    PMCOM_XY
 
 ## Nice-to-have
 * [x] Check all regexes on single strings
-* [x] Remove `$` (= assert position to end of line) regex-sings to enhance compatibility
+* [x] Remove `$` (= assert position at end of line) regex-signs to enhance compatibility
 * [ ] Add automated sanity checks (e.g. compare all RD, OR, ANDs to the amount of bitReadOps)

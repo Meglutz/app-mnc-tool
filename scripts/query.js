@@ -3,6 +3,7 @@
 *******************************************************************************/
 const bitReadOps = "Bit-Read";
 const bitWriteOps = "Bit-Write";
+const bitReadWriteOps = "Bit-Read-Write";
 const definedBitsInInstructions = "Defined Bits which are handled in Instructions";
 
 /*******************************************************************************
@@ -93,7 +94,7 @@ class Query
         }
 
         this.queryLogFooter(this.result);
-        break;
+      break;
 
       /* ---------------------------------------------------------------------*/
       case bitWriteOps:
@@ -144,41 +145,65 @@ class Query
         }
 
         this.queryLogFooter(this.result);
-        break;
+      break;
 
       /* ---------------------------------------------------------------------*/
-      case definedBitsInInstructions:
+      case bitReadWriteOps:
         query = this.memory;
-        this.queryLogHead("Defined Bits which are handled in Instructions");
+        this.queryLogHead("Bit-Read and Bit-Write Operations for (" + query + ")");
 
         /* get definition */
-        this.log.push("Looking trough all definitions...");
-        for (let bit of this.src.SBDMemory)
+        this.log.push("Looking for definitions...");
+        bit = this.src.getBitDef(query);
+
+        /* check if bit has been found */
+        if (bit != undefined)
         {
-          /* look for matching "writes" in instructionOperations */
-          for (let ins of this.src.instructionOperations)
+          this.log.push("Found definition:");
+          this.log.push(bit);
+          this.memoryDefinition = bit;
+        }
+        else
+        {
+          /* bit has no definition, create Dummy */
+          this.log.push("Bit is undefined. Creating Dummy Memory...");
+          this.memoryDefinition, bit = this.src.makeDummyDefinition(query)
+          if (bit == null)
           {
-            /* loop trough "writes" array, if there is one */
-            if (ins.writes != null)
-            {
-              this.checkInstuctionRange(ins.writes, bit.byteType, bit.byteAddress, ins, bit);
-            }
+            this.log.push("Illegal format, couldn't finish Query");
+            break;
+          }
+        }
+
+        /* look for matching bitRead and bitWrite operations */
+        this.log.push("Looking for read or write operations...");
+        let bitString = bit.byteType  + bit.byteAddress  + "." + bit.bitAddress;
+        for (let bitRW of this.src.bitOperations)
+        {
+          if (bitRW.writes == bitString || bitRW.reads == bitString)
+          {
+            this.result.push(bitRW);
+          }
+        }
+
+        /* look for matching "reads" or "writes" in instructionOperations */
+        for (let ins of this.src.instructionOperations)
+        {
+          /* loop trough "reads" array, if there is one */
+          if (ins.reads != null)
+          {
+            this.checkInstuctionRange(ins.reads, bit.byteType, bit.byteAddress, ins);
           }
 
-          /* look for matching "reads" in instructionOperations */
-          for (let ins of this.src.instructionOperations)
+          /* loop trough "writes" array, if there is one */
+          if (ins.writes != null)
           {
-            /* loop trough "reads" array, if there is one */
-            if (ins.reads != null)
-            {
-              /* If it "reads" is an array, loop trough it */
-              this.checkInstuctionRange(ins.reads, bit.byteType, bit.byteAddress, ins, bit);
-            }
+            this.checkInstuctionRange(ins.writes, bit.byteType, bit.byteAddress, ins);
           }
         }
 
         this.queryLogFooter(this.result);
-        break;
+      break;
       /* ---------------------------------------------------------------------*/
       default:
         this.log.push("Query Type undefined.");
@@ -280,7 +305,7 @@ function checkInstructionByteRange(startByte, length, checkByteType, checkByteAd
       for (let i = 0; i < length; i++)
       {
         /* if the bit's byteAdress matches the instructions byteAdress + i then it's getting handled there */
-        if (checkByteType + checkByteAddress == type + (number + i)) 
+        if (checkByteType + checkByteAddress == type + (number + i))
         {
           return true;
         }

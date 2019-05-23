@@ -332,6 +332,7 @@ function addDOMmncShowList(query, resultIndex)
 
   title.innerHTML = op.operation + " " + query.memory + " at Line " + op.inLine;
 
+  /* make sourcefile / info string if the data is available */
   if (op.inModule.sourceFile != null || op.inModule.sourceFile != "")
   {
     info.innerHTML  = "This code is found in the Sourcefile <b>fc" + op.inModule.sourceFile + ".lad</b> (" + op.inModule.title + ")";
@@ -341,6 +342,7 @@ function addDOMmncShowList(query, resultIndex)
     info.innerHTML  = "Coudldn't analyze in which Sourcefile this code is located."
   }
 
+  /* get the lines to diplay according to the VIEW_RANGE */
   let stopLine = op.inLine + VIEW_RANGE;
   if (stopLine > query.src.source.lines.length - 1)
   {
@@ -353,8 +355,9 @@ function addDOMmncShowList(query, resultIndex)
     startLine = 0;
   }
 
+  /* add each mnc line to the list DOM element. if the the line location matches
+  the result, add a code-highlight class to the list element*/
   let mncLine;
-
   for (let i = startLine; i < stopLine; i++)
   {
     if (i == op.inLine)
@@ -597,14 +600,14 @@ function prepareDOMresult(result, type)
   else if (result instanceof BitOperation)
   {
     /* evaluate strings for bit operations */
-    highlight = false; /* turn highlight off if it's a bit operation  */
-    if (type == bitReadOps)
-    {
-      operationString = result.reads  + " " + beautifyBitOpString(result.operation);
-    }
-    if (type == bitWriteOps)
+    highlight = false; /* turn highlight off if - it's just a bit operation  */
+    if (result.reads == null)
     {
       operationString = result.writes + " " + beautifyBitOpString(result.operation);
+    }
+    else
+    {
+      operationString = result.reads  + " " + beautifyBitOpString(result.operation);
     }
   }
   else

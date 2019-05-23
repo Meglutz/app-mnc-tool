@@ -432,7 +432,7 @@ function addWarning(wLog, fName, desc, optData = null)
 
 /*******************************************************************************
 ** Action: Adds padding to number, (3).pad(4) = 0003.
-** Return: padded number
+** Return: padded number string
 *******************************************************************************/
 Number.prototype.pad = function(size)
 {
