@@ -12,6 +12,7 @@ let MyQueries = [];
 let Data;
 let MNC;
 let MNCData;
+let InstructionData;
 
 let CurrentModule;
 let CurrentNetwork;
@@ -33,6 +34,7 @@ function preload()
 
 function setup()
 {
+  InstructionData = loadJSON("./resources/fanuc_ins.json");
   /* pre-analyze mnemonic levels and structure */
   MNC.levels.push(new LineRange(MNC.lines, "1",   /^\%\@3/,   /^SUB\s1$/));
   MNC.levels.push(new LineRange(MNC.lines, "2",   /^SUB\s1$/, /^SUB\s2$/));

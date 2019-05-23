@@ -1,0 +1,569 @@
+{
+  "-99999" : {
+    "0" : "Array elements are targeted with .N instead of [N]",
+    "1" : ""
+  },
+
+  "1" : {
+    "name" : "END1"
+  },
+
+  "2" : {
+    "name" : "END2"
+  },
+
+  "48" : {
+    "name" : "END3"
+  },
+
+  "64" : {
+    "name" : "SUBEND"
+  },
+
+  "65" : {
+    "name" : "SUBCALL",
+    "format.length" : 1,
+    "readsOffset" : 1,
+    "graphicalData" : {
+      "opStr" : "Starts the Subprogram $reads"
+    }
+  },
+
+  "66" : {
+    "name" : "SUBCALLU",
+    "format.length" : 1,
+    "readsOffset" : 1,
+    "graphicalData" : {
+      "opStr" : "Starts the Subprogram $reads"
+    }
+  },
+
+  "71" : {
+    "name" : "SUBPRG",
+    "format.length" : 1,
+    "readsOffset" : 1,
+    "graphicalData" : {
+      "opStr" : "Header of the Subprogram $reads"
+    }
+  },
+
+  "72" : {
+    "name" : "SUBE"
+  },
+
+  "3" : {
+    "name" : "TMR",
+    "format.length" : 1,
+    "readsOffset" : 1
+  },
+
+  "24" : {
+    "name" : "TMRB",
+    "format.length" : 1,
+    "readsOffset" : 1
+  },
+
+  "54" : {
+    "name" : "TMRC",
+    "format.length" : 1,
+    "readsOffset" : 1
+  },
+
+  "77" : {
+    "name" : "TMBRF",
+    "format.length" : 1,
+    "readsOffset" : 1
+  },
+
+  "25" : {
+    "name" : "DECB",
+    "format" : 1,
+    "readsOffset" : [2, 3],
+    "writesOffset" : 4,
+    "graphicalData" : {
+      "opStr" : "Reads for $format.length byte(s) $format.kind starting at $reads.0 & $reads.1 and writes the decoded result to $writes",
+      "tableRows" : ["$StyleNextCellGreen", "$reads.0", "$Definition", "DECB", "$StyleNextCellRed", "$reads.1", "$Definition", "->", "$StyleNextCellRed", "$writes", "Definition"]
+    }
+  },
+
+  "5" : {
+    "name" : "CTR",
+    "format.length" : 1,
+    "readsOffset" : 1,
+    "writesOffset" : 1
+  },
+
+  "55" : {
+    "name" : "CTRC",
+    "format.length" : 2,
+    "readsOffset" : 1,
+    "writesOffset" : 1,
+    "graphicalData" : {
+      "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
+      "tableRows" : ["$StyleNextCellGreen", "$reads", "$Definition", "$StyleNextCellRed", "$writes", "$Definition", "CTRC"]
+    }
+  },
+
+  "56" : {
+    "name" : "CTRB",
+    "format.length" : 1,
+    "readsOffset" : 1,
+    "writesOffset" : 1,
+    "graphicalData" : {
+      "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
+      "tabelRows" : ["$StyleNextCellGreen","$reads", "$Definition", "$StyleNextCellRed","$writes", "$Definition", "CTRB"]
+    }
+  },
+
+  "6" : {
+    "name" : "ROT",
+    "usedUndefinedInstruction" : true
+  },
+
+  "26" : {
+    "name" : "ROTB",
+    "usedUndefinedInstruction" : true
+  },
+
+  "7" : {
+    "name" : "COD",
+    "usedUndefinedInstruction" : true
+  },
+
+  "27" : {
+    "name" : "CODB",
+    "format" : 1,
+    "readsOffset" : 3,
+    "writesOffset" : 4,
+    "graphicalData" : {
+      "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
+      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "CODB", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "8" : {
+    "name" : "MOVE",
+    "usedUndefinedInstruction" : true
+  },
+
+  "28" : {
+    "name" : "MOVOR",
+    "format.length" : 1,
+    "readsOffset" : [1, 2],
+    "writesOffset" : 3,
+    "graphicalData" : {
+      "opStr" :  "Writes the logical OR product of $reads.0 & $reads.1 to $writes",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "MOVOR", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "9" : {
+    "name" : "COM",
+    "usedUndefinedInstruction" : true
+  },
+
+  "29" : {
+    "name" : "COME",
+    "usedUndefinedInstruction" : true
+  },
+
+  "10" : {
+    "name" : "JMP"
+  },
+
+  "30" : {
+    "name" : "JMPE"
+  },
+
+  "68" : {
+    "name" : "JMPB"
+  },
+
+  "69" : {
+    "name" : "LBL"
+  },
+
+  "11" : {
+    "name" : "PARI",
+    "usedUndefinedInstruction" : true
+  },
+
+  "14" : {
+    "name" : "DCNV",
+    "usedUndefinedInstruction" : true
+  },
+
+  "31" : {
+    "name" : "DCNVB",
+    "format" : 1,
+    "readsOffset" : 2,
+    "writesOffset" : 3,
+    "graphicalData" : {
+      "opStr" : "Converts $reads from binary to BCD and writes it to $writes",
+      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "DCNVB", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "15" : {
+    "name" : "COMP",
+    "usedUndefinedInstruction" : true
+  },
+
+  "32" : {
+    "name" : "COMPB",
+    "format" : 1,
+    "readsOffset" : [2, 3],
+    "writesOffset" : null,
+    "graphicalData" : {
+      "opStr" : "Compares $reads.0 to $reads.1. Uses internal evaluation register to store the result",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "COMPB", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed", "R9000", "$Definition"]
+    }
+  },
+
+  "16" : {
+    "name" : "COIN",
+    "usedUndefinedInstruction" : true
+  },
+
+  "33" : {
+    "name" : "SFT",
+    "usedUndefinedInstruction" : true
+  },
+
+  "17" : {
+    "name" : "DSCH",
+    "usedUndefinedInstruction" : true
+  },
+
+  "34" : {
+    "name" : "DSCHB",
+    "usedUndefinedInstruction" : true
+  },
+
+  "18" : {
+    "name" : "XMOV",
+    "usedUndefinedInstruction" : true
+  },
+
+  "35" : {
+    "name" : "XMOVB",
+    "format" : 1,
+    "format.modifier" : ["*", "lines[index + 2]"],
+    "readsOffset" :  [3, 4],
+    "writesOffset" : [4, 3],
+    "dependency" : "new ReadWriteDependency(lines[index  - 3])",
+    "graphicalData" : {
+      "opStr" : "If <b> $dependency.dependentOf</b> is true, it will read $reads.0 and write it to $writes.0. <br>If <b> $dependency.dependentOf </b> is false, it will read $writes.0 and write it to $reads.0.<br> The length is defined by it's format ($format.length byte(s), $format.kind) multiplied by the value of <b>$format.modifier.1</b>",
+      "tableExtraDescription" : "Read / Write depends on the state of $dependency.dependentOf",
+      "tableRows" : ["$StyleNextCellYellow",  "$reads.0", "$Definition", "XMOVB", "$StyleNextCellYellow",  "$writes.0", "$Definition"]
+    }
+  },
+
+  "19" : {
+    "name" : "ADD",
+    "usedUndefinedInstruction" : true
+  },
+
+  "36" : {
+    "name" : "ADDB",
+    "format" : 1,
+    "readsOffset" : [2, 3],
+    "writesOffset" : 4,
+    "graphicalData" : {
+      "opStr" : "Adds $reads.0 to $reads.1 and writes it to $writes",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "+", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "20" : {
+    "name" : "SUB",
+    "usedUndefinedInstruction" : true
+  },
+
+  "37" : {
+    "name" : "SUBB",
+    "format" : 1,
+    "readsOffset" : [2, 3],
+    "writesOffset" : 4,
+    "graphicalData" : {
+      "opStr" : "Subtracts $reads.1 from $reads.0 and writes it to $writes",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "-", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "21" : {
+    "name" : "MUL",
+    "usedUndefinedInstruction" : true
+  },
+
+  "38" : {
+    "name" : "MULB",
+    "format" : 1,
+    "readsOffset" : [2, 3],
+    "writesOffset" : 4,
+    "graphicalData" : {
+      "opStr" : "Multiplies $reads.0 by $reads.1 and writes it to $writes",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "x", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "22" : {
+    "name" : "DIV",
+    "usedUndefinedInstruction" : true
+  },
+
+  "39" : {
+    "name" : "DIVB",
+    "format" : 1,
+    "readsOffset" : [2, 3],
+    "writesOffset" : 4,
+    "graphicalData" : {
+      "opStr" : "Divides $reads.1 trough $reads.0 and writes it to $writes",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "/", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "23" : {
+    "name" : "NUME",
+    "usedUndefinedInstruction" : true
+  },
+
+  "40" : {
+    "name" : "NUMEB",
+    "format" : 1,
+    "readsOffset" :  2,
+    "writesOffset" : 3,
+    "graphicalData" : {
+      "opStr" : "Defines $reads as a constant and stores it to $writes",
+      "tableRows" : ["define", "$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "49" : {
+    "name" : "DISP",
+    "usedUndefinedInstruction" : true
+  },
+
+  "41" : {
+    "name" : "DISPB"
+  },
+
+  "42" : {
+  "name" : "EXIN",
+    "format.length" : 5,
+    "readsOffset" : 1,
+    "writesOffset" : 1,
+    "graphicalData" : {
+      "opStr" : "TEXT TO DO",
+      "tableRows" : ["EXIN", "$StyleNextCellGreen","$reads", "$Definition", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "43" : {
+    "name" : "MOVB",
+    "format.length" : 1,
+    "readsOffset" : 1,
+    "writesOffset" : 2,
+    "graphicalData" : {
+      "opStr" : "Moves one byte, $reads to $writes",
+      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "44" : {
+    "name" : "MOVW",
+    "format.length" : 2,
+    "readsOffset" : 1,
+    "writesOffset" : 2,
+    "graphicalData" : {
+      "opStr" : "Moves one word, $reads to $writes",
+      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "45" : {
+    "name" : "MOVN",
+    "format" : 1,
+    "readsOffset" : 2,
+    "writesOffset" : 3,
+    "graphicalData" : {
+      "opStr" : "Moves n-bytes, ($format.length $format.kind) $reads to $writes",
+      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "51" : {
+    "name" : "WINDR",
+    "format.length" : 1,
+    "writesOffset" : 1,
+    "graphicalData" : {
+      "opStr" : "Reads dataelements from the PMC / CNC window and writes it to $writes",
+      "tableRows" : ["WINDR", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "52" : {
+    "name" : "WINDW",
+    "format.length" : 1,
+    "writesOffset" : 1,
+    "graphicalData" : {
+      "opStr" : "Reads dataelements from the PMC / CNC window and writes it to $writes",
+      "tableRows" : ["WINDR", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "57" : {
+    "name" : "DIFU",
+    "format.length" : 1,
+    "readsOffset" : 1,
+    "dependency" : "new ActivationDependency(lines[index - 1])",
+    "graphicalData" : {
+      "opStr" : "Generates a positive impulse of the signal $dependency.dependentOf. DIFU Number: $reads",
+      "tableRows" : null
+    }
+  },
+
+  "58" : {
+    "name" : "DIFD",
+    "format.length" : 1,
+    "readsOffset" : 1,
+    "dependency" : "new ActivationDependency(lines[index - 1])",
+    "graphicalData" : {
+      "opStr" : "Generates a negative impulse of the signal $dependency.dependentOf. DIFD Number: $reads",
+      "tableRows" : null
+    }
+  },
+
+  "53" : {
+    "name" : "AXCTL"
+  },
+
+  "59" : {
+    "name" : "EXOR",
+    "format" : 1,
+    "readsOffset" : [2, 3],
+    "writesOffset" : 4,
+    "graphicalData" : {
+      "opStr" : "Bitwise EXOR links $reads.0 to $reads.1 and writes it to $writes",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "EXOR", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "60" : {
+    "name" : "LOGAND",
+    "format" : 1,
+    "readsOffset" : [2, 3],
+    "writesOffset" : 4,
+    "graphicalData" : {
+      "opStr" : "Bitwise AND links $reads.0 and $reads.1 and writes it to $writes",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "&&", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "61" : {
+    "name" : "LOGOR",
+    "format" : 1,
+    "readsOffset" : [2, 3],
+    "writesOffset" : 4,
+    "graphicalData" : {
+      "opStr" : "Bitwise OR links $reads.0 to $reads.1 and writes it to $writes",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "OR", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "62" : {
+    "name" : "LOGNOT",
+    "format" : 1,
+    "readsOffset" : 2,
+    "writesOffset" : 3,
+    "graphicalData" : {
+      "opStr" : "Bitwise negates $reads and writes it to $writes",
+      "tableRows" : ["NOT", "$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+    }
+  },
+
+  "90" : {
+    "name" : "FNC90",
+    "usedUndefinedInstruction" : true
+  },
+
+  "91" : {
+    "name" : "FNC91",
+    "usedUndefinedInstruction" : true
+  },
+
+  "92" : {
+    "name" : "FNC92",
+    "usedUndefinedInstruction" : true
+  },
+
+  "93" : {
+    "name" : "FNC93",
+    "usedUndefinedInstruction" : true
+  },
+
+  "94" : {
+    "name" : "FNC94",
+    "usedUndefinedInstruction" : true
+  },
+
+  "95" : {
+    "name" : "FNC95",
+    "usedUndefinedInstruction" : true
+  },
+
+  "96" : {
+    "name" : "FNC96",
+    "usedUndefinedInstruction" : true
+  },
+
+  "97" : {
+    "name" : "FNC97",
+    "usedUndefinedInstruction" : true
+  },
+
+  "88" : {
+    "name" : "MMC3R",
+    "usedUndefinedInstruction" : true
+  },
+
+  "89" : {
+    "name" : "MMC3W",
+    "usedUndefinedInstruction" : true
+  },
+
+  "98" : {
+    "name" : "MMCWR",
+    "usedUndefinedInstruction" : true
+  },
+
+  "99" : {
+    "name" : "MMCWW",
+    "usedUndefinedInstruction" : true
+  },
+
+  "460" : {
+    "name" : "PID",
+    "usedUndefinedInstruction" : true
+  },
+
+  "219" : {
+    "name" : "RNGW",
+    "format.length" : 2,
+    "readsOffset" :  [1, 2, 3],
+    "graphicalData" : {
+      "opStr" : "Word-Range comparison. <br>Lower / Upper Boundary: <b>$reads.0</b> <br>Lower / Upper Boundary: <b>$reads.1</b> <br>Input Data :            <b>$reads.2</b> <br>Sets its output <br>if $reads.0 ≤ $reads.2 ≤ $reads.1 or <br>if $reads.1 ≤ $reads.2 ≤ $reads.0",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "≤", "$StyleNextCellGreen",  "$reads.2", "$Definition", "≤", "$StyleNextCellGreen",  "$reads.1", "$Definition"]
+    }
+  },
+
+  "220" : {
+    "name" : "RNGD",
+    "format.length" : 4,
+    "reads" :  [1, 2, 3],
+    "graphicalData" : {
+      "opStr" : "Doubleword-Range comparison. <br>Lower / Upper Boundary: <b>$reads.0</b> <br>Lower / Upper Boundary: <b>$reads.1</b> <br>Input Data :            <b>$reads.2</b> <br>Sets its output <br>if $reads.0 ≤ $reads.2 ≤ $reads.1 or <br>if $reads.1 ≤ $reads.2 ≤ $reads.0",
+      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "≤", "$StyleNextCellGreen",  "$reads.2", "$Definition", "≤", "$StyleNextCellGreen",  "$reads.1", "$Definition"]
+    }
+  }
+}

@@ -1061,6 +1061,101 @@ class Resource
     }
   }
 
+
+  instructionParseJSON(index, subNumber) {
+
+    /* TODO: XMOVB format.modifier!!!
+      test format.Length
+      test format.kind
+    */
+
+    let name = null;
+    let reads = null;
+    let writes = null;
+    let dependency = null;
+    let format = {kind: "-", length: 0, modifier: null};
+    let graphicalData = {opStr: null, tableRows: null, tableExtraDescription: null};
+
+    Object.entries(InstructionData[subNumber]).forEach(key =>
+      {
+        switch (key[0]) {
+          case "name":
+            name = key[1];
+          break;
+
+          case "usedUndefinedInstruction":
+            this.usedUndefinedInstructions.push(name);
+          break;
+
+          case "format":
+            console.log("format: " + key[1]);
+            format = this.instructionFormat(this.source.lines, index, key[1]);
+          break;
+
+          case "format.length":
+            format.length = key[1];
+          break;
+
+          case "format.kind":
+            format.kind = key[1];
+          break;
+
+          case "readsOffset":
+            /* if there are multiple reads for an ins, then loop trough them */
+            if (isIterable(key[1]))
+            {
+              reads = [];
+              for (let i = 0; i < key[1].length; i++)
+              {
+                reads.push(this.instructionReads(this.source.lines, index, key[1][i]));
+              }
+            }
+            else
+            {
+              reads = this.instructionReads(this.source.lines, index, key[1]);
+            }
+          break;
+
+          case "writesOffset":
+            /* if there are multiple writes for an ins, then loop trough them */
+            if (isIterable(key[1]))
+            {
+              writes = [];
+              for (let i = 0; i < key[1].length; i++)
+              {
+                writes.push(this.instructionWrites(this.source.lines, index, key[1][i]));
+              }
+            }
+            else
+            {
+              writes = this.instructionWrites(this.source.lines, index, key[1]);
+            }
+          break;
+
+          case "graphicalData":
+            graphicalData.opStr = key[1].opStr;
+            graphicalData.tableRows = key[1].tableRows;
+            graphicalData.tableExtraDescription = key[1].tableExtraDescription;
+
+          default:
+
+        }
+      }
+    );
+
+    return  {
+              instruction      : name,
+              number           : subNumber,
+              reads            : reads,
+              writes           : writes,
+              dependency       : dependency,
+              graphicalData    : new GraphicalData(graphicalData.opStr, graphicalData.tableRows, graphicalData.tableExtraDescription),
+              format           : format.kind,
+              formatLength     : format.length,
+              formatModifier   : format.modifier
+            };
+  }
+
   /*******************************************************************************
   ** Action: Checks which Memory gets read by an instruction
   ** Return: String, containing Starting memory [startByte]
