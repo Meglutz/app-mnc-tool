@@ -167,7 +167,7 @@ document.getElementById("query-submit").onclick = function()
   /* Add a new TimeLine "Modal" for each result */
   for (let i = 0; i < MyQueries[latestQuery].result.length; i++)
   {
-    content = prepareDOMresult(MyQueries[latestQuery].result[i], typeVal);
+    content = prepareDOMresult(MyQueries[latestQuery].result[i]);
     if (content != undefined)
     {
         addDOMresult(content.lineString,
@@ -385,7 +385,7 @@ function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass =
   let colType = "td";
   let texType = "p";
   let style = "";
-  
+
   if (isHead)
   {
     colType = "th"; texType = "h1";
@@ -581,7 +581,7 @@ function updateDOMheader(mnc)
 ** Action: Formats query results into prepared Strings for the DOM Elements
 ** Return: action-, operation-, module- lineString
 *******************************************************************************/
-function prepareDOMresult(result, type)
+function prepareDOMresult(result)
 {
   /* These strings represent one column in the output table */
   let actionString = "";
