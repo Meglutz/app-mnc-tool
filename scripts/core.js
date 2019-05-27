@@ -24,17 +24,18 @@ let WarningLog = []; /* Contains html styled string array of all warnings
 /*******************************************************************************
 ** p5 Main functions
 *******************************************************************************/
+
 function preload()
 {
   /* the loadStrings function returns an array, indexed by the line count of the loaded file */
   MNC = new Mnemonic(loadStrings(Source, console.log("Mnemonic file loaded correctly.")));
   Data = new Resource(MNC);
+  InstructionData = loadJSON("./resources/fanuc_ins.json");
 }
 
 
 function setup()
 {
-  InstructionData = loadJSON("./resources/fanuc_ins.json");
   /* pre-analyze mnemonic levels and structure */
   MNC.levels.push(new LineRange(MNC.lines, "1",   /^\%\@3/,   /^SUB\s1$/));
   MNC.levels.push(new LineRange(MNC.lines, "2",   /^SUB\s1$/, /^SUB\s2$/));
@@ -211,7 +212,7 @@ function analyzeLogic(res)
     }
 
     /* instruction operations */
-    op = res.InstructionLogicData(lines, i);
+    op = res.instructionParseJSON(i, lines[i]);
     if (op != null)
     {
       res.instructionOperations.push(new InstructionOperation(op.instruction,

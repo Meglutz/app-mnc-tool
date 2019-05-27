@@ -490,591 +490,43 @@ class Resource
 
 
   /*******************************************************************************
-  ** Action: Checks if string[index] contains a instruction.
-  **         This method also holds all Instrucion logic. That's  why you have
-  **         to pass this method a whole lines array instead of just one line: It needs
-  **         to look ahead / behind to get some necessary Data for the found instruction.
+  ** Action: Checks if line[index] contains an instruction call.
+  **         Parses JSON-Data properties to be compatible with the methods which
+  **         handle the respective properties.
   ** Return: All Data to create a new InstructionOperation Object
   *******************************************************************************/
-  InstructionLogicData(lines, index)
-  {
-    let match = instructionOperationRegex.exec(lines[index]);
-    if (match != null && match[1,2] != null && match[1,2] != "")
-    {
-      /* DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG */
-      console.log(index + " | " + parseInt(match[2], 10));
-      let a = this.instructionParseJSON(index, parseInt(match[2], 10));
-      return a
-      /* DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG */
-
-      let name;
-      let number = parseInt(match[2], 10);
-      let reads = null;
-      let writes = null;
-      let dependency = null;
-      let format = {kind: "-", length: 0, modifier: null};
-      let graphicalData = {opStr: null, tableRows: null, tableExtraDescription: null};
-        switch (number)
-        {
-          case 1: /* ☑️ */
-            name = "END1";
-            /* Needs nothing */
-          break;
-
-          case 2: /* ☑️ */
-            name = "END2";
-            /* Needs nothing */
-          break;
-
-          case 48: /* ☑️ */
-            name = "END3";
-            /* Needs nothing */
-          break;
-
-          case 64: /* ☑️ */
-            name = "SUBEND";
-            /* Needs nothing */
-          break;
-
-          case 65: /* ☑️ */
-            name = "SUBCALL";
-            format.length = 1;
-            reads = this.instructionReads(lines, index, 1);
-            graphicalData.opStr = "Starts the Subprogram " + reads ;
-          break;
-
-          case 66: /* ☑️ */
-            name = "SUBCALLU";
-            format.length = 1;
-            reads = this.instructionReads(lines, index, 1);
-            graphicalData.opStr = "Starts the Subprogram " + reads ;
-          break;
-
-          case 71: /* ☑️ */
-            name = "SUBPRG";
-            format.length = 1;
-            reads = this.instructionReads(lines, index, 1);
-            graphicalData.opStr = "Header of the Subprogram " + reads ;
-          break;
-
-          case 72: /* ☑️ */
-            name = "SUBE";
-            /* Needs nothing */
-          break;
-
-          case 3: /* ☑️ */
-            name = "TMR";
-            format.length = 1;
-            reads = "TMR_" + this.instructionReads(lines, index, 1);
-          break;
-
-          case 24: /* ☑️ */
-            name = "TMRB";
-            format.length = 1;
-            reads = "TMR_" + this.instructionReads(lines, index, 1);
-          break;
-
-          case 54: /* ☑️ */
-            name = "TMRC";
-            format.length = 1;
-            reads = "TMR_" + this.instructionReads(lines, index, 1);
-          break;
-
-          case 77: /* ☑️ */
-            name = "TMBRF";
-            format.length = 1;
-            reads = "TMR_" + this.instructionReads(lines, index, 1);
-          break;
-
-          case 25: /* ☑️ */
-            name = "DECB";
-            format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
-            writes = this.instructionWrites(lines, index, 4);
-            graphicalData.opStr = "Reads for " + format.length + " byte(s) " + format.kind + " starting at " + reads[0] + " & " + reads[1] + " and writes the decoded result to " + writes
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "DECB", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 5: /* ☑️ */
-            name = "CTR";
-            format.length = 1;
-            reads = "CTR_" + this.instructionReads(lines, index, 1);
-            writes = "CTR_" + this.instructionWrites(lines, index, 1);
-          break;
-
-          case 55: /* ☑️ */
-            name = "CTRC";
-            format.length = 2;
-            reads = this.instructionReads(lines, index, 1);
-            writes = this.instructionWrites(lines, index, 1);
-            graphicalData.opStr = "Reads counter initialization value from " + reads + " and handles the counter register " + writes;
-            graphicalData.tabeRows = [StyleNextCellGreen, reads, Definition, StyleNextCellRed, writes, Definition, "CTRC"];
-          break;
-
-          case 56: /* ☑️ */
-            name = "CTRB";
-            format.length = 1;
-            reads = "CTR_" + this.instructionReads(lines, index, 1);
-            writes = "CTR_" + this.instructionWrites(lines, index, 1);
-            graphicalData.opStr = "Reads counter initialization value from " + reads + " and handles the counter register " + writes;
-            graphicalData.tabeRows = [StyleNextCellGreen, reads, Definition, StyleNextCellRed, writes, Definition, "CTRB"];
-          break;
-
-          case 6:
-            name = "ROT";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 26:
-            name = "ROTB";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 7:
-            name = "COD";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 27: /* ☑️ */
-            name = "CODB";
-            format = this.instructionFormat(lines, index, 1);
-            reads = this.instructionReads(lines, index, 3);
-            writes = this.instructionWrites(lines, index, 4);
-            graphicalData.opStr = "Reads counter initialization value from " + reads + " and handles the counter register " + writes;
-            graphicalData.tabeRows = [StyleNextCellGreen, reads, Definition, "CODB", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 8:
-            name = "MOVE";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 28: /* ❔ */
-            name = "MOVOR";
-            format.length = 1;
-            reads = [this.instructionReads(lines, index, 1), this.instructionReads(lines, index, 2)];
-            writes = this.instructionWrites(lines, index, 3);
-            graphicalData.opStr = "Writes the logical OR product of " + reads[0] + " & " + reads[1] + " to " + writes;
-            graphicalData.tabeRows = [StyleNextCellGreen, reads[0], Definition, "MOVOR", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 9:
-            name = "COM";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 29:
-            name = "COME";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 10: /* ☑️ */
-            name = "JMP";
-            /* Needs nothing */
-          break;
-
-          case 30: /* ☑️ */
-            name = "JMPE";
-            /* Needs nothing */
-          break;
-
-          case 68: /* ☑️ */
-            name = "JMPB";
-            /* Needs nothing */
-          break;
-
-          case 69: /* ☑️ */
-            name = "LBL";
-            /* Needs nothing */
-          break;
-
-          case 11:
-            name = "PARI";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 14:
-            name = "DCNV";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 31: /* ☑️ */
-            name = "DCNVB";
-            format = this.instructionFormat(lines, index, 1);
-            reads = this.instructionReads(lines, index, 2);
-            writes = this.instructionWrites(lines, index, 3);
-            graphicalData.opStr = "Converts " + reads + " from binary to BCD and writes it to " + writes;
-            graphicalData.tabeRows = [StyleNextCellGreen, reads, Definition, "DCNVB", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 15:
-            name = "COMP";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 32: /* ☑️ */
-            name = "COMPB";
-            format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
-            writes = null;
-            graphicalData.opStr = "Compares " + reads[0] + " to " + reads[1] + ". Uses internal evaluation register to store the result";
-            graphicalData.tabeRows = [StyleNextCellGreen, reads[0], Definition, "COMPB", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, "R9000", Definition];
-          break;
-
-          case 16:
-            name = "COIN";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 33:
-            name = "SFT";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 17:
-            name = "DSCH";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 34:
-            name = "DSCHB";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 18:
-            name = "XMOV";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 35:
-            name = "XMOVB";
-            format = this.instructionFormat(lines, index, 1);
-            format.modifier = [];
-            format.modifier.push("*");
-            format.modifier.push(lines[index + 2]);
-            reads =  [this.instructionReads(lines, index,  3), this.instructionWrites(lines, index, 4)];
-            writes = [this.instructionWrites(lines, index, 4), this.instructionReads(lines, index,  3)];
-            dependency = new ReadWriteDependency(lines[index  - 3]);
-            graphicalData.opStr = "If <b>" + dependency.dependentOf + "</b> is true, it will read " + reads[0] + " and write it to " + writes[0] +
-                           ".<br>If <b>" + dependency.dependentOf + "</b> is false, it will read " + writes[0] + " and write it to " + reads[0] +
-                           ".<br>The length is defined by it's format (" + format.length + " byte(s), " + format.kind + ") multiplied by the value of <b>" + format.modifier[1] + "</b>";
-            graphicalData.tableExtraDescription = "Read / Write depends on the state of " + dependency.dependentOf;
-            graphicalData.tableRows = [StyleNextCellYellow, reads[0], Definition, "XMOVB", StyleNextCellYellow, writes[0], Definition];
-          break;
-
-          case 19:
-            name = "ADD";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 36: /* ☑️ */
-            name = "ADDB";
-            format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
-            writes = this. instructionWrites(lines, index, 4);
-            graphicalData.opStr = "Adds " + reads[0] + " to " + reads[1] + " and writes it to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "+", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 20:
-            name = "SUB";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 37: /* ☑️ */
-            name = "SUBB";
-            format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
-            writes = this. instructionWrites(lines, index, 4);
-            graphicalData.opStr = "Subtracts " + reads[1] + " from " + reads[0] + " and writes it to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "-", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 21:
-            name = "MUL";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 38: /* ☑️ */
-            name = "MULB";
-            format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
-            writes = this. instructionWrites(lines, index, 4);
-            graphicalData.opStr = "Multiplies " + reads[0] + " by " + reads[1] + " and writes it to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "x", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 22:
-            name = "DIV";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 39: /* ☑️ */
-            name = "DIVB";
-            format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
-            writes = this. instructionWrites(lines, index, 4);
-            graphicalData.opStr = "Divides " + reads[1] + " trough " + reads[0] + " and writes it to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "/", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 23: /* ❎ */
-            name = "NUME";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 40: /* ☑️ */
-            name = "NUMEB";
-            format = this.instructionFormat(lines, index, 1);
-            reads =  this.instructionReads (lines, index, 2);
-            writes = this.instructionWrites(lines, index, 3);
-            graphicalData.opStr = "Defines " + reads + " as a constant and stores it to " + writes;
-            graphicalData.tableRows = ["define", StyleNextCellGreen, reads, Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 49:
-            name = "DISP";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 41: /* ☑️ */
-            name = "DISPB";
-            /* Needs nothing */
-          break;
-
-          case 42: /* ❔ */
-          name = "EXIN";
-            format.length = 5;
-            reads = this.instructionReads(lines, index, 1);
-            writes = this.instructionWrites(lines, index, 1);
-            graphicalData.opStr = "TEXT TO DO";
-            graphicalData.tableRows = ["EXIN", StyleNextCellGreen, reads, Definition, StyleNextCellRed, writes, Definition];
-          break;
-
-          case 43: /* ☑️ */
-            name = "MOVB";
-            format.length = 1;
-            reads = this.instructionReads(lines, index, 1);
-            writes = this.instructionWrites(lines, index, 2);
-            graphicalData.opStr = "Moves one byte, " + reads + " to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads, Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 44: /* ☑️ */
-            name = "MOVW";
-            format.length = 2;
-            reads = this.instructionReads(lines, index, 1);
-            writes = this.instructionWrites(lines, index, 2);
-            graphicalData.opStr = "Moves one word, " + reads + " to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads, Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 45: /* ☑️ */
-            name = "MOVN";
-            format = this.instructionFormat(lines, index, 1);
-            reads = this.instructionReads(lines, index, 2);
-            writes = this. instructionWrites(lines, index, 3);
-            graphicalData.opStr = "Moves n-bytes, (" + format.length + " " + format.kind + ") " + reads + " to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads, Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 51: /* ☑️ */
-            name = "WINDR";
-            format.length = 1;
-            writes = this.instructionWrites(lines, index, 1);
-            graphicalData.opStr = "Reads dataelements from the PMC / CNC window and writes it to " + writes;
-            graphicalData.tableRows = ["WINDR", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 52:
-            name = "WINDW";
-            format.length = 1;
-            writes = this.instructionWrites(lines, index, 1);
-            graphicalData.opStr = "Reads dataelements from the PMC / CNC window and writes it to " + writes;
-            graphicalData.tableRows = ["WINDR", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 57: /* ☑️ */
-            name = "DIFU";
-            format.length = 1;
-            reads = "DIFU_" + this.instructionReads(lines, index, 1);
-            dependency = new ActivationDependency(lines[index - 1]);
-            graphicalData.opStr = "Generates a positive impulse of the signal " + dependency.dependentOf + ". DIFU Number: " + reads;
-            graphicalData.tableRows = null;
-          break;
-
-          case 58: /* ☑️ */
-            name = "DIFD";
-            format.length = 1;
-            reads = "DIFD_" + this.instructionReads(lines, index, 1);
-            dependency = new ActivationDependency(lines[index - 1]);
-            graphicalData.opStr = "Generates a negative impulse of the signal " + dependency.dependentOf + ". DIFD Number: " + reads;
-            graphicalData.tableRows = null;
-          break;
-
-          case 53: /* ☑️ */
-            name = "AXCTL";
-            /* Needs nothing */
-          break;
-
-          case 59: /* ☑️ */
-            name = "EXOR";
-            format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
-            writes = this. instructionWrites(lines, index, 4);
-            graphicalData.opStr = "Bitwise EXOR links " + reads[0] + " to " + reads[1] + " and writes it to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "EXOR", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 60: /* ☑️ */
-            name = "LOGAND";
-            format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
-            writes = this. instructionWrites(lines, index, 4);
-            graphicalData.opStr = "Bitwise AND links " + reads[0] + " and " + reads[1] + " and writes it to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "&&", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 61: /* ☑️ */
-            name = "LOGOR";
-            format = this.instructionFormat(lines, index, 1);
-            reads = [this.instructionReads(lines, index, 2), this.instructionReads(lines, index, 3)];
-            writes = this. instructionWrites(lines, index, 4);
-            graphicalData.opStr = "Bitwise OR links " + reads[0] + " to " + reads[1] + " and writes it to " + writes;
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "OR", StyleNextCellGreen, reads[1], Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 62: /* ☑️ */
-            name = "LOGNOT";
-            format = this.instructionFormat(lines, index, 1);
-            reads = this.instructionReads(lines, index, 2);
-            writes = this. instructionWrites(lines, index, 3);
-            graphicalData.opStr = "Bitwise negates " + reads + " and writes it to " + writes;
-            graphicalData.tableRows = ["NOT", StyleNextCellGreen, reads, Definition, "->", StyleNextCellRed, writes, Definition];
-          break;
-
-          case 90:
-            name = "FNC90";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 91:
-            name = "FNC91";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 92:
-            name = "FNC92";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 93:
-            name = "FNC93";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 94:
-            name = "FNC94";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 95:
-            name = "FNC95";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 96:
-            name = "FNC96";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 97:
-            name = "FNC97";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 88:
-            name = "MMC3R";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 89:
-            name = "MMC3W";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 98:
-            name = "MMCWR";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 99:
-            name = "MMCWW";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 460:
-            name = "PID";
-            this.usedUndefinedInstructions.push(name);
-          break;
-
-          case 219:
-            name = "RNGW";
-            format.length = 2;
-            reads =  [this.instructionReads(lines, index,  1), this.instructionWrites(lines, index, 2), this.instructionWrites(lines, index, 3)];
-            graphicalData.opStr = "Word-Range comparison. <br>" +
-                           "Lower / Upper Boundary: <b>" + reads[0] + "</b> <br>" +
-                           "Lower / Upper Boundary: <b>" + reads[1] + "</b> <br>" +
-                           "Input Data :            <b>" + reads[2] + "</b> <br>" +
-                           "Sets its output <br>" +
-                           "if " + reads[0] + " ≤ " + reads[2] + " ≤ " + reads[1] + " or <br>" +
-                           "if " + reads[1] + " ≤ " + reads[2] + " ≤ " + reads[0];
-            // graphicalData.tableExtraDescription = "";
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "≤", StyleNextCellGreen, reads[2], Definition, "≤", StyleNextCellGreen, reads[1], Definition];
-          break;
-
-          case 220:
-            name = "RNGD";
-            format.length = 4;
-            reads =  [this.instructionReads(lines, index,  1), this.instructionWrites(lines, index, 2), this.instructionWrites(lines, index, 3)];
-            graphicalData.opStr = "Doubleword-Range comparison. <br>" +
-                           "Lower / Upper Boundary: <b>" + reads[0] + "</b> <br>" +
-                           "Lower / Upper Boundary: <b>" + reads[1] + "</b> <br>" +
-                           "Input Data :            <b>" + reads[2] + "</b> <br>" +
-                           "Sets its output <br>" +
-                           "if " + reads[0] + " ≤ " + reads[2] + " ≤ " + reads[1] + " or <br>" +
-                           "if " + reads[1] + " ≤ " + reads[2] + " ≤ " + reads[0];
-            // graphicalData.tableExtraDescription = "";
-            graphicalData.tableRows = [StyleNextCellGreen, reads[0], Definition, "≤", StyleNextCellGreen, reads[2], Definition, "≤", StyleNextCellGreen, reads[1], Definition];
-          break;
-
-          default:
-            /* Collect Subs which appear in the mnemonic and are defined but aren't
-            handled in code */
-        }
-
-        return  {
-                  instruction      : name,
-                  number           : number,
-                  reads            : reads,
-                  writes           : writes,
-                  dependency       : dependency,
-                  graphicalData    : new GraphicalData(graphicalData.opStr, graphicalData.tableRows, graphicalData.tableExtraDescription),
-                  format           : format.kind,
-                  formatLength     : format.length,
-                  formatModifier   : format.modifier
-                };
-    }
-  }
-
-
-  instructionParseJSON(index, subNumber) {
+  instructionParseJSON(index) {
+    let match = instructionOperationRegex.exec(this.source.lines[index]);
+    let subNumber = null;
     let name = null;
     let reads = null;
     let writes = null;
-    let dependency = {dependentOf: null};
-    let format = {kind: "-", length: 0, modifier: null};
-    let graphicalData = {opStr: "-", tableRows: "-", tableExtraDescription: "-"};
+
+    let dependency =      {
+                            dependentOf: null
+                          };
+
+    let format =          {
+                            kind: "-",
+                            length: 0,
+                            modifier: null
+                          };
+
+    let graphicalData =   {
+                            opStr: "-",
+                            tableRows: "-",
+                            tableExtraDescription: "-"
+                          };
+
+    /* if the current line contains an ins op, then set subNumber. Else, leave */
+    if (match != null && match[1,2] != null && match[1,2] != "")
+    {
+      subNumber = parseInt(match[2], 10)
+    }
+    else
+    {
+      return null
+    }
 
     if (InstructionData[subNumber] == undefined) {
       console.error("Error: The instruction with the number: " + subNumber + " is inexistent in this JSON data.");
@@ -1187,14 +639,16 @@ class Resource
                   graphicalData.tableExtraDescription = replaceInString(graphicalData.tableExtraDescription, "$", keywords[i], ".", values[i]);
                 }
 
-                for (let j = 0; j < graphicalData.tableRows.length; j++)
+                if (graphicalData.tableRows != null)
                 {
-                  if (graphicalData.tableRows[j] != null)
+                  for (let j = 0; j < graphicalData.tableRows.length; j++)
                   {
-                    graphicalData.tableRows[j]= replaceInString(graphicalData.tableRows[j], "$", keywords[i], ".", values[i]);
+                    if (graphicalData.tableRows[j] != null)
+                    {
+                      graphicalData.tableRows[j]= replaceInString(graphicalData.tableRows[j], "$", keywords[i], ".", values[i]);
+                    }
                   }
                 }
-
               }
             }
           break;
@@ -1295,8 +749,7 @@ class Resource
 *******************************************************************************/
 function formatDate(str)
 {
-  const monthNames = ["January", "February", "March", "April", "May", "June",
-                      "July", "August", "September", "October", "November", "December"];
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   let regexp = /^(\d\d)\/(\d\d)\/(\d\d)\s*(\d\d)\:(\d\d)/;
   let Year  = str.match(regexp)[1];
   let Month = monthNames[parseInt(str.match(regexp)[2], 10) - 1]
@@ -1336,7 +789,6 @@ function removeLeadingChar(inputStr, charToRemove)
 function replaceInString(str, prefix, keyword, delimiter, value)
 {
   let rep
-
   /* make sure only strings get passed into this method */
   if (typeof str != "string")
   {
@@ -1372,6 +824,5 @@ function replaceInString(str, prefix, keyword, delimiter, value)
       str = str.replace(rep, value);
     }
   }
-
   return str
 }
