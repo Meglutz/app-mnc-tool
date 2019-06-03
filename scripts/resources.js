@@ -490,7 +490,7 @@ class Resource
 
 
   /*******************************************************************************
-  ** Action: Checks if line[index] contains an instruction call.
+  ** Action: Checks if lines[index] contains an instruction call.
   **         Parses JSON-Data properties to be compatible with the methods which
   **         handle the respective properties.
   ** Return: All Data to create a new InstructionOperation Object
@@ -502,21 +502,9 @@ class Resource
     let reads = null;
     let writes = null;
 
-    let dependency =      {
-                            dependentOf: null
-                          };
-
-    let format =          {
-                            kind: "-",
-                            length: 0,
-                            modifier: null
-                          };
-
-    let graphicalData =   {
-                            opStr: "-",
-                            tableRows: "-",
-                            tableExtraDescription: "-"
-                          };
+    let dependency =      {};
+    let format =          {};
+    let graphicalData =   {};
 
     /* if the current line contains an ins op, then set subNumber. Else, leave */
     if (match != null && match[1,2] != null && match[1,2] != "")
@@ -544,7 +532,6 @@ class Resource
           break;
 
           case "format":
-            console.log("format: " + key[1]);
             format = this.instructionFormat(this.source.lines, index, key[1]);
           break;
 
@@ -560,7 +547,7 @@ class Resource
             format.modifier = [];
             for (let item of key[1])
             {
-              /* if it's a number it must be an offset of the current index, pointing to a line */
+              /* if it's a number it must be an offset, meant for the current index, pointing to a line */
               if (isNaN(item) != true)
               {
                 format.modifier.push(this.source.lines[index + item]);
@@ -618,9 +605,18 @@ class Resource
           break;
 
           case "graphicalData":
-            graphicalData.opStr = key[1].opStr;
-            graphicalData.tableRows = key[1].tableRows;
-            graphicalData.tableExtraDescription = key[1].tableExtraDescription;
+            if (key[1].tableRows != null)
+            {
+              graphicalData.tableRows = key[1].tableRows.concat();
+            }
+            if (key[1].opStr != null)
+            {
+              graphicalData.opStr = key[1].opStr.concat();
+            }
+            if (key[1].tableExtraDescription)
+            {
+              graphicalData.tableExtraDescription = key[1].tableExtraDescription.concat();
+            }
 
             /* replace placeholders in graphicalData */
             let keywords = ["StyleNextCellRed", "StyleNextCellGreen", "StyleNextCellYellow", "Definition", "reads", "writes", "frmLen",      "frmKin",    "frmMod",        "depOf"];
@@ -652,6 +648,7 @@ class Resource
               }
             }
           break;
+
 
           default:
         }
