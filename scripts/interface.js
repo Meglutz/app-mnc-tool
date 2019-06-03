@@ -52,6 +52,16 @@ document.getElementById(stateClose).onclick = function()
   document.getElementById(stateOverlay).style.display = "none";
 }
 
+/* close overlays */
+document.getElementById(insOpClose).onclick = function()
+{
+  document.getElementById(insOpOverlay).style.display = "none";
+}
+document.getElementById(mncShowClose).onclick = function()
+{
+  document.getElementById(mncShowOverlay).style.display = "none";
+}
+
 /* user-click events (DOM overlays) */
 function evaluateDOMUserClick(resultId)
 {
@@ -71,17 +81,6 @@ function evaluateDOMUserClick(resultId)
   }
 }
 
-/* close insOp Overlay */
-document.getElementById(insOpClose).onclick = function()
-{
-  document.getElementById(insOpOverlay).style.display = "none";
-}
-
-/* close MNCShow Overlay */
-document.getElementById(mncShowClose).onclick = function()
-{
-  document.getElementById(mncShowOverlay).style.display = "none";
-}
 
 /*******************************************************************************
 ** Action: Event: onClick Submit Button.
