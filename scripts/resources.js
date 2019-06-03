@@ -1,5 +1,6 @@
-
-
+/*******************************************************************************
+** Definitions
+*******************************************************************************/
 const multiBitDefinitionRegex =      /^(T|D|E|F|G|R|X|Y)(\d+)(\s*)([\S]+)/;
 const singleBitDefinitionRegex =     /^(T|D|E|F|G|R|X|Y)(\d+)(\.)(\d)(\s+)([\S]+)/;
 const singleBitAddressRegex =        /^(T|D|E|F|G|R|X|Y)(\d+)(\.)(\d)(\s+|)/;
@@ -627,12 +628,12 @@ class Resource
               if (values[i] != null) {
                 if (graphicalData.opStr != null)
                 {
-                  graphicalData.opStr = replaceInString(graphicalData.opStr, "$", keywords[i], ".", values[i]);
+                  graphicalData.opStr = detokenize(graphicalData.opStr, "$", keywords[i], ".", values[i]);
                 }
 
                 if (graphicalData.tableExtraDescription != null)
                 {
-                  graphicalData.tableExtraDescription = replaceInString(graphicalData.tableExtraDescription, "$", keywords[i], ".", values[i]);
+                  graphicalData.tableExtraDescription = detokenize(graphicalData.tableExtraDescription, "$", keywords[i], ".", values[i]);
                 }
 
                 if (graphicalData.tableRows != null)
@@ -641,7 +642,7 @@ class Resource
                   {
                     if (graphicalData.tableRows[j] != null)
                     {
-                      graphicalData.tableRows[j]= replaceInString(graphicalData.tableRows[j], "$", keywords[i], ".", values[i]);
+                      graphicalData.tableRows[j]= detokenize(graphicalData.tableRows[j], "$", keywords[i], ".", values[i]);
                     }
                   }
                 }
@@ -776,20 +777,20 @@ function removeLeadingChar(inputStr, charToRemove)
 
 
 /*******************************************************************************
-** Action: Replaces any placholders of [prefix] + [keyword] in [str]
+** Action: Replaces any placholders (tokens) of [prefix] + [keyword] in [str]
 **         with the value(s) of [value]. [value] can be an array. If an array,
 **         it will check for all [value.length] references where [delimiter]
 **         represents the char to announce th array index.
 **         e.g. "$test.1": "$" = [prefix], "test" = [keyword], "." = [delimiter]
 ** Return: string with all placeholders replaced
 *******************************************************************************/
-function replaceInString(str, prefix, keyword, delimiter, value)
+function detokenize(str, prefix, keyword, delimiter, value)
 {
   let rep
   /* make sure only strings get passed into this method */
   if (typeof str != "string")
   {
-    console.error("Error: " + replaceInString.name + " 'str' arg must be typeof string. Now it's: " + typeof str);
+    console.error("Error: " + detokenize.name + " 'str' arg must be typeof string. Now it's: " + typeof str);
   }
 
   /* if [value] is an array, loop [value.length] times to be sure to replace all
