@@ -1,10 +1,6 @@
-
 /*******************************************************************************
 ** Definitions
 *******************************************************************************/
-/* colors for console highlighting */
-const red   = "#b72828"
-const green = "#3bb728"
 
 let Source = "./mnemonic.mnc";
 
@@ -20,6 +16,10 @@ let CurrentNetwork;
 let Warnings = null;
 let WarningLog = []; /* Contains html styled string array of all warnings
                         which occured during the sequences */
+
+/* colors for console highlighting */
+const red   = "#b72828"
+const green = "#3bb728"
 
 /*******************************************************************************
 ** p5 Main functions
