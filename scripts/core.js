@@ -212,7 +212,7 @@ function analyzeLogic(res)
     }
 
     /* instruction operations */
-    op = res.instructionParseJSON(i, lines[i]);
+    op = res.instructionParseJSON(i);
     if (op != null)
     {
       res.instructionOperations.push(new InstructionOperation(op.instruction,
