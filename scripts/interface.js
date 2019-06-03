@@ -30,13 +30,13 @@ const mncShowInfoLoc   =    "mncshow-info-location";
 const mncShowElementId =    "mncshow-element";
 const mncShowClose     =    "overlay-close-button-3";
 
-const Exit             =    "EXIT";
-const Style            =    "STYLE__";
+const Exit                 =    "EXIT";
+const Style                =    "STYLE__";
 const StyleNextCellRed     =    Style + "red-cell";
 const StyleNextCellGreen   =    Style + "green-cell";
 const StyleNextCellYellow  =    Style + "yellow-cell";
-const Definition       =    "DEF__";
-const styleDefRegex    =    /^(STYLE__)(.*)$/;
+const Definition           =    "DEF__";
+const styleDefRegex        =    /^(STYLE__)(.*)$/;
 
 
 /*******************************************************************************
@@ -226,12 +226,12 @@ function addDOMresult (title, content1, content2, content3, content4, highlight 
   }
 
   /* add style tag to level tag */
-  tagElement = appendDOMtag(tagElement, "class", "level-tag-" + content4);
+  tagElement           = appendDOMtag(tagElement, "class", "level-tag-" + content4);
   tagElement.innerHTML = "Ladder-Level: " + content4;
-  h1Element.innerHTML =  content1;
-  pElement.innerHTML =   content2 + "<br>";
-  p2Element = appendDOMtag(p2Element, "class", "module-string");
-  p2Element.innerHTML = content3;
+  h1Element.innerHTML  = content1;
+  pElement.innerHTML   = content2 + "<br>";
+  p2Element            = appendDOMtag(p2Element, "class", "module-string");
+  p2Element.innerHTML  = content3;
 
   divElement.appendChild(tagElement);
   divElement.appendChild(h1Element);
