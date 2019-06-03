@@ -1,5 +1,5 @@
 {
-  "-99999" : {
+  "COMMENT" : {
     "0" : "JSON-Info",
     "1" : "opStr placeholders: $xyz.0 or xyz.n   -> n-th element of [xyz]. used if [xyz] is an array",
     "2" : "                    $reads or $writes -> value of [reads] or [writes]",
@@ -341,7 +341,7 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Defines $reads as a constant and stores it to $writes",
-      "tableRows" : ["define", "$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["define", "$StyleNextCellGreen", "$reads", "->", "$StyleNextCellRed","$writes", "$Definition"]
     }
   },
 
