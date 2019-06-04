@@ -1,7 +1,8 @@
 /*******************************************************************************
 ** Definitions
 *******************************************************************************/
-const multiBitDefinitionRegex =      /^(T|D|E|F|G|R|X|Y)(\d+)(\s*)([\S]+)/;
+const multiBitDefinitionRegex =      /^(T|D|E|F|G|R|X|Y)(\d+)(\s+)([\S]+)/;
+const multiBitAddressRegex =         /^(T|D|E|F|G|R|X|Y)(\d+)(\s+|)/;
 const singleBitDefinitionRegex =     /^(T|D|E|F|G|R|X|Y)(\d+)(\.)(\d)(\s+)([\S]+)/;
 const singleBitAddressRegex =        /^(T|D|E|F|G|R|X|Y)(\d+)(\.)(\d)(\s+|)/;
 const moduleNumberDefinitionRegex =  /^[P](\d+)\s+C(\d+)/;
@@ -453,14 +454,23 @@ class Resource
 
 
   /*******************************************************************************
-  ** Action: Checks for defined bits. bit must be a string! ("E312.2" or "ELADGK")
-  ** Return: SBDMemory Object
+  ** Action: Checks for defined bits. bit must be a string!
+  **         for Bits: "E312.2" or "ELADGK", for multi Bits: "E320" or "ACTPRG"
+  ** Return: SBDMemory ord MBDMemory Object
   *******************************************************************************/
-  getBitDef(bit)
+  getDef(mem)
   {
+
     for (let b of this.SBDMemory)
     {
-      if (bit == b.byteType + b.byteAddress + "." + b.bitAddress || bit == b.symbol)
+      if (mem == b.byteType + b.byteAddress + "." + b.bitAddress || mem == b.symbol)
+      {
+        return b;
+      }
+    }
+    for (let b of this.MBDMemory)
+    {
+      if (mem == b.byteType + b.byteAddress || mem == b.symbol)
       {
         return b;
       }
@@ -471,17 +481,23 @@ class Resource
 
   /*******************************************************************************
   ** Action: Creates a new Memory Object if the given query is valid
-  **         bit must be a string! ("E312.2" or "ELADGK")
-  **         ATTENTION: gets not stored in SBDMemory Array!
+  **         mem must be a string!
+  **         for Bits: "E312.2" or "ELADGK", for multi Bits: "E320" or "ACTPRG"
+  **         Heads up: Does not get stored in SBDMemory / MBDMemory Array!
   ** Return: Dummy Memory Object of type [Memory]
   *******************************************************************************/
-  makeDummyDefinition(bit)
+  makeDummyDefinition(mem)
   {
-    let match = singleBitAddressRegex.exec(bit);
+    let bit = singleBitAddressRegex.exec(mem);
+    let mBit = multiBitAddressRegex.exec(mem);
 
-    if (match != null && match[1,2,4] != null && match[1,2,4] != "")
+    if (bit != null && bit[1,2,4] != null && bit[1,2,4] != "")
     {
-      return new Memory(match[1], match[2], match[4], 1, "Undefined (dMem)");
+      return new Memory(bit[1], bit[2], bit[4], 1, "Undefined (dMem)");
+    }
+    else if (mBit != null && mBit[1,2] != null && mBit[1,2] != "")
+    {
+      return new Memory(mBit[1], mBit[2], "", ">=8", "Undefined (dMem)");
     }
     else
     {

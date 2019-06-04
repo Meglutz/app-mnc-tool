@@ -83,8 +83,6 @@ function evaluateDOMUserClick(resultId)
   }
 }
 
-TODO ADD ERROR HTML STYLING!
-
 function errorToDOM(e)
 {
   /* clear all Elements containing [tlElementId] */
@@ -322,7 +320,7 @@ function addDOMinsOpTable(query, resultIndex)
         if no definition has been found, make a dummy */
         if (row[i + 1] == Definition)
         {
-          def = query.src.getBitDef(row[i]);
+          def = query.src.getDef(row[i]);
 
           if (def == undefined)
           {

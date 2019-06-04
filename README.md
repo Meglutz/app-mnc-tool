@@ -23,18 +23,18 @@ save the file as such.
 
 Quick overview on how this app is structured:
 
-- `main.js` launches the electron Obj and passes the `index.html` file into the main window. `index.html` is the only
+- `main.js` creates the electron Obj and passes the `index.html` file into the main window. `index.html` is the only
 html file (aka. view or window) for this application.
 
 - `index.html` is styled by the cascading stylesheets in `/styles`
 
-- `index.html` calls all jscripts from the `/scripts` folder.
+- `index.html` includes all jscripts from the `/scripts` folder.
 
 The following table explains the roles of each jscript in the `/scripts` folder. All the app logic is contained within these files.
 
 Level | Module | Description
 ---|---|---
-1|`core.js`|Contains main mnemonic analyzing sequences
+1|`core.js`|Contains main mnemonic analyzing sequence
 2|`resources.js`|Contains classes and class-specific methods for each type of evaluated data
 3|`query.js`|Contains the query-class and class-specific methods. Used to query `Resource` Objects
 4|`interface.js`|Contains functions to interface with the `index.html` DOM. (GUI functions)

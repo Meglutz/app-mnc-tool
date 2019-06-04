@@ -67,6 +67,24 @@ header {
 
 /* Style Overlay */
 /******************************************************************************/
+.error-header {
+  margin: 0px;
+  padding: 4px;
+  background-color: var(--tone-4-color);
+  color:            var(--tone-1-color);
+  border-radius: 3px;
+}
+
+.error-text {
+  margin: 0px;
+  padding: 4px;
+  background-color: var(--tone-4-color);
+  color:            var(--tone-1-color);
+  border-radius: 3px;
+}
+
+/* Style Overlay */
+/******************************************************************************/
 .overlay {
   height: 100%;
   width: 100%;

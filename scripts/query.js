@@ -262,31 +262,37 @@ class Query
 
     /* try to find the correct definition for the sought after mem */
     this.log.push("Looking for definition...");
-    if (isBit != null)
+    if ((isMultiBit || isBit || isSymbol) == null)
     {
-      mem = this.src.getBitDef(query);
-    }
-    else if (isMultiBit != null)
-    {
-      mem = this.src.getMultiBitDef(query);
-    }
-    else if (isSymbol != null)
-    {
-      mem = this.src.getMultiBitDef(query);
-      if (mem == null)
-      {
-        mem = this.src.getBitDef(query);
-        if (mem == null)
-        {
-          throw "Error@'" + this.validateAndDefine.name + "': Found a definion for '" + query + "' in SBD & MBD memory!";
-        }
-      }
-    }
-    else
-    {
-      /* none of the categorizing regexes matched */
       throw "Error@'" + this.validateAndDefine.name + "': Invalid input string '" + query + "'. Consider this: Bit (e.g. A0000.0), Byte or (multi-bit) (e.g. A000) or Symbol (e.g. ABCDEF length = min. 2 Chars & max. 6 Chars)";
     }
+    mem = this.src.getDef(query);
+
+    // if (isBit != null)
+    // {
+    //   mem = this.src.getDef(query);
+    // }
+    // else if (isMultiBit != null)
+    // {
+    //   mem = this.src.getDef(query);
+    // }
+    // else if (isSymbol != null)
+    // {
+    //   mem = this.src.getDef(query);
+    //   if (mem == null)
+    //   {
+    //     mem = this.src.getDef(query);
+    //     if (mem == null)
+    //     {
+    //       throw "Error@'" + this.validateAndDefine.name + "': Found a definion for '" + query + "' in SBD & MBD memory!";
+    //     }
+    //   }
+    // }
+    // else
+    // {
+    //   /* none of the categorizing regexes matched */
+    //   throw "Error@'" + this.validateAndDefine.name + "': Invalid input string '" + query + "'. Consider this: Bit (e.g. A0000.0), Byte or (multi-bit) (e.g. A000) or Symbol (e.g. ABCDEF length = min. 2 Chars & max. 6 Chars)";
+    // }
 
     /* check if we've found a def */
     if (mem != undefined)
@@ -297,21 +303,26 @@ class Query
     }
     else
     {
-      /* if no def has been found, create dummy */
+      /* no def has been found, create dummy */
       this.log.push("'" + query +"' is undefined. Creating Dummy Memory...");
-      if (isBit != null)
+      if ((isBit || isMultiBit) != null)
       {
-        this.memoryDefinition, mem = this.src.makeDummyBitDefinition(query)
-      }
-      else if (isMultiBit != null)
-      {
-        this.memoryDefinition, mem = this.src.makeDummyMultiBitDefinition(query)
+        mem = this.src.makeDummyDefinition(query)
+        this.memoryDefinition = mem;
       }
       else
       {
         throw "Error@'" + this.validateAndDefine.name + "': Symbol '" + query + "' couldn't be found. Please double-check your input. Make sure there are no spelling errors!";
       }
     }
+
+    /* check if mem is now defined. if it isn't then the makeDummyDefinition didn't work. */
+    if ((mem || this.memoryDefinition) == null)
+    {
+      throw "Error@'" + this.validateAndDefine.name + "': The query '" + query + "' couldn't be found in the defined memory and the dummy definition could't be made.";
+    }
+
+    console.log(this.memoryDefinition);
   }
 
   /*******************************************************************************
