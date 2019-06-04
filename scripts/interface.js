@@ -2,7 +2,7 @@
 ** Definitions
 *******************************************************************************/
 const tlElementLoc     =    "timeline_location";
-const tlElementId      =    "timeLine_element";
+const tlElementId      =    "timeline_element";
 const tlElementTitle   =    "timeline_title";
 
 const stateButton      =    "status-button";
@@ -22,6 +22,8 @@ const insOpInfoLoc     =    "insop-info-location";
 const insOpElementId   =    "insop-table_element";
 const insOpClose       =    "overlay-close-button-2";
 
+const errorTitle       =    "error-header";
+const errorText        =    "error-text";
 
 const mncShowOverlay   =    "overlay-container-3";
 const mncShowLoc       =    "mncshow-location";
@@ -81,6 +83,27 @@ function evaluateDOMUserClick(resultId)
   }
 }
 
+TODO ADD ERROR HTML STYLING!
+
+function errorToDOM(e)
+{
+  /* clear all Elements containing [tlElementId] */
+  removeDOMelements(tlElementId);
+
+  /* add error message */
+  let titleSection = document.getElementById(tlElementTitle);
+  let divElement   = addDOMelement("div", tlElementId, "container");
+  let hElement     = addDOMelement("h1",  tlElementId, errorTitle);
+  let pElement     = addDOMelement("p",   tlElementId, errorText);
+
+  hElement.innerHTML += "ERROR";
+  pElement.innerHTML += e + "<br><br>" + "Please try again";
+
+  divElement.appendChild(hElement);
+  divElement.appendChild(pElement);
+  titleSection.appendChild(divElement);
+
+}
 
 /*******************************************************************************
 ** Action: Event: onClick Submit Button.
@@ -91,57 +114,69 @@ function evaluateDOMUserClick(resultId)
 *******************************************************************************/
 document.getElementById("query-submit").onclick = function()
 {
-  /* Clear all Elements containing [tlElementId] */
+  /* clear all Elements containing [tlElementId] */
   removeDOMelements(tlElementId);
 
-  let type =  document.getElementById("query-type");  let typeVal = type.options[type.selectedIndex].value;
+  let type =  document.getElementById("query-type");
+  let typeVal = type.options[type.selectedIndex].value;
   let query = document.getElementsByTagName("input")[0].value;
 
-  /* Make a new query */
-  MyQueries.push(new Query(Data, typeVal, query));
+  /* make a new query */
+  try
+  {
+    MyQueries.push(new Query(Data, typeVal, query));
+  }
+  catch(e)
+  {
+    /* if an error occured, do not finish the sequence */
+    errorToDOM(e);
+    return;
+  }
+  finally {}
+
 
   let latestQuery = MyQueries.length - 1;
 
-  /* Make result array iterable, if there's only one result it's not iterable */
+  /* make result array iterable. If there's only one result it's not iterable */
   if (isIterable(MyQueries[latestQuery].result) == false)
   {
     MyQueries[latestQuery].result.push("dummy");
   }
 
-  /* Prepare Memory definition string (If the query bit has a Definition) */
+  /* prepare Memory definition string (If the query bit has a Definition) */
   let memDefString = "";
 
   if (MyQueries[latestQuery].memoryDefinition != null || undefined)
   {
-      Object.entries(MyQueries[latestQuery].memoryDefinition).forEach(memDefAttr =>
+    Object.entries(MyQueries[latestQuery].memoryDefinition).forEach(memDefAttr =>
+      {
+        switch (memDefAttr[0])
         {
-          switch (memDefAttr[0])
-          {
-              case "byteType":
-                memDefString += "<b>Address:</b> " + memDefAttr[1];
-              break;
+          case "byteType":
+            memDefString += "<b>Address:</b> " + memDefAttr[1];
+          break;
 
-              case "byteAddress":
-                memDefString += memDefAttr[1];
-              break;
+          case "byteAddress":
+            memDefString += memDefAttr[1];
+          break;
 
-              case "bitAddress":
-                memDefString += "." + memDefAttr[1];
-              break;
+          case "bitAddress":
+            memDefString += "." + memDefAttr[1];
+          break;
 
-              case "length":
-                let bitStr = " bits";
-                if (memDefAttr[1] == 1)
-                {
-                  bitStr = " bit"
-                };
-                memDefString += " | <b>length:</b> " + memDefAttr[1] + bitStr;
-              break;
+          case "length":
+            let bitStr = " bits";
+            if (memDefAttr[1] == 1)
+            {
+              bitStr = " bit";
+            }
+            memDefString += " | <b>length:</b> " + memDefAttr[1] + bitStr;
+          break;
 
-              case "symbol":
-                memDefString += "<br><b>" + "Symbol:</b> " + memDefAttr[1];
-              break;
-          }
+          case "symbol":
+            memDefString += "<br><b>" + "Symbol:</b> " + memDefAttr[1];
+          break;
+        }
       })
   }
   else
@@ -150,7 +185,7 @@ document.getElementById("query-submit").onclick = function()
   }
 
 
-  /* Add TimeLine title */
+  /* add TimeLine title */
   let titleSection = document.getElementById(tlElementTitle);
   let divElement   = addDOMelement("div", tlElementId, "container");
   let pElement     = addDOMelement("p",   tlElementId);
@@ -163,7 +198,7 @@ document.getElementById("query-submit").onclick = function()
   titleSection.appendChild(divElement);
 
 
-  /* Add a new TimeLine "Modal" for each result */
+  /* add a new TimeLine "Modal" for each result */
   for (let i = 0; i < MyQueries[latestQuery].result.length; i++)
   {
     content = prepareDOMresult(MyQueries[latestQuery].result[i]);
@@ -612,8 +647,8 @@ function prepareDOMresult(result)
   }
   else
   {
-    /* catch invalid result types */
-    console.error("Error: Invalid Object in query.result property: " + result);
+    /* throw error for invalid result types */
+    throw "Error@'" + prepareDOMresult.name + "': Invalid Object in query.result property: " + result;
   }
 
   /* set return strings which are identical wheter it's a bit- or instruction operation */
@@ -650,17 +685,26 @@ function beautifyBitOpString(op)
   let r = "is ";
   switch (true)
   {
-    case op.includes("RD.NOT")  ||
-         op.includes("AND.NOT") ||
-         op.includes("OR.NOT"):    r = r + "negated-read (" + op + ")"; break;
-    case op.includes("RD")      ||
-         op.includes("OR")      ||
-         op.includes("AND"):       r = r + "read (" + op + ")"; break;
-    case op.includes("WRT.NOT"):   r = r + "un-written (" + op + ")"; break;
-    case op.includes("WRT"):       r = r + "written (" + op + ")"; break;
-    case op.includes("RST"):       r = r + "reset (" + op + ")"; break;
-    case op.includes("SET"):       r = r + "set (" + op + ")";  break;
-    default: console.log("Couldn't find " + op + " in 'beautify' Cases");
+    case op.includes("RD.NOT") || op.includes("AND.NOT") || op.includes("OR.NOT"):
+      r = r + "negated-read (" + op + ")";
+    break;
+    case op.includes("RD") || op.includes("OR") || op.includes("AND"):
+      r = r + "read (" + op + ")";
+    break;
+    case op.includes("WRT.NOT"):
+      r = r + "un-written (" + op + ")";
+    break;
+    case op.includes("WRT"):
+      r = r + "written (" + op + ")";
+    break;
+    case op.includes("RST"):
+      r = r + "reset (" + op + ")";
+    break;
+    case op.includes("SET"):
+      r = r + "set (" + op + ")";
+    break;
+    default:
+      throw "Error@'" + beautifyBitOpString.name + "': Couldn't find '" + op + "' in the beautify-Cases";
   }
   return r;
 }
