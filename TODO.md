@@ -31,7 +31,7 @@
 * [x] Remove bitReadOps / bitWriteOps arrays -> replace with bitOps (branch: *newBitOpStructure*)
 * [ ] Rework Module detection / definition strategy. There should be a better solution.
 * [x] Fix Instruction Operation Text in result display (Only plot reads / writes)
-* [ ] Fix Result sorting: lowest line count to highest line count. (Or by level?)
+* [X] Fix Result sorting: lowest line count to highest line count. (Or by level?)
 * [ ] Only parse lines which are in the same network as the selected Op to MNCshow
 * [ ] Check for defines before drawing MNCshow
 * [x] Finally implement XMOVB instructions
