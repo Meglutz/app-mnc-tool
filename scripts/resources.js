@@ -534,7 +534,7 @@ class Resource
     }
 
     if (InstructionData[subNumber] == undefined) {
-      console.error("Error: The instruction with the number: " + subNumber + " is inexistent in this JSON data.");
+      throw "Error@'" + this.instructionParseJSON.name + "': The instruction with the number: " + subNumber + " is inexistent in this JSON data.";
     }
 
     Object.entries(InstructionData[subNumber]).forEach(key =>
@@ -806,7 +806,7 @@ function detokenize(str, prefix, keyword, delimiter, value)
   /* make sure only strings get passed into this method */
   if (typeof str != "string")
   {
-    console.error("Error: " + detokenize.name + " 'str' arg must be typeof string. Now it's: " + typeof str);
+    throw "Error@'" + detokenize.name + "': 'str' arg must be typeof string. Now it's: " + typeof str;
   }
 
   /* if [value] is an array, loop [value.length] times to be sure to replace all

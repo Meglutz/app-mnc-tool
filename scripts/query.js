@@ -321,8 +321,6 @@ class Query
     {
       throw "Error@'" + this.validateAndDefine.name + "': The query '" + query + "' couldn't be found in the defined memory and the dummy definition could't be made.";
     }
-
-    console.log(this.memoryDefinition);
   }
 
   /*******************************************************************************
