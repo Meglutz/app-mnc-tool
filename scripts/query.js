@@ -268,32 +268,6 @@ class Query
     }
     mem = this.src.getDef(query);
 
-    // if (isBit != null)
-    // {
-    //   mem = this.src.getDef(query);
-    // }
-    // else if (isMultiBit != null)
-    // {
-    //   mem = this.src.getDef(query);
-    // }
-    // else if (isSymbol != null)
-    // {
-    //   mem = this.src.getDef(query);
-    //   if (mem == null)
-    //   {
-    //     mem = this.src.getDef(query);
-    //     if (mem == null)
-    //     {
-    //       throw "Error@'" + this.validateAndDefine.name + "': Found a definion for '" + query + "' in SBD & MBD memory!";
-    //     }
-    //   }
-    // }
-    // else
-    // {
-    //   /* none of the categorizing regexes matched */
-    //   throw "Error@'" + this.validateAndDefine.name + "': Invalid input string '" + query + "'. Consider this: Bit (e.g. A0000.0), Byte or (multi-bit) (e.g. A000) or Symbol (e.g. ABCDEF length = min. 2 Chars & max. 6 Chars)";
-    // }
-
     /* check if we've found a def */
     if (mem != undefined)
     {
@@ -338,20 +312,26 @@ class Query
   }
 }
 
-
+/*******************************************************************************
+** Action: Checks if a bit or byte with [checkByteType] + [checkByteAddress] is
+**         handled in the range [startByte] * [length].
+**         This works for bit and bytes as [checkByteType] + [checkByteAddress]
+**         since e.g. the byte R103 contains all bits from R103.0 to R103.7
+** Return: boolean, true if the bit / byte is handled inside the given range
+*******************************************************************************/
 function checkInstructionByteRange(startByte, length, checkByteType, checkByteAddress) {
   if (startByte != null)
   {
     let match = (/^([A-Z])(\d*)$/).exec(startByte);
     if (match != null)
     {
-      let number = parseInt(match[2], 10);
+      let byte = parseInt(match[2], 10);
       let type = match[1];
       /* loop trough length (amount of bytes) */
       for (let i = 0; i < length; i++)
       {
         /* if the bit's byteAdress matches the instructions byteAdress + i then it's getting handled there */
-        if (checkByteType + checkByteAddress == type + (number + i))
+        if (checkByteType + checkByteAddress == type + (byte + i))
         {
           return true;
         }

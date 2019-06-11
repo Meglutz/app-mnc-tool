@@ -7,8 +7,9 @@ let Source = "./mnemonic.mnc";
 let MyQueries = [];
 let Data;
 let MNC;
-let MNCData;
 let InstructionData;
+
+let ActiveQuery = 0;
 
 let CurrentModule;
 let CurrentNetwork;
@@ -78,9 +79,6 @@ function draw()
   /* plot mnemonic info to DOM header & update overlay */
   updateDOMheader(MNC);
   updateDOMinfo(Warnings, WarningLog, Data);
-
-  /* Query to see all defined bits which are handled in Instructions */
-  // let test = new Query(Data, definedBitsInInstructions, null);
 
   noLoop();
 }

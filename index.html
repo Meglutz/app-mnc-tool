@@ -62,6 +62,21 @@
     <header>
 
       <!-- UI -->
+      <!-- Query pagination -->
+      <svg class="query-pagination-button" onclick="displayDOMquery(-1)" height="50" width="50">
+        <polygon points="12,2 12,18 0,10" class="button-line" stroke-width="0" fill="#ffffff" />
+        <polygon points="14,2 14,18 2,10" stroke-width="0" fill="#313131" />
+      </svg>
+
+      <p id="query-count" class="query-pagination-text"> - </p>
+
+      <svg class="query-pagination-button" onclick="displayDOMquery(1)" height="50" width="50">
+        <polygon points="38,2 38,18 50,10" class="button-line" stroke-width="0" fill="#ffffff" />
+        <polygon points="36,2 36,18 48,10" stroke-width="0" fill="#313131" />
+      </svg>
+
+      <!-- <label id="query-count">0 / 0</label> -->
+
       <label for="query-type">Type</label>
       <select id="query-type" name="query-type">
         <option value="Read">Find all Read Operations for:</option>

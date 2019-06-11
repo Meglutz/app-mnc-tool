@@ -205,11 +205,17 @@ header {
   margin: 0px;
   font-family: "consolas";
   padding: 5px;
-  background-color: #4e9455;
-  color: #1f3c22;
+  background-color: var(--tone-5-color);
+  color: var(--tone-5-accent);
   border-radius: 3px;
   font-weight: bold;
 }
+
+.mncshow .code:hover {
+  background-color: var(--tone-1-color);
+  color: var(--main-color);
+}
+
 
 /* Style Status Bar */
 /******************************************************************************/
@@ -254,6 +260,28 @@ header {
 
 /* Style Controls */
 /******************************************************************************/
+.query-pagination-button {
+  cursor: pointer;
+  vertical-align: middle;
+  display: inline-block;
+}
+.query-pagination-button:hover > .button-line {
+  fill: var(--main-accent-color);
+}
+
+.query-pagination-text {
+  font-size: 0.8rem;
+  font-family: "Roboto";
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--tone-3-color);
+  margin: 0px !important;
+  white-space: nowrap;
+  vertical-align: middle;
+  display: inline-block;
+  padding-bottom: 30px
+}
+
 header label {
   font-family: "Oswald", sans-serif;
   display: block;
@@ -398,10 +426,10 @@ p {
 }
 
 .level-tag-1   {background-color: #33a5b0;
-                color: #1f3c22;}
-.level-tag-2   {background-color: #4e9455;
-                color: #1f3c22;}
+                color: var(--tone-5-accent);}
+.level-tag-2   {background-color: var(--tone-5-color);
+                color: var(--tone-5-accent);}
 .level-tag-3   {background-color: #a1266f;
-                color: #1f3c22;}
+                color: var(--tone-5-accent);}
 .level-tag-SUB {background-color: var(--tone-4-color);
                 color: var(--tone-4-accent);}

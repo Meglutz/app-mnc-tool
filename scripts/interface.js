@@ -64,35 +64,77 @@ document.getElementById(mncShowClose).onclick = function()
   document.getElementById(mncShowOverlay).style.display = "none";
 }
 
-/* user-click events (DOM overlays) */
-function evaluateDOMUserClick(resultId)
+/*******************************************************************************
+** Action: Creates a new mncShow overlay and displays it if the clicked
+**         queryresult ([resultId]) it's NOT an instance of insOp.
+** Return: null
+*******************************************************************************/
+function evalMNCShow(resultId)
 {
   /* generate mncShow view if the user didn't click an instruction operation */
   if (MyQueries[MyQueries.length - 1].result[resultId] instanceof InstructionOperation == false)
   {
-    removeDOMelements(mncShowElementId);
-    addDOMmncShowList(MyQueries[MyQueries.length - 1], resultId);
+    removeDOM_elements(mncShowElementId);
+    addDOM_MNCShowList(MyQueries[MyQueries.length - 1], resultId);
     document.getElementById(mncShowOverlay).style.display = "block";
   }
   else
   {
     /* generate insOp table if the user did click on an instruction operation */
-    removeDOMelements(insOpElementId);
-    addDOMinsOpTable(MyQueries[MyQueries.length - 1], resultId);
+    removeDOM_elements(insOpElementId);
+    addDOM_insOpTable(MyQueries[MyQueries.length - 1], resultId);
     document.getElementById(insOpOverlay).style.display = "block";
   }
 }
 
+/*******************************************************************************
+** Action: hides mncShow overlay, deletes all displayed result and puts the memory
+**         into the [query-value] input field. prioritizes bits but can also
+**         handle clicked bytes
+** Return: null
+*******************************************************************************/
+function evalMNCShowLineClick(line)
+{
+  match = /(T|D|E|F|G|R|X|Y)(\d+)(\.\d|)/.exec(line);
+  if (match != null)
+  {
+    /* clear all results, hide the mncShow overlay and put the new line into the query input field */
+    removeDOM_elements(tlElementId);
+    document.getElementById(mncShowOverlay).style.display = "none";
+    let el = document.getElementsByTagName("input");
+    el["query-value"].value = match[1] + match[2] + match[3];
+  }
+}
+
+function displayDOMquery(ofs)
+{
+  /* exit if the ofs will make  the [ActiveQuery] out of range */
+  if (ActiveQuery + ofs >= MyQueries.length || ActiveQuery + ofs < 0)
+  {
+    return
+  }
+  else
+  {
+    removeDOM_elements(tlElementId);
+    ActiveQuery += ofs;
+    addDOM_showQuery(ActiveQuery);
+  }
+}
+
+/*******************************************************************************
+** Action: Logs [e] to DOM as a [tlElementId] element (Table Element)
+** Return: null
+*******************************************************************************/
 function errorToDOM(e)
 {
   /* clear all Elements containing [tlElementId] */
-  removeDOMelements(tlElementId);
+  removeDOM_elements(tlElementId);
 
   /* add error message */
   let titleSection = document.getElementById(tlElementTitle);
-  let divElement   = addDOMelement("div", tlElementId, "container");
-  let hElement     = addDOMelement("h1",  tlElementId, errorTitle);
-  let pElement     = addDOMelement("p",   tlElementId, errorText);
+  let divElement   = addDOM_element("div", tlElementId, "container");
+  let hElement     = addDOM_element("h1",  tlElementId, errorTitle);
+  let pElement     = addDOM_element("p",   tlElementId, errorText);
 
   hElement.innerHTML += "ERROR";
   pElement.innerHTML += e + "<br><br>" + "Please try again";
@@ -105,15 +147,15 @@ function errorToDOM(e)
 
 /*******************************************************************************
 ** Action: Event: onClick Submit Button.
-           - Clears all DOM Elements with the [tlElementId] id
-           - Makes a new query using the DOM inputs
-           - Creates a DOM TimeLine and a "Modal" for each result
+**         - Clears all DOM Elements with the [tlElementId] id
+**         - Makes a new query using the DOM inputs
+**         - Creates a DOM TimeLine and a "Modal" for each result
 ** Return: null
 *******************************************************************************/
 document.getElementById("query-submit").onclick = function()
 {
   /* clear all Elements containing [tlElementId] */
-  removeDOMelements(tlElementId);
+  removeDOM_elements(tlElementId);
 
   let type =  document.getElementById("query-type");
   let typeVal = type.options[type.selectedIndex].value;
@@ -132,21 +174,30 @@ document.getElementById("query-submit").onclick = function()
   }
   finally {}
 
+  ActiveQuery = MyQueries.length - 1;
+  addDOM_showQuery(ActiveQuery);
+}
 
-  let latestQuery = MyQueries.length - 1;
 
+/*******************************************************************************
+** Action: Adds the MyQuery[id] to the DOM. This includes
+**         the correct memory definition, title and all results.
+** Return: null
+*******************************************************************************/
+function addDOM_showQuery(id)
+{
   /* make result array iterable. If there's only one result it's not iterable */
-  if (isIterable(MyQueries[latestQuery].result) == false)
+  if (isIterable(MyQueries[id].result) == false)
   {
-    MyQueries[latestQuery].result.push("dummy");
+    MyQueries[id].result.push("dummy");
   }
 
   /* prepare Memory definition string (If the query bit has a Definition) */
   let memDefString = "";
 
-  if (MyQueries[latestQuery].memoryDefinition != null || undefined)
+  if (MyQueries[id].memoryDefinition != null || undefined)
   {
-    Object.entries(MyQueries[latestQuery].memoryDefinition).forEach(memDefAttr =>
+    Object.entries(MyQueries[id].memoryDefinition).forEach(memDefAttr =>
       {
         switch (memDefAttr[0])
         {
@@ -185,11 +236,11 @@ document.getElementById("query-submit").onclick = function()
 
   /* add TimeLine title */
   let titleSection = document.getElementById(tlElementTitle);
-  let divElement   = addDOMelement("div", tlElementId, "container");
-  let pElement     = addDOMelement("p",   tlElementId);
+  let divElement   = addDOM_element("div", tlElementId, "container");
+  let pElement     = addDOM_element("p",   tlElementId);
 
-  pElement.innerHTML += MyQueries[latestQuery].type + " for " +
-                        MyQueries[latestQuery].memory + "<br><br>" +
+  pElement.innerHTML += MyQueries[id].type + " for " +
+                        MyQueries[id].memory + "<br><br>" +
                         memDefString + " &rarr;";
 
   divElement.appendChild(pElement);
@@ -197,20 +248,23 @@ document.getElementById("query-submit").onclick = function()
 
 
   /* add a new TimeLine "Modal" for each result */
-  for (let i = 0; i < MyQueries[latestQuery].result.length; i++)
+  for (let i = 0; i < MyQueries[id].result.length; i++)
   {
-    content = prepareDOMresult(MyQueries[latestQuery].result[i]);
+    content = prepareDOMresult(MyQueries[id].result[i]);
     if (content != undefined)
     {
-        addDOMresult(content.lineString,
-                     query + content.actionString,
+        addDOM_result(content.lineString,
+                     MyQueries[id].memory + content.actionString,
                      content.operationString,
                      content.moduleString,
                      content.tagString,
                      content.highlight,
-                     ["onclick", ("evaluateDOMUserClick(" + i + ")")]);
+                     ["onclick", ("evalMNCShow(" + i + ")")]);
     }
   }
+
+  /* update query count */
+  document.getElementById("query-count").innerHTML = (ActiveQuery + 1) + " / " + MyQueries.length;
 
   /* update Warning state */
   updateDOMinfo(Warnings, WarningLog, Data);
@@ -228,14 +282,14 @@ document.getElementById("query-submit").onclick = function()
 **                           optAttr = ["attrName", attrValue]
 ** Return: null
 *******************************************************************************/
-function addDOMresult (title, content1, content2, content3, content4, highlight = false, optAttr = null)
+function addDOM_result (title, content1, content2, content3, content4, highlight = false, optAttr = null)
 {
   let tlBody =      document.getElementById(tlElementLoc);
-  let h1Element =   addDOMelement("h1", tlElementId);
-  let pElement =    addDOMelement("p", tlElementId);
-  let p2Element =   addDOMelement("p", tlElementId);
-  let tagElement =  addDOMelement("a", tlElementId);
-  let divElement =  addDOMelement("div", tlElementId, "timeline-item");
+  let h1Element =   addDOM_element("h1", tlElementId);
+  let pElement =    addDOM_element("p", tlElementId);
+  let p2Element =   addDOM_element("p", tlElementId);
+  let tagElement =  addDOM_element("a", tlElementId);
+  let divElement =  addDOM_element("div", tlElementId, "timeline-item");
 
   /* assemble modal div */
   divElement.setAttribute("on-line", "MNC Line " + title);
@@ -279,7 +333,7 @@ function addDOMresult (title, content1, content2, content3, content4, highlight 
 ** Action: Adds new DOM table for instruction operation visualisation
 ** Return: null
 *******************************************************************************/
-function addDOMinsOpTable(query, resultIndex)
+function addDOM_insOpTable(query, resultIndex)
 {
   const regexp = /^(T|D|E|F|G|R|X|Y)(\d*)$/;
   let ins = query.result[resultIndex];
@@ -335,7 +389,7 @@ function addDOMinsOpTable(query, resultIndex)
       }
     }
 
-    addDOMtableColumn(document.getElementById(insOpTableLoc), row, false)
+    addDOM_tableColumn(document.getElementById(insOpTableLoc), row, false)
     row = [];
 
     /* increment bit & byte offset */
@@ -353,7 +407,7 @@ function addDOMinsOpTable(query, resultIndex)
 ** Action: Adds new DOM table for instruction operation visualisation
 ** Return: null
 *******************************************************************************/
-function addDOMmncShowList(query, resultIndex)
+function addDOM_MNCShowList(query, resultIndex)
 {
   let op = query.result[resultIndex];
   let VIEW_RANGE = 10;
@@ -394,12 +448,13 @@ function addDOMmncShowList(query, resultIndex)
   {
     if (i == op.inLine)
     {
-      mncLine = addDOMelement("a", mncShowElementId, "code-highlight")
+      mncLine = addDOM_element("a", mncShowElementId, "code-highlight")
     }
     else
     {
-      mncLine = addDOMelement("a", mncShowElementId, "code")
+      mncLine = addDOM_element("a", mncShowElementId, "code")
     }
+    mncLine = appendDOMtag(mncLine, "onclick", "evalMNCShowLineClick('" + query.src.source.lines[i] + "')")
     mncLine.innerHTML = (i).pad(5) + ": <b>" + query.src.source.lines[i] + "</b>";
     list.appendChild(mncLine);
   }
@@ -410,9 +465,9 @@ function addDOMmncShowList(query, resultIndex)
 ** Action: Adds DOM table cloumn element to specified parent element
 ** Return: DOM element
 *******************************************************************************/
-function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass = null)
+function addDOM_tableColumn(parentElement, rowContent, isHead = false, optClass = null)
 {
-  let row = addDOMelement("tr", insOpElementId, optClass);
+  let row = addDOM_element("tr", insOpElementId, optClass);
   let temp; let text;
   let colType = "td";
   let texType = "p";
@@ -433,8 +488,8 @@ function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass =
     }
     else
     {
-      temp = addDOMelement(colType, insOpElementId, optClass);
-      text = addDOMelement(texType, insOpElementId);
+      temp = addDOM_element(colType, insOpElementId, optClass);
+      text = addDOM_element(texType, insOpElementId);
       /* add style to text element, if the item before was a style definer */
       if (style != "")
       {
@@ -453,7 +508,7 @@ function addDOMtableColumn(parentElement, rowContent, isHead = false, optClass =
 ** Action: Adds new DOM element of type [type]
 ** Return: DOM element
 *******************************************************************************/
-function addDOMelement(type, id, addClass = null)
+function addDOM_element(type, id, addClass = null)
 {
   let el = document.createElement(type);
   el.setAttribute("id", id);
@@ -513,7 +568,7 @@ function replaceDOMtagValue(el, type, prevVal, newVal) {
 ** Action: Removes all DOM Elements which are of the ID "id"
 ** Return: null
 *******************************************************************************/
-function removeDOMelements(id) {
+function removeDOM_elements(id) {
   while (document.getElementById(id) != null)
   {
     let elem = document.getElementById(id);
