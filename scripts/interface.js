@@ -335,7 +335,8 @@ function addDOM_result (title, content1, content2, content3, content4, highlight
 *******************************************************************************/
 function addDOM_insOpTable(query, resultIndex)
 {
-  const regexp = /^(T|D|E|F|G|R|X|Y)(\d*)$/;
+  const memRegexp = /^(T|D|E|F|G|R|X|Y)(\d*)$/;
+  const constRegexp = /^\s*\d+\s*$/;
   let ins = query.result[resultIndex];
   let def;
   let bitAmount = ins.formatLength * 8;
@@ -364,11 +365,11 @@ function addDOM_insOpTable(query, resultIndex)
     /* loop trough each cell of the row */
     for (let i = 0; i < row.length; i++)
     {
-      let match = row[i].match(regexp);
+      let match = row[i].match(memRegexp);
       if (match != null)
       {
         /* replace current cell content with the new bit address */
-        row[i] = match[1] + (parseInt(row[i].match(regexp)[2], 10) + byteCount) + "." + bitCount;
+        row[i] = match[1] + (parseInt(row[i].match(memRegexp)[2], 10) + byteCount) + "." + bitCount;
 
         /* check for def-tag in the next cell. if there is one, look for definition.
         if no definition has been found, make a dummy */
@@ -384,8 +385,19 @@ function addDOM_insOpTable(query, resultIndex)
           {
             row[i + 1] = def.symbol;
           }
+
         }
         def = undefined; /* reset for next definition */
+      }
+      else
+      {
+        /* check if it's a constant when it didn't match the [regexp] */
+        let isConstant = constRegexp.exec(row[i]);
+        if (isConstant != null)
+        {
+          /* if it's not a constant, check if it has a definition. */
+          row[i + 1] = "Constant";
+        }
       }
     }
 

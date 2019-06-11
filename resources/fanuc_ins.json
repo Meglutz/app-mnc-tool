@@ -221,8 +221,9 @@
     "readsOffset" : [2, 3],
     "writesOffset" : null,
     "graphicalData" : {
-      "opStr" : "Compares $reads.0 to $reads.1. Uses internal evaluation register to store the result",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "COMPB", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed", "R9000", "$Definition"]
+      "opStr" : "Compares $reads.0 to $reads.1",
+      "tableExtraDescription" : "Uses internal evaluation register to store the result <br><br>R000.0 (REQUAL) is true if $reads.0 = $reads.1 <br>R000.1 (RLESS) is true if $reads.0 < $reads.1",
+      "tableRows" : ["COMPB", "$StyleNextCellGreen",  "$reads.1", "$Definition"]
     }
   },
 

@@ -1,7 +1,5 @@
 # To Do List
 
-**Now over 2500SLOC!**
-
 ## General
 * [x] Change DOMTable generation for InstructionOperations so that it can take more
       than two inputs (e.g. EXOR uses 2 read- and 1 write-input)
@@ -11,11 +9,7 @@
 * [x] Center InstructionOperation table
 
 ## Nice-to-have
-* [ ] Add sendable queries and Data files
-* [ ] **Interactive COP (Contact-plan)**
-    * [ ] Add MNC-to-COP interpreter
-    * [ ] Add visualisation
-    * [ ] Add simulation
+* [x] Support scrolling trough Queries (Query history)
 
 ## Prerequisities for stable release
 * [x] Add "%@1" - "%" detection to get the MNC Data more reliably.
@@ -29,13 +23,13 @@
     * [x] Add Level Tags to result visualisation
     * [x] Remove the `MNCData` global Variable and put it's keys as properties into the `Mnemonic` class
 * [x] Remove bitReadOps / bitWriteOps arrays -> replace with bitOps (branch: *newBitOpStructure*)
-* [ ] Rework Module detection / definition strategy. There should be a better solution.
 * [x] Fix Instruction Operation Text in result display (Only plot reads / writes)
 * [X] Fix Result sorting: lowest line count to highest line count. (Or by level?)
-* [ ] Only parse lines which are in the same network as the selected Op to MNCshow
-* [ ] Check for defines before drawing MNCshow
-* [x] Finally implement XMOVB instructions
+* [x] Finally implement xmovb instructions
 * [x] Find a better solution to the issue with the Operation strings and preparation of the InsOp table data. Maybe include it in the Switch statement in the Resource class? Obviously with a few new properties for the InstructionOperation class
+* [ ] **MNCShow: Only parse lines which are in the same network as the selected Op**
+* [ ] **MNCShow: Check for defines before drawing MNCshow**
+* [x] Fix COMPB instruction
 * [ ] Make sure "Dependency" Bits are being tagged when being a dependency for example for RW / ACT / RST.
 * [ ] Implement Module detection for decompiled MNCs:
 

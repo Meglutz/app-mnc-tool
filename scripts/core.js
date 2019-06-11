@@ -3,6 +3,7 @@
 *******************************************************************************/
 
 let Source = "./mnemonic.mnc";
+let InstructionSource = "./resources/fanuc_ins.json"
 
 let MyQueries = [];
 let Data;
@@ -31,7 +32,7 @@ function preload()
   /* the loadStrings function returns an array, indexed by the line count of the loaded file */
   MNC = new Mnemonic(loadStrings(Source, console.log("Mnemonic file loaded correctly.")));
   Data = new Resource(MNC);
-  InstructionData = loadJSON("./resources/fanuc_ins.json");
+  InstructionData = loadJSON(InstructionSource);
 }
 
 
