@@ -635,9 +635,9 @@ class Resource
               graphicalData.tableExtraDescription = key[1].tableExtraDescription.concat();
             }
 
-            /* replace placeholders in graphicalData */
-            let keywords = ["StyleNextCellRed", "StyleNextCellGreen", "StyleNextCellYellow", "Definition", "reads", "writes", "frmLen",      "frmKin",    "frmMod",        "depOf"];
-            let values   = [ StyleNextCellRed,   StyleNextCellGreen,   StyleNextCellYellow,   Definition,   reads ,  writes ,  format.length, format.kind, format.modifier, dependency.dependentOf];
+            /* replace placeholders [keywords] with [values] in graphicalData */
+            let keywords = ["RowRepeat",     "StyleCellRed",     "StyleCellGreen",     "StyleCellYellow",     "StyleCellHead",     "Definition",     "reads", "writes", "frmLenBit",       "frmLen",       "frmKin",    "frmMod",        "depOf"];
+            let values   = [ Table_RowRepeat,  Table_StyleCellRed, Table_StyleCellGreen, Table_StyleCellYellow, Table_StyleCellHead, Table_Definition, reads ,  writes , format.length * 8, format.length, format.kind, format.modifier, dependency.dependentOf];
             for (let i = 0; i < keywords.length; i++)
             {
               /* only replace if the value isn't null. not all instruction have e.g. the "dependency.dependentOf" property */
@@ -656,9 +656,23 @@ class Resource
                 {
                   for (let j = 0; j < graphicalData.tableRows.length; j++)
                   {
-                    if (graphicalData.tableRows[j] != null)
+                    /* DEBUG: is going to be always iterable! */
+                    if (isIterable(graphicalData.tableRows[j]))
                     {
-                      graphicalData.tableRows[j]= detokenize(graphicalData.tableRows[j], "$", keywords[i], ".", values[i]);
+                      for (let y = 0; y < graphicalData.tableRows[j].length; y++)
+                      {
+                        if (graphicalData.tableRows[j][y] != null)
+                        {
+                          graphicalData.tableRows[j][y] = detokenize(graphicalData.tableRows[j][y], "$", keywords[i], ".", values[i]);
+                        }
+                      }
+                    }
+                    else
+                    {
+                      if (graphicalData.tableRows[j] != null)
+                      {
+                        graphicalData.tableRows[j] = detokenize(graphicalData.tableRows[j], "$", keywords[i], ".", values[i]);
+                      }
                     }
                   }
                 }
@@ -806,7 +820,7 @@ function detokenize(str, prefix, keyword, delimiter, value)
   /* make sure only strings get passed into this method */
   if (typeof str != "string")
   {
-    throw "Error@'" + detokenize.name + "': 'str' arg must be typeof string. Now it's: " + typeof str;
+    throw "Error@'" + detokenize.name + "': 'str' arg (passed value = '" + str + "') must be typeof string. Now it's: " + typeof str;
   }
 
   /* if [value] is an array, loop [value.length] times to be sure to replace all

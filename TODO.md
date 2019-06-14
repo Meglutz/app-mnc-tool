@@ -32,6 +32,7 @@
 * [x] Fix COMPB instruction
 * [ ] Make sure "Dependency" Bits are being tagged when being a dependency for example for RW / ACT / RST.
 * [ ] Implement Module detection for decompiled MNCs:
+* [ ] Make array of styles
 
 ```
 RD     PMCOM_XY

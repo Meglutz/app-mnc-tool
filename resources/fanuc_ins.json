@@ -206,7 +206,8 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Converts $reads from binary to BCD and writes it to $writes",
-      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "DCNVB", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : [["$StyleCellHeader Reads", "$StyleCellHeader Symbol", " ", "$StyleCellHeader Writes", "$StyleCellHeader Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition", "DCNVB", "$StyleCellRed $writes", "$Definition"]]
     }
   },
 
@@ -222,8 +223,12 @@
     "writesOffset" : null,
     "graphicalData" : {
       "opStr" : "Compares $reads.0 to $reads.1",
-      "tableExtraDescription" : "Uses internal evaluation register to store the result <br><br>R000.0 (REQUAL) is true if $reads.0 = $reads.1 <br>R000.1 (RLESS) is true if $reads.0 < $reads.1",
-      "tableRows" : ["COMPB", "$StyleNextCellGreen",  "$reads.1", "$Definition"]
+      "tableExtraDescription" : "Uses internal evaluation register to store the result <br><br>R9000.0 (REQUAL) is true if $reads.0 = $reads.1 <br>R9000.1 (RLESS) is true if $reads.0 < $reads.1",
+      "tableRows" : [["$StyleCellHeader A", "$StyleCellHeader Symbol", " ", "$StyleCellHeader B", "$StyleCellHeader Symbol", "$StyleCellHeader Description"],
+                     ["$StyleCellGreen $reads.0", "$Definition", "COMPB", "$StyleCellGreen $reads.1", "$Definition", " "],
+                     [" ", " ", "->", "$StyleCellRed R9000.0", "$Definition", "A = B"],
+                     [" ", " ", "->", "$StyleCellRed R9000.1", "$Definition", "A < B"],
+                     [" ", " ", "->", "$StyleCellRed R9000.5", "$Definition", "A | B > Max (Overflow)"]]
     }
   },
 
@@ -260,7 +265,7 @@
     "writesOffset" : [4, 3],
     "dependency" : ["ReadWriteDependency", -3],
     "graphicalData" : {
-      "opStr" : "If <b> $depOf</b> is true, it will read $reads.0 and write it to $writes.0. <br>If <b> $depOf </b> is false, it will read $writes.0 and write it to $reads.0.<br> The length is defined by it's format ($frmLen byte(s), $frmKin) multiplied by the value of <b>$frmMod.1</b>",
+      "opStr" : "If <b> $depOf is true, it will read $reads.0 and write it to $writes.0. <br>If <b> $depOf </b> is false, it will read $writes.0 and write it to $reads.0.<br> The length is defined by it's format ($frmLen byte(s), $frmKin) multiplied by the value of <b>$frmMod.1</b>",
       "tableExtraDescription" : "Read / Write depends on the state of $depOf",
       "tableRows" : ["$StyleNextCellYellow",  "$reads.0", "$Definition", "XMOVB", "$StyleNextCellYellow",  "$writes.0", "$Definition"]
     }

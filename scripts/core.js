@@ -11,6 +11,7 @@ let MNC;
 let InstructionData;
 
 let ActiveQuery = 0;
+let ActiveInsOpTable;
 
 let CurrentModule;
 let CurrentNetwork;

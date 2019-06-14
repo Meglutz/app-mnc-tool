@@ -181,6 +181,13 @@ header {
   color: var(--tone-6-accent);
 }
 
+.insop-table .head-cell  {
+  background-color: var(--main-color);
+  color: var(--tone-1-color);
+  font-size: 1rem;
+  font-weight: bold;
+}
+
 /* Style MNCshow Overlay */
 /******************************************************************************/
 .mncshow {

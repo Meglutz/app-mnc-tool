@@ -32,13 +32,18 @@ const mncShowInfoLoc   =    "mncshow-info-location";
 const mncShowElementId =    "mncshow-element";
 const mncShowClose     =    "overlay-close-button-3";
 
-const Exit                 =    "EXIT";
-const Style                =    "STYLE__";
-const StyleNextCellRed     =    Style + "red-cell";
-const StyleNextCellGreen   =    Style + "green-cell";
-const StyleNextCellYellow  =    Style + "yellow-cell";
-const Definition           =    "DEF__";
-const styleDefRegex        =    /^(STYLE__)(.*)$/;
+const styleDefStart          =    "STYLE__";
+const styleDefEnd            =    "-cell";
+const styleDefRegex          =    /^(STYLE__)(.+cell)/;
+const rowRepRegex            =    /^ROWREP__(\d+)/;
+const memRegexp              =    /(T|D|E|F|G|R|X|Y)(\d*)(\.*[0-7]*)$/;
+const constRegexp            =    /^\s*\d+\s*$/;
+const Table_RowRepeat        =    "ROWREP__";
+const Table_Definition       =    "DEF__";
+const Table_StyleCellRed     =    styleDefStart + "red" + styleDefEnd;
+const Table_StyleCellGreen   =    styleDefStart + "green" + styleDefEnd;
+const Table_StyleCellYellow  =    styleDefStart + "yellow" + styleDefEnd;
+const Table_StyleCellHead    =    styleDefStart + "head" + styleDefEnd;
 
 
 /*******************************************************************************
@@ -95,7 +100,7 @@ function evalMNCShow(resultId)
 *******************************************************************************/
 function evalMNCShowLineClick(line)
 {
-  match = /(T|D|E|F|G|R|X|Y)(\d+)(\.\d|)/.exec(line);
+  match = memRegexp.exec(line);
   if (match != null)
   {
     /* clear all results, hide the mncShow overlay and put the new line into the query input field */
@@ -329,24 +334,33 @@ function addDOM_result (title, content1, content2, content3, content4, highlight
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*******************************************************************************
 ** Action: Adds new DOM table for instruction operation visualisation
 ** Return: null
 *******************************************************************************/
 function addDOM_insOpTable(query, resultIndex)
 {
-  const memRegexp = /^(T|D|E|F|G|R|X|Y)(\d*)$/;
-  const constRegexp = /^\s*\d+\s*$/;
   let ins = query.result[resultIndex];
-  let def;
-  let bitAmount = ins.formatLength * 8;
-  let bitCount = 0; let byteCount = 0;
-  let row = [];
-
   let title = document.getElementById(insOpTitleLoc);
   let info =  document.getElementById(insOpInfoLoc);
+
+  /* assemble title & info string of the table */
   title.innerHTML = ins.instruction + " | SUB" + ins.instructionNumber;
-  info.innerHTML  = "Range: " + bitAmount + " bits (" + ins.formatLength + " byte(s))";
+  info.innerHTML  = "Range: " + rowAmount + " bits (" + ins.formatLength + " byte(s))";
 
   /* if the instructions graphicalData has something to append to the info label, do it here. */
   if (ins.graphicalData.tableExtraDescription != null)
@@ -354,65 +368,203 @@ function addDOM_insOpTable(query, resultIndex)
     info.innerHTML += "<br> <b>" + ins.graphicalData.tableExtraDescription + "</b>";
   }
 
-  for (let i = 0; i < bitAmount; i++)
+  /* generate DOM table according to the [.tableRows] property */
+  ActiveInsOpTable = new DOM_OpTable(ins.graphicalData.tableRows)
+}
+
+
+class DOM_OpTable
+{
+  constructor(rows)
   {
-    /* loop trough the .tableRows property of the instruction.
-    this array needs to be concatenated (new copy). if not,
-    the ins.graphicalData.tableRows reference will be affected when changing
-    the "row" variable, since "row" will then only be a reference to .tableRows.. */
-    row = ins.graphicalData.tableRows.concat();
-
-    /* loop trough each cell of the row */
-    for (let i = 0; i < row.length; i++)
+    this.rows = [];
+    /* fill [.rows] property with input array. the input array must be two dimensional and structured like this:
+    [ [c1, c2, c3, c4],
+      [c5, c6, c7, c8] ] */
+    for (let row of rows)
     {
-      let match = row[i].match(memRegexp);
-      if (match != null)
+      if (isIterable(row))
       {
-        /* replace current cell content with the new bit address */
-        row[i] = match[1] + (parseInt(row[i].match(memRegexp)[2], 10) + byteCount) + "." + bitCount;
-
-        /* check for def-tag in the next cell. if there is one, look for definition.
-        if no definition has been found, make a dummy */
-        if (row[i + 1] == Definition)
+        let tempRow = [];
+        for (let cell of row)
         {
-          def = query.src.getDef(row[i]);
-
-          if (def == undefined)
-          {
-            row[i + 1] = "No Symbol";
-          }
-          else
-          {
-            row[i + 1] = def.symbol;
-          }
-
+          tempRow.push(new DOM_OpTableCell(cell))
         }
-        def = undefined; /* reset for next definition */
+        this.rows.push(tempRow);
       }
       else
       {
-        /* check if it's a constant when it didn't match the [regexp] */
-        let isConstant = constRegexp.exec(row[i]);
-        if (isConstant != null)
-        {
-          /* if it's not a constant, check if it has a definition. */
-          row[i + 1] = "Constant";
-        }
+        throw ("Error@'DOM_OpTable constructor': The passed 'rows' arg contains an empty row ");
       }
     }
 
-    addDOM_tableColumn(document.getElementById(insOpTableLoc), row, false)
-    row = [];
+    this.solveTags();
+  }
 
-    /* increment bit & byte offset */
-    bitCount += 1;
-    if (bitCount == 8)
+  solveTags()
+  {
+    for (let i = 0; i < this.rows.length; i++) /* loop trough rows */
     {
-      bitCount = 0;
-      byteCount += 1;
+      this.solveRepTags(i);
+      for (let j = 0; j < this.rows[i].length; j++) /* loop trough cells of row */
+      {
+        // this.solveDefTags(i, j, -1); /* def tags always source the memory for their definition in the previous cell (-1) */
+      }
+    }
+  }
+
+  solveRepTags(rowNum)
+  {
+    /* must always be in the first cell of a row, just to restrict it a bit */
+    if (this.rows[rowNum][0].content.includes(Table_RowRepeat))
+    {
+      let origin = rowNum;
+      let temp;
+      let bitCount = 0;
+      let byteCount = 0;
+
+      /* get repeat amount and remove tag from cell content */
+      let repAmount = parseInt(this.rows[rowNum][0].content.match(rowRepRegex)[1], 10);
+      this.rows[rowNum][0].content = this.rows[rowNum][0].content.replace(rowRepRegex, "");
+
+      /* create the required amount of copies of the origin row */
+      for (let i = 1; i < repAmount; i++)
+      {
+
+        %%%COMBAK%%%
+        THIS LOOP COPIES THE ROW[ORIGIN]
+        BUT THE ITEMS IN THIS ROW ARE ALSO ARRAYS (OR OBJS OF DOM_OpTableCell)
+        WHICH MUST NOT BE REFERENCED!
+
+        Object.assign(temp, this.rows[origin]);
+        this.rows.splice(origin + i, 0, temp);
+      }
+
+      /* append the bit + byte count to the byte strings.
+      attention: this hinders the usage of byte strings in rowrepeats
+      since it will always replace them! */
+      for (let j = 0; j < repAmount; j++)
+      {
+        for (let cell of this.rows[j + origin])
+        {
+          match = cell.content.match(memRegexp);
+          if (match != null)
+          {
+            cell.content = cell.content.replace(memRegexp, (match[1] + (parseInt(match[2], 10) + byteCount) + "." + bitCount));
+          }
+        }
+        /* increment bit & byte offset */
+        bitCount += 1;
+        if (bitCount == 8)
+        {
+          bitCount = 0;
+          byteCount += 1;
+        }
+      }
+    }
+  }
+
+  solveDefTags(rowNum, cellNum, cellOffset)
+  {
+    let isMemory;
+    let isConstant;
+    let def
+
+    if (this.rows[rowNum][cellNum].content.includes(Table_Definition))
+    {
+      isMemory = this.rows[rowNum][cellNum + cellOffset].content.match(memRegexp);
+      if (isMemory != null)
+      {
+        def = Data.getDef(this.rows[rowNum][cellNum + cellOffset].content);
+        if (def == undefined)
+        {
+          this.rows[rowNum][cellNum].content = "No Symbol";
+        }
+        else
+        {
+          this.rows[rowNum][cellNum].content = def.symbol;
+        }
+      }
+      else
+      {
+        isConstant = constRegexp.exec(this.rows[rowNum][cellNum + cellOffset].content);
+        if (isConstant != null)
+        {
+          this.rows[rowNum][cellNum].content = "Constant";
+        }
+      }
     }
   }
 }
+
+class DOM_OpTableCell
+{
+  constructor(str)
+  {
+    if (str.match(styleDefRegex) != null)
+    {
+      this.style = str.match(styleDefRegex)[2];
+      str = str.replace(styleDefRegex, "");
+    }
+    this.content = str.trim();
+  }
+}
+
+
+/*******************************************************************************
+** Action: Adds DOM table row element to specified parent element
+** Return: DOM element
+*******************************************************************************/
+function addDOM_tableRow(parentElement, rowContent, optClass = null, cellType = "td")
+{
+  let row = addDOM_element("tr", insOpElementId, optClass);
+  let cell;
+  let text;
+  let texType = "p";
+  let style = "";
+
+  /* create new row */
+  for (let item of rowContent)
+  {
+    /* check if the item is a style definer */
+    if (item.match(styleDefRegex) != null)
+    {
+      style = item.match(styleDefRegex)[2];
+    }
+    else
+    {
+      cell = addDOM_element(cellType, insOpElementId, optClass);
+      text = addDOM_element(texType,  insOpElementId);
+      /* add style to text element, if the item before was a style definer */
+      if (style != "")
+      {
+        text = appendDOMtag(text, "class", style); style = "";
+      }
+      text.innerHTML = item;
+      cell.appendChild(text);
+      row.appendChild(cell);
+    }
+  }
+  parentElement.appendChild(row);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*******************************************************************************
@@ -470,49 +622,6 @@ function addDOM_MNCShowList(query, resultIndex)
     mncLine.innerHTML = (i).pad(5) + ": <b>" + query.src.source.lines[i] + "</b>";
     list.appendChild(mncLine);
   }
-}
-
-
-/*******************************************************************************
-** Action: Adds DOM table cloumn element to specified parent element
-** Return: DOM element
-*******************************************************************************/
-function addDOM_tableColumn(parentElement, rowContent, isHead = false, optClass = null)
-{
-  let row = addDOM_element("tr", insOpElementId, optClass);
-  let temp; let text;
-  let colType = "td";
-  let texType = "p";
-  let style = "";
-
-  if (isHead)
-  {
-    colType = "th"; texType = "h1";
-  }
-
-  /* create new column */
-  for (let item of rowContent)
-  {
-    /* check if the item is a style definer */
-    if (item.match(styleDefRegex) != null)
-    {
-      style = item.match(styleDefRegex)[2];
-    }
-    else
-    {
-      temp = addDOM_element(colType, insOpElementId, optClass);
-      text = addDOM_element(texType, insOpElementId);
-      /* add style to text element, if the item before was a style definer */
-      if (style != "")
-      {
-        text = appendDOMtag(text, "class", style); style = "";
-      }
-      text.innerHTML = item;
-      temp.appendChild(text);
-      row.appendChild(temp);
-    }
-  }
-  parentElement.appendChild(row);
 }
 
 
