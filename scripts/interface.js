@@ -34,16 +34,16 @@ const mncShowClose     =    "overlay-close-button-3";
 
 const styleDefStart          =    "STYLE__";
 const styleDefEnd            =    "-cell";
-const styleDefRegex          =    /^(STYLE__)(.+cell)/;
+const styleDefRegex          =    /(STYLE__)(.+cell)/;
 const rowRepRegex            =    /^ROWREP__(\d+)/;
 const memRegexp              =    /(T|D|E|F|G|R|X|Y)(\d*)(\.*[0-7]*)$/;
 const constRegexp            =    /^\s*\d+\s*$/;
 const Table_RowRepeat        =    "ROWREP__";
 const Table_Definition       =    "DEF__";
-const Table_StyleCellRed     =    styleDefStart + "red" + styleDefEnd;
-const Table_StyleCellGreen   =    styleDefStart + "green" + styleDefEnd;
+const Table_StyleCellRed     =    styleDefStart   + "red" +  styleDefEnd;
+const Table_StyleCellGreen   =    styleDefStart  + "green" + styleDefEnd;
 const Table_StyleCellYellow  =    styleDefStart + "yellow" + styleDefEnd;
-const Table_StyleCellHead    =    styleDefStart + "head" + styleDefEnd;
+const Table_StyleCellHead    =    styleDefStart  + "head" +  styleDefEnd;
 
 
 /*******************************************************************************
@@ -360,7 +360,7 @@ function addDOM_insOpTable(query, resultIndex)
 
   /* assemble title & info string of the table */
   title.innerHTML = ins.instruction + " | SUB" + ins.instructionNumber;
-  info.innerHTML  = "Range: " + rowAmount + " bits (" + ins.formatLength + " byte(s))";
+  info.innerHTML  = "Range: " + (ins.formatLength * 8) + " bits (" + ins.formatLength + " byte(s))";
 
   /* if the instructions graphicalData has something to append to the info label, do it here. */
   if (ins.graphicalData.tableExtraDescription != null)
@@ -377,82 +377,84 @@ class DOM_OpTable
 {
   constructor(rows)
   {
-    this.rows = [];
+    this.rows = rows;
     /* fill [.rows] property with input array. the input array must be two dimensional and structured like this:
     [ [c1, c2, c3, c4],
-      [c5, c6, c7, c8] ] */
-    for (let row of rows)
+    [c5, c6, c7, c8] ] */
+
+    let tempRow = [];
+    let tempRows = [];
+
+    /* resolve all tags which are contained in the cells */
+    for (let i = 0; i < this.rows.length; i++) /* loop trough rows of the table */
     {
-      if (isIterable(row))
+      for (let j = 0; j < this.rows[i].length; j++) /*  loop trough cells of row[i] */
       {
-        let tempRow = [];
-        for (let cell of row)
-        {
-          tempRow.push(new DOM_OpTableCell(cell))
-        }
-        this.rows.push(tempRow);
-      }
-      else
-      {
-        throw ("Error@'DOM_OpTable constructor': The passed 'rows' arg contains an empty row ");
+        this.solveRepTags(i); /* check if row contains repeating tags, if it does, expand [rows] */
+        this.solveDefTags(i, j, -1); /* def tags ALWAYS source the memory for their definition in the previous cell (-1) */
       }
     }
 
-    this.solveTags();
-  }
-
-  solveTags()
-  {
-    for (let i = 0; i < this.rows.length; i++) /* loop trough rows */
+    /* create objs for each cell */
+    for (let i = 0; i < this.rows.length; i++) /* loop trough rows of the table */
     {
-      this.solveRepTags(i);
-      for (let j = 0; j < this.rows[i].length; j++) /* loop trough cells of row */
+      for (let j = 0; j < this.rows[i].length; j++) /*  loop trough cells of row[i] */
       {
-        // this.solveDefTags(i, j, -1); /* def tags always source the memory for their definition in the previous cell (-1) */
+        tempRow.push(new DOM_OpTableCell(this.rows[i][j]));
       }
+      tempRows.push(tempRow); tempRow = [];
     }
+
+    this.rows = [...tempRows];
+    console.log(this.rows);
   }
 
   solveRepTags(rowNum)
   {
-    /* must always be in the first cell of a row, just to restrict it a bit */
-    if (this.rows[rowNum][0].content.includes(Table_RowRepeat))
+    /* [Table_RowRepeat] must always be in the first cell of a row, just to restrict it a bit */
+    if (this.rows[rowNum][0].includes(Table_RowRepeat))
     {
       let origin = rowNum;
-      let temp;
       let bitCount = 0;
       let byteCount = 0;
+      let tempRow = [];
+      let tempRows = [];
+      let sourceRow = [];
 
       /* get repeat amount and remove tag from cell content */
-      let repAmount = parseInt(this.rows[rowNum][0].content.match(rowRepRegex)[1], 10);
-      this.rows[rowNum][0].content = this.rows[rowNum][0].content.replace(rowRepRegex, "");
+      let repAmount = parseInt(this.rows[origin][0].match(rowRepRegex)[1], 10);
+      this.rows[origin][0] = this.rows[origin][0].replace(rowRepRegex, "");
 
-      /* create the required amount of copies of the origin row */
-      for (let i = 1; i < repAmount; i++)
+      /* create separate copy of the source row and remove it from [this.rows] */
+      sourceRow = [...this.rows[origin]];
+      this.rows.splice(origin, 1);
+
+      /* create the required amount of copies of the origin row and append the bit + byte count to the byte strings.
+      attention: this hinders the usage of byte strings in rowrepeats since it will always replace them! */
+      for (let i = 0; i < repAmount; i++)
       {
+        /* add a new [sourceRow] row */
+        tempRows.push(sourceRow);
 
-        %%%COMBAK%%%
-        THIS LOOP COPIES THE ROW[ORIGIN]
-        BUT THE ITEMS IN THIS ROW ARE ALSO ARRAYS (OR OBJS OF DOM_OpTableCell)
-        WHICH MUST NOT BE REFERENCED!
-
-        Object.assign(temp, this.rows[origin]);
-        this.rows.splice(origin + i, 0, temp);
-      }
-
-      /* append the bit + byte count to the byte strings.
-      attention: this hinders the usage of byte strings in rowrepeats
-      since it will always replace them! */
-      for (let j = 0; j < repAmount; j++)
-      {
-        for (let cell of this.rows[j + origin])
+        /* loop trough the freshly added row's cells */
+        for (let j = 0; j < tempRows[i].length; j++)
         {
-          match = cell.content.match(memRegexp);
+          /* if the cell contains [memRegexp], then add to it an incremented value (byte / bit) */
+          match = tempRows[i][j].match(memRegexp);
           if (match != null)
           {
-            cell.content = cell.content.replace(memRegexp, (match[1] + (parseInt(match[2], 10) + byteCount) + "." + bitCount));
+            tempRow.push(tempRows[i][j].replace(memRegexp, (match[1] + (parseInt(match[2], 10) + byteCount) + "." + bitCount)));
+          }
+          else
+          {
+            tempRow.push(tempRows[i][j])
           }
         }
+
+        /* add the new row to the [this.rows] array at index [origin]. */
+        this.rows.splice(origin + i, 0, tempRow);
+        tempRow = [];
+
         /* increment bit & byte offset */
         bitCount += 1;
         if (bitCount == 8)
@@ -470,27 +472,27 @@ class DOM_OpTable
     let isConstant;
     let def
 
-    if (this.rows[rowNum][cellNum].content.includes(Table_Definition))
+    if (this.rows[rowNum][cellNum].includes(Table_Definition))
     {
-      isMemory = this.rows[rowNum][cellNum + cellOffset].content.match(memRegexp);
+      isMemory = this.rows[rowNum][cellNum + cellOffset].match(memRegexp);
       if (isMemory != null)
       {
-        def = Data.getDef(this.rows[rowNum][cellNum + cellOffset].content);
+        def = Data.getDef(this.rows[rowNum][cellNum + cellOffset]);
         if (def == undefined)
         {
-          this.rows[rowNum][cellNum].content = "No Symbol";
+          this.rows[rowNum][cellNum] = "No Symbol";
         }
         else
         {
-          this.rows[rowNum][cellNum].content = def.symbol;
+          this.rows[rowNum][cellNum] = def.symbol;
         }
       }
       else
       {
-        isConstant = constRegexp.exec(this.rows[rowNum][cellNum + cellOffset].content);
+        isConstant = constRegexp.exec(this.rows[rowNum][cellNum + cellOffset]);
         if (isConstant != null)
         {
-          this.rows[rowNum][cellNum].content = "Constant";
+          this.rows[rowNum][cellNum] = "Constant";
         }
       }
     }

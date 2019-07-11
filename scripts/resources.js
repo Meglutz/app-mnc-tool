@@ -636,7 +636,7 @@ class Resource
             }
 
             /* replace placeholders [keywords] with [values] in graphicalData */
-            let keywords = ["RowRepeat",     "StyleCellRed",     "StyleCellGreen",     "StyleCellYellow",     "StyleCellHead",     "Definition",     "reads", "writes", "frmLenBit",       "frmLen",       "frmKin",    "frmMod",        "depOf"];
+            let keywords = ["RowRepeat",     "StyleCellRed",     "StyleCellGreen",     "StyleCellYellow",     "StyleCellHeader",     "Definition",     "reads", "writes", "frmLenBit",       "frmLen",       "frmKin",    "frmMod",        "depOf"];
             let values   = [ Table_RowRepeat,  Table_StyleCellRed, Table_StyleCellGreen, Table_StyleCellYellow, Table_StyleCellHead, Table_Definition, reads ,  writes , format.length * 8, format.length, format.kind, format.modifier, dependency.dependentOf];
             for (let i = 0; i < keywords.length; i++)
             {
