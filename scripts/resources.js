@@ -768,6 +768,33 @@ class Resource
     }
     return {kind: kind, length: length};
   }
+
+  /*******************************************************************************
+  ** Action: Looks trough all InstructionOperations and serves an array of all
+  **         instances where the .name property of the instruction contains
+  **         the string [insName]
+  ** Return: Array of found instruction operations, null if nothing was found
+  *******************************************************************************/
+  serveInstructionOperationsOfType(insName) {
+    let found = [];
+
+    for (let ins of this.instructionOperations)
+    {
+      if (ins.instruction.includes(insName))
+      {
+        found.push(ins);
+      }
+    }
+
+    if (found.length == 0)
+    {
+      return null
+    }
+    else
+    {
+      return found;
+    }
+  }
 }
 
 
