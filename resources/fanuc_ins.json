@@ -1,12 +1,14 @@
 {
   "COMMENT" : {
     "0" : "JSON-Info",
-    "1" : "opStr placeholders: $xyz.0 or xyz.n   -> n-th element of [xyz]. used if [xyz] is an array",
-    "2" : "                    $reads or $writes -> value of [reads] or [writes]",
-    "3" : "                    $depOf            -> value of dependecy.dependentOf",
-    "4" : "                    $frmLen           -> value of format.length",
-    "5" : "                    $frmKin           -> value of format.kind",
-    "6" : "                    $frmMod           -> value of format.modifier"
+    "1" : "opStr placeholders: $xyz.0 or xyz.n      -> N-th element of [xyz]. used if [xyz] is an array",
+    "2" : "                    $reads or $writes    -> Value of [reads] or [writes]",
+    "3" : "                    $depOf               -> Value of dependecy.dependentOf",
+    "4" : "                    $frmLen              -> Value of format.length",
+    "5" : "                    $frmKin              -> Value of format.kind",
+    "6" : "                    $frmMod              -> Value of format.modifier",
+    "7" : "                    $frmLenBit           -> Value of format.length multiplied by 8. F.e. If Word, then $frmLenBit = 16",
+    "8" : "                    $RowRepeatX          -> Repeats the current row X times. No spaces allowed. Other ph's can be used. F.e. '$RowRepeat$frmLenBit'"
 
   },
 
@@ -87,8 +89,12 @@
     "readsOffset" : [2, 3],
     "writesOffset" : 4,
     "graphicalData" : {
-      "opStr" : "Reads for $frmLen byte(s) $frmKin starting at $reads.0 & $reads.1 and writes the decoded result to $writes",
-      "tableRows" : ["$StyleNextCellGreen", "$reads.0", "$Definition", "DECB", "$StyleNextCellRed", "$reads.1", "$Definition", "->", "$StyleNextCellRed", "$writes", "Definition"]
+      "opStr" : "Reads for $frmLen byte(s) $frmKin. At $reads.0 & $reads.1 and writes the decoded result to $writes",
+      "tableRows" : [["$StyleCellHeader Reads",   "$StyleCellHeader Symbol", " ",    "$StyleCellHeader Reads", "$StyleCellHeader Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition", "DECB", "$StyleCellGreen $reads.1",  "$Definition"],
+                     ["$StyleCellHeader Writes",  "$StyleCellHeader Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellRed $writes", "$Definition"]]
+
     }
   },
 
@@ -106,7 +112,8 @@
     "writesOffset" : 1,
     "graphicalData" : {
       "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
-      "tableRows" : ["$StyleNextCellGreen", "$reads", "$Definition", "$StyleNextCellRed", "$writes", "$Definition", "CTRC"]
+      "tableRows" : [["$StyleCellHeader Reads",   "$StyleCellHeader Symbol", "$StyleCellHeader Reads", "$StyleCellHeader Symbol", " "],
+                     ["$StyleCellGreen $reads", "$Definition", "$StyleCellRed $writes", "$Definition", "CTRC"]]
     }
   },
 
@@ -117,7 +124,8 @@
     "writesOffset" : 1,
     "graphicalData" : {
       "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
-      "tabelRows" : ["$StyleNextCellGreen","$reads", "$Definition", "$StyleNextCellRed","$writes", "$Definition", "CTRB"]
+      "tabelRows" : [["$StyleCellHeader Reads",   "$StyleCellHeader Symbol", "$StyleCellHeader Reads", "$StyleCellHeader Symbol", " "],
+                     ["$StyleCellGreen $reads", "$Definition", "$StyleCellRed $writes", "$Definition", "CTRB"]]
     }
   },
 
@@ -142,8 +150,9 @@
     "readsOffset" : 3,
     "writesOffset" : 4,
     "graphicalData" : {
-      "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
-      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "CODB", "$StyleNextCellRed","$writes", "$Definition"]
+      "opStr" : "This instruction converts data at $reads in binary format to an optional binary format 1 byte, 2 bytes or 4 bytes data at $writes.",
+      "tableRows" : [["$StyleCellHeader Reads",   "$StyleCellHeader Symbol", " ", "$StyleCellHeader Reads", "$StyleCellHeader Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition", "CODB", "$StyleCellRed $writes", "$Definition"]]
     }
   },
 
@@ -159,7 +168,7 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" :  "Writes the logical OR product of $reads.0 & $reads.1 to $writes",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "MOVOR", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "MOVOR", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -267,7 +276,7 @@
     "graphicalData" : {
       "opStr" : "If <b> $depOf is true, it will read $reads.0 and write it to $writes.0. <br>If <b> $depOf </b> is false, it will read $writes.0 and write it to $reads.0.<br> The length is defined by it's format ($frmLen byte(s), $frmKin) multiplied by the value of <b>$frmMod.1</b>",
       "tableExtraDescription" : "Read / Write depends on the state of $depOf",
-      "tableRows" : ["$StyleNextCellYellow",  "$reads.0", "$Definition", "XMOVB", "$StyleNextCellYellow",  "$writes.0", "$Definition"]
+      "tableRows" : ["$StyleCellYellow",  "$reads.0", "$Definition", "XMOVB", "$StyleCellYellow",  "$writes.0", "$Definition"]
     }
   },
 
@@ -283,7 +292,7 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Adds $reads.0 to $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "+", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "+", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -299,7 +308,7 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Subtracts $reads.1 from $reads.0 and writes it to $writes",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "-", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "-", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -315,7 +324,7 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Multiplies $reads.0 by $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "x", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "x", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -331,7 +340,7 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Divides $reads.1 trough $reads.0 and writes it to $writes",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "/", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "/", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -347,7 +356,7 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Defines $reads as a constant and stores it to $writes",
-      "tableRows" : ["define", "$StyleNextCellGreen", "$reads", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["define", "$StyleCellGreen", "$reads", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -367,7 +376,7 @@
     "writesOffset" : 1,
     "graphicalData" : {
       "opStr" : "TEXT TO DO",
-      "tableRows" : ["EXIN", "$StyleNextCellGreen","$reads", "$Definition", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["EXIN", "$StyleCellGreen","$reads", "$Definition", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -378,7 +387,7 @@
     "writesOffset" : 2,
     "graphicalData" : {
       "opStr" : "Moves one byte, $reads to $writes",
-      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen","$reads", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -389,7 +398,7 @@
     "writesOffset" : 2,
     "graphicalData" : {
       "opStr" : "Moves one word, $reads to $writes",
-      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen","$reads", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -400,7 +409,7 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Moves n-bytes, ($frmLen $frmKin) $reads to $writes",
-      "tableRows" : ["$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen","$reads", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -410,7 +419,7 @@
     "writesOffset" : 1,
     "graphicalData" : {
       "opStr" : "Reads dataelements from the PMC / CNC window and writes it to $writes",
-      "tableRows" : ["WINDR", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["WINDR", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -420,7 +429,7 @@
     "writesOffset" : 1,
     "graphicalData" : {
       "opStr" : "Reads dataelements from the PMC / CNC window and writes it to $writes",
-      "tableRows" : ["WINDR", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["WINDR", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -457,7 +466,7 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Bitwise EXOR links $reads.0 to $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "EXOR", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "EXOR", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -468,7 +477,7 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Bitwise AND links $reads.0 and $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "&&", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "&&", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -479,7 +488,7 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Bitwise OR links $reads.0 to $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "OR", "$StyleNextCellGreen",  "$reads.1", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "OR", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -490,7 +499,7 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Bitwise negates $reads and writes it to $writes",
-      "tableRows" : ["NOT", "$StyleNextCellGreen","$reads", "$Definition", "->", "$StyleNextCellRed","$writes", "$Definition"]
+      "tableRows" : ["NOT", "$StyleCellGreen","$reads", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
     }
   },
 
@@ -565,7 +574,7 @@
     "readsOffset" :  [1, 2, 3],
     "graphicalData" : {
       "opStr" : "Word-Range comparison. <br>Lower / Upper Boundary: <b>$reads.0</b> <br>Lower / Upper Boundary: <b>$reads.1</b> <br>Input Data :            <b>$reads.2</b> <br>Sets its output <br>if $reads.0 ≤ $reads.2 ≤ $reads.1 or <br>if $reads.1 ≤ $reads.2 ≤ $reads.0",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "≤", "$StyleNextCellGreen",  "$reads.2", "$Definition", "≤", "$StyleNextCellGreen",  "$reads.1", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "≤", "$StyleCellGreen",  "$reads.2", "$Definition", "≤", "$StyleCellGreen",  "$reads.1", "$Definition"]
     }
   },
 
@@ -575,7 +584,7 @@
     "reads" :  [1, 2, 3],
     "graphicalData" : {
       "opStr" : "Doubleword-Range comparison. <br>Lower / Upper Boundary: <b>$reads.0</b> <br>Lower / Upper Boundary: <b>$reads.1</b> <br>Input Data :            <b>$reads.2</b> <br>Sets its output <br>if $reads.0 ≤ $reads.2 ≤ $reads.1 or <br>if $reads.1 ≤ $reads.2 ≤ $reads.0",
-      "tableRows" : ["$StyleNextCellGreen",  "$reads.0", "$Definition", "≤", "$StyleNextCellGreen",  "$reads.2", "$Definition", "≤", "$StyleNextCellGreen",  "$reads.1", "$Definition"]
+      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "≤", "$StyleCellGreen",  "$reads.2", "$Definition", "≤", "$StyleCellGreen",  "$reads.1", "$Definition"]
     }
   }
 }

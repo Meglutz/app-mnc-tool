@@ -370,6 +370,11 @@ function addDOM_insOpTable(query, resultIndex)
 
   /* generate DOM table according to the [.tableRows] property */
   ActiveInsOpTable = new DOM_OpTable(ins.graphicalData.tableRows)
+
+  for (let row of ActiveInsOpTable.rows)
+  {
+    addDOM_tableRow(document.getElementById(insOpTableLoc), row, false);
+  }
 }
 
 
@@ -406,7 +411,6 @@ class DOM_OpTable
     }
 
     this.rows = [...tempRows];
-    console.log(this.rows);
   }
 
   solveRepTags(rowNum)
@@ -523,50 +527,25 @@ function addDOM_tableRow(parentElement, rowContent, optClass = null, cellType = 
   let cell;
   let text;
   let texType = "p";
-  let style = "";
 
-  /* create new row */
+  /* create new DOM row */
   for (let item of rowContent)
   {
-    /* check if the item is a style definer */
-    if (item.match(styleDefRegex) != null)
+    /* create new DOM cell */
+    cell = addDOM_element(cellType, insOpElementId, optClass);
+    text = addDOM_element(texType,  insOpElementId);
+
+    /* add style to text element, if applicable */
+    if (item.style != "")
     {
-      style = item.match(styleDefRegex)[2];
+      text = appendDOMtag(text, "class", item.style);
     }
-    else
-    {
-      cell = addDOM_element(cellType, insOpElementId, optClass);
-      text = addDOM_element(texType,  insOpElementId);
-      /* add style to text element, if the item before was a style definer */
-      if (style != "")
-      {
-        text = appendDOMtag(text, "class", style); style = "";
-      }
-      text.innerHTML = item;
-      cell.appendChild(text);
-      row.appendChild(cell);
-    }
+    text.innerHTML = item.content;
+    cell.appendChild(text);
+    row.appendChild(cell);
   }
   parentElement.appendChild(row);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*******************************************************************************
