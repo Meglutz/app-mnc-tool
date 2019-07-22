@@ -647,9 +647,17 @@ class Resource
                   graphicalData.opStr = detokenize(graphicalData.opStr, "$", keywords[i], ".", values[i]);
                 }
 
+                /* if nothing is specified for [tableExtraDescription] then just use [opStr] */
                 if (graphicalData.tableExtraDescription != null)
                 {
                   graphicalData.tableExtraDescription = detokenize(graphicalData.tableExtraDescription, "$", keywords[i], ".", values[i]);
+                }
+                else
+                {
+                  if (graphicalData.opStr != null)
+                  {
+                    graphicalData.tableExtraDescription = graphicalData.opStr;
+                  }
                 }
 
                 if (graphicalData.tableRows != null)

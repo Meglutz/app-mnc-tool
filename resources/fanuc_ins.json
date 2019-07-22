@@ -167,8 +167,9 @@
     "readsOffset" : [1, 2],
     "writesOffset" : 3,
     "graphicalData" : {
-      "opStr" :  "Writes the logical OR product of $reads.0 & $reads.1 to $writes",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "MOVOR", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" :  "Executes the logical OR sum between $reads.0 & $reads.1 and stores it to $writes",
+      "tableRows" : [["$StyleCellHeader Reads",                        "$StyleCellHeader Symbol", "MOVOR", "$StyleCellHeader Reads",   "$StyleCellHeader Symbol", " ",  "$StyleCellHeader Writes", "$StyleCellHeader Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             " ˅ ",   "$StyleCellGreen $reads.1", "$Definition",             "->", "$StyleCellRed $writes",  "$Definition"]]
     }
   },
 
@@ -214,9 +215,9 @@
     "readsOffset" : 2,
     "writesOffset" : 3,
     "graphicalData" : {
-      "opStr" : "Converts $reads from binary to BCD and writes it to $writes",
-      "tableRows" : [["$StyleCellHeader Reads", "$StyleCellHeader Symbol", " ", "$StyleCellHeader Writes", "$StyleCellHeader Symbol"],
-                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition", "DCNVB", "$StyleCellRed $writes", "$Definition"]]
+      "opStr" : "Converts $frmLen bytes at $reads from binary to BCD and writes it to $writes",
+      "tableRows" : [["$StyleCellHeader Reads",                      "$StyleCellHeader Symbol", "DCNVB", "$StyleCellHeader Writes", "$StyleCellHeader Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",             " -> ",  "$StyleCellRed $writes",  "$Definition"]]
     }
   },
 
@@ -231,16 +232,15 @@
     "readsOffset" : [2, 3],
     "writesOffset" : null,
     "graphicalData" : {
-      "opStr" : "Compares $reads.0 to $reads.1",
-      "tableExtraDescription" : "Uses internal evaluation register to store the result <br><br>R9000.0 (REQUAL) is true if $reads.0 = $reads.1 <br>R9000.1 (RLESS) is true if $reads.0 < $reads.1",
-      "tableRows" : [["$StyleCellHeader A", "$StyleCellHeader Symbol", " ", "$StyleCellHeader B", "$StyleCellHeader Symbol", "$StyleCellHeader Description"],
-                     ["$StyleCellGreen $reads.0", "$Definition", "COMPB", "$StyleCellGreen $reads.1", "$Definition", " "],
-                     [" ", " ", "->", "$StyleCellRed R9000.0", "$Definition", "A = B"],
-                     [" ", " ", "->", "$StyleCellRed R9000.1", "$Definition", "A < B"],
-                     [" ", " ", "->", "$StyleCellRed R9000.5", "$Definition", "A | B > Max (Overflow)"]]
+      "opStr" : "This instruction compares $frmLen byte binary data ($reads.0 to $reads.1). Results of comparison are set in the operation output register (R9000, Z0).",
+      "tableRows" : [["$StyleCellHeader A",                            "$StyleCellHeader Symbol", "COMPB", "$StyleCellHeader B",       "$StyleCellHeader Symbol", " "],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             "<> ",   "$StyleCellGreen $reads.1", "$Definition",             " "],
+                     [" ",                                             " ",                       "->",    "$StyleCellRed R9000.0",    "$Definition",             "$reads.0 == $reads.1"],
+                     [" ",                                             " ",                       "->",    "$StyleCellRed R9000.1",    "$Definition",             "$reads.0 <  $reads.1"],
+                     [" ",                                             " ",                       "->",    "$StyleCellRed R9000.5",    "$Definition",             "$reads.0 || $reads.1 > Max (Overflow)"]]
     }
   },
-
+///////////////////////////////////////////////////// COMBACK ////////////////////////////////////////////////////////////////////////////
   "16" : {
     "name" : "COIN",
     "usedUndefinedInstruction" : true
