@@ -27,12 +27,17 @@
 * [X] Fix Result sorting: lowest line count to highest line count. (Or by level?)
 * [x] Finally implement xmovb instructions
 * [x] Find a better solution to the issue with the Operation strings and preparation of the InsOp table data. Maybe include it in the Switch statement in the Resource class? Obviously with a few new properties for the InstructionOperation class
+* [x] Fix COMPB instruction
+
 * [ ] **MNCShow: Only parse lines which are in the same network as the selected Op**
 * [ ] **MNCShow: Check for defines before drawing MNCshow**
-* [x] Fix COMPB instruction
+
 * [ ] Make sure "Dependency" Bits are being tagged when being a dependency for example for RW / ACT / RST.
 * [ ] Implement Module detection for decompiled MNCs:
 * [ ] Make array of styles
+* [ ] Fix pressable Memory in insOpTables not being pressable anymore (Since newInsOpTableHandling)
+* [x] Fix cell referencing in graphicalData.tableRows
+* [x] Fix definitions not being found in insOpTables
 
 ```
 RD     PMCOM_XY

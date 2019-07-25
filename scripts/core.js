@@ -229,6 +229,7 @@ function analyzeLogic(res)
                                                               i,
                                                               res.source.getLevelOf(i)));
     }
+
   }
 
   console.log("-- Found bitwise operations     : ");

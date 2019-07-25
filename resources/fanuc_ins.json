@@ -90,9 +90,9 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Reads for $frmLen byte(s) $frmKin. At $reads.0 & $reads.1 and writes the decoded result to $writes",
-      "tableRows" : [["$StyleCellHeader Reads",   "$StyleCellHeader Symbol", " ",    "$StyleCellHeader Reads", "$StyleCellHeader Symbol"],
+      "tableRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", " ",    "$StyleCellHead Reads", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition", "DECB", "$StyleCellGreen $reads.1",  "$Definition"],
-                     ["$StyleCellHeader Writes",  "$StyleCellHeader Symbol"],
+                     ["$StyleCellHead Writes",  "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellRed $writes", "$Definition"]]
 
     }
@@ -112,7 +112,7 @@
     "writesOffset" : 1,
     "graphicalData" : {
       "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
-      "tableRows" : [["$StyleCellHeader Reads",   "$StyleCellHeader Symbol", "$StyleCellHeader Reads", "$StyleCellHeader Symbol", " "],
+      "tableRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", "$StyleCellHead Reads", "$StyleCellHead Symbol", " "],
                      ["$StyleCellGreen $reads", "$Definition", "$StyleCellRed $writes", "$Definition", "CTRC"]]
     }
   },
@@ -124,7 +124,7 @@
     "writesOffset" : 1,
     "graphicalData" : {
       "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
-      "tabelRows" : [["$StyleCellHeader Reads",   "$StyleCellHeader Symbol", "$StyleCellHeader Reads", "$StyleCellHeader Symbol", " "],
+      "tabelRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", "$StyleCellHead Reads", "$StyleCellHead Symbol", " "],
                      ["$StyleCellGreen $reads", "$Definition", "$StyleCellRed $writes", "$Definition", "CTRB"]]
     }
   },
@@ -151,7 +151,7 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "This instruction converts data at $reads in binary format to an optional binary format 1 byte, 2 bytes or 4 bytes data at $writes.",
-      "tableRows" : [["$StyleCellHeader Reads",   "$StyleCellHeader Symbol", " ", "$StyleCellHeader Reads", "$StyleCellHeader Symbol"],
+      "tableRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", " ", "$StyleCellHead Reads", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition", "CODB", "$StyleCellRed $writes", "$Definition"]]
     }
   },
@@ -168,7 +168,7 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" :  "Executes the logical OR sum between $reads.0 & $reads.1 and stores it to $writes",
-      "tableRows" : [["$StyleCellHeader Reads",                        "$StyleCellHeader Symbol", "MOVOR", "$StyleCellHeader Reads",   "$StyleCellHeader Symbol", " ",  "$StyleCellHeader Writes", "$StyleCellHeader Symbol"],
+      "tableRows" : [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "MOVOR", "$StyleCellHead Reads",   "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             " ˅ ",   "$StyleCellGreen $reads.1", "$Definition",             "->", "$StyleCellRed $writes",  "$Definition"]]
     }
   },
@@ -216,7 +216,7 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Converts $frmLen bytes at $reads from binary to BCD and writes it to $writes",
-      "tableRows" : [["$StyleCellHeader Reads",                      "$StyleCellHeader Symbol", "DCNVB", "$StyleCellHeader Writes", "$StyleCellHeader Symbol"],
+      "tableRows" : [["$StyleCellHead Reads",                      "$StyleCellHead Symbol", "DCNVB", "$StyleCellHead Writes", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",             " -> ",  "$StyleCellRed $writes",  "$Definition"]]
     }
   },
@@ -233,14 +233,14 @@
     "writesOffset" : null,
     "graphicalData" : {
       "opStr" : "This instruction compares $frmLen byte binary data ($reads.0 to $reads.1). Results of comparison are set in the operation output register (R9000, Z0).",
-      "tableRows" : [["$StyleCellHeader A",                            "$StyleCellHeader Symbol", "COMPB", "$StyleCellHeader B",       "$StyleCellHeader Symbol", " "],
-                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             "<> ",   "$StyleCellGreen $reads.1", "$Definition",             " "],
+      "tableRows" : [["$StyleCellHead A",                            "$StyleCellHead Symbol", "COMPB", "$StyleCellHead B",       "$StyleCellHead Symbol", "$StyleCellHead Description"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             "<> ",   "$StyleCellGreen $reads.1", "$Definition",             "(Doesn't compare bits!)"],
                      [" ",                                             " ",                       "->",    "$StyleCellRed R9000.0",    "$Definition",             "$reads.0 == $reads.1"],
                      [" ",                                             " ",                       "->",    "$StyleCellRed R9000.1",    "$Definition",             "$reads.0 <  $reads.1"],
                      [" ",                                             " ",                       "->",    "$StyleCellRed R9000.5",    "$Definition",             "$reads.0 || $reads.1 > Max (Overflow)"]]
     }
   },
-///////////////////////////////////////////////////// COMBACK ////////////////////////////////////////////////////////////////////////////
+
   "16" : {
     "name" : "COIN",
     "usedUndefinedInstruction" : true

@@ -523,7 +523,7 @@ class Resource
     let format =          {};
     let graphicalData =   {};
 
-    /* if the current line contains an ins op, then set subNumber. Else, leave */
+    /* if the current line contains an ins op, then set subNumber. else, leave */
     if (match != null && match[1,2] != null && match[1,2] != "")
     {
       subNumber = parseInt(match[2], 10)
@@ -536,7 +536,6 @@ class Resource
     if (InstructionData[subNumber] == undefined) {
       throw "Error@'" + this.instructionParseJSON.name + "': The instruction with the number: " + subNumber + " is inexistent in this JSON data.";
     }
-
     Object.entries(InstructionData[subNumber]).forEach(key =>
       {
         switch (key[0]) {
@@ -624,7 +623,24 @@ class Resource
           case "graphicalData":
             if (key[1].tableRows != null)
             {
-              graphicalData.tableRows = key[1].tableRows.concat();
+              /* make sure to check for 2d array. we don't want to reference
+              the cells to another (across identical instructions) */
+              let tempRow = [];
+              let temp = [];
+              if (isIterable(key[1].tableRows))
+              {
+                for (let row of key[1].tableRows)
+                {
+                  tempRow = row.concat();
+                  temp.push(tempRow);
+                  // tempRow = [];
+                }
+                graphicalData.tableRows = temp.concat(); temp = [];
+              }
+              else
+              {
+                graphicalData.tableRows = key[1].tableRows.concat();
+              }
             }
             if (key[1].opStr != null)
             {
@@ -636,11 +652,12 @@ class Resource
             }
 
             /* replace placeholders [keywords] with [values] in graphicalData */
-            let keywords = ["RowRepeat",     "StyleCellRed",     "StyleCellGreen",     "StyleCellYellow",     "StyleCellHeader",     "Definition",     "reads", "writes", "frmLenBit",       "frmLen",       "frmKin",    "frmMod",        "depOf"];
-            let values   = [ Table_RowRepeat,  Table_StyleCellRed, Table_StyleCellGreen, Table_StyleCellYellow, Table_StyleCellHead, Table_Definition, reads ,  writes , format.length * 8, format.length, format.kind, format.modifier, dependency.dependentOf];
+            let keywords = ["RowRepeat",            "StyleCellRed",     "StyleCellGreen",     "StyleCellYellow",     "StyleCellHead",     "Definition", "reads", "writes", "frmLenBit",       "frmLen",      "frmKin",    "frmMod",        "depOf"];
+            let values   = [ Table_RowRepeat,  Table_StyleCellRed, Table_StyleCellGreen, Table_StyleCellYellow, Table_StyleCellHead, Table_Definition,   reads ,  writes ,  format.length * 8, format.length, format.kind, format.modifier, dependency.dependentOf];
+
             for (let i = 0; i < keywords.length; i++)
             {
-              /* only replace if the value isn't null. not all instruction have e.g. the "dependency.dependentOf" property */
+              /* only replace if the corresponding value isn't null. not all instruction have e.g. the "dependency.dependentOf" property */
               if (values[i] != null) {
                 if (graphicalData.opStr != null)
                 {
@@ -664,7 +681,7 @@ class Resource
                 {
                   for (let j = 0; j < graphicalData.tableRows.length; j++)
                   {
-                    /* DEBUG: is going to be always iterable! */
+                    /* DEBUG: it's going to be always iterable! */
                     if (isIterable(graphicalData.tableRows[j]))
                     {
                       for (let y = 0; y < graphicalData.tableRows[j].length; y++)

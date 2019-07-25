@@ -37,7 +37,7 @@ const styleDefEnd            =    "-cell";
 const styleDefRegex          =    /(STYLE__)(.+cell)/;
 const rowRepRegex            =    /^ROWREP__(\d+)/;
 const memRegexp              =    /(T|D|E|F|G|R|X|Y)(\d*)(\.*[0-7]*)$/;
-const constRegexp            =    /^\s*\d+\s*$/;
+const constRegexp            =    /\s*\d+\s*$/;
 const Table_RowRepeat        =    "ROWREP__";
 const Table_Definition       =    "DEF__";
 const Table_StyleCellRed     =    styleDefStart   + "red" +  styleDefEnd;
@@ -71,7 +71,7 @@ document.getElementById(mncShowClose).onclick = function()
 
 /*******************************************************************************
 ** Action: Creates a new mncShow overlay and displays it if the clicked
-**         queryresult ([resultId]) it's NOT an instance of insOp.
+**         queryresult ([resultId]) is NOT an instance of insOp.
 ** Return: null
 *******************************************************************************/
 function evalMNCShow(resultId)
@@ -333,21 +333,6 @@ function addDOM_result (title, content1, content2, content3, content4, highlight
   tlBody.appendChild(divElement);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*******************************************************************************
 ** Action: Adds new DOM table for instruction operation visualisation
 ** Return: null
@@ -481,7 +466,7 @@ class DOM_OpTable
       isMemory = this.rows[rowNum][cellNum + cellOffset].match(memRegexp);
       if (isMemory != null)
       {
-        def = Data.getDef(this.rows[rowNum][cellNum + cellOffset]);
+        def = Data.getDef(isMemory[0]); /* the zeroth index of a (.match) return contains the whole match, in this case the memory address */
         if (def == undefined)
         {
           this.rows[rowNum][cellNum] = "No Symbol";
