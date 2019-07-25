@@ -90,11 +90,10 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Reads for $frmLen byte(s) $frmKin. At $reads.0 & $reads.1 and writes the decoded result to $writes",
-      "tableRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", " ",    "$StyleCellHead Reads", "$StyleCellHead Symbol"],
-                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition", "DECB", "$StyleCellGreen $reads.1",  "$Definition"],
-                     ["$StyleCellHead Writes",  "$StyleCellHead Symbol"],
-                     ["$RowRepeat$frmLenBit $StyleCellRed $writes", "$Definition"]]
-
+      "tableRows" : [["$StyleCellHead Reads",                          "$StyleCellHead Symbol", "DECB",  "$StyleCellHead Reads",         "$StyleCellHead Symbol", " ",     "$StyleCellHead Writes",        "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads.0",                      "$Definition",           "<>",    "$StyleCellGreen $reads.1",     "$Definition"          , "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",     "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -112,8 +111,8 @@
     "writesOffset" : 1,
     "graphicalData" : {
       "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
-      "tableRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", "$StyleCellHead Reads", "$StyleCellHead Symbol", " "],
-                     ["$StyleCellGreen $reads", "$Definition", "$StyleCellRed $writes", "$Definition", "CTRC"]]
+      "tableRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", "$StyleCellHead Reads",  "$StyleCellHead Symbol", " "   ],
+                     ["$StyleCellGreen $reads", "$Definition",           "$StyleCellRed $writes", "$Definition",           "CTRC"]]
     }
   },
 
@@ -124,8 +123,8 @@
     "writesOffset" : 1,
     "graphicalData" : {
       "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
-      "tabelRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", "$StyleCellHead Reads", "$StyleCellHead Symbol", " "],
-                     ["$StyleCellGreen $reads", "$Definition", "$StyleCellRed $writes", "$Definition", "CTRB"]]
+      "tabelRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", "$StyleCellHead Reads",  "$StyleCellHead Symbol", " "   ],
+                     ["$StyleCellGreen $reads", "$Definition",           "$StyleCellRed $writes", "$Definition",           "CTRB"]]
     }
   },
 
@@ -151,8 +150,10 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "This instruction converts data at $reads in binary format to an optional binary format 1 byte, 2 bytes or 4 bytes data at $writes.",
-      "tableRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", " ", "$StyleCellHead Reads", "$StyleCellHead Symbol"],
-                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition", "CODB", "$StyleCellRed $writes", "$Definition"]]
+      "tableRows" : [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "CODB",  "$StyleCellHead Reads",         "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -167,9 +168,9 @@
     "readsOffset" : [1, 2],
     "writesOffset" : 3,
     "graphicalData" : {
-      "opStr" :  "Executes the logical OR sum between $reads.0 & $reads.1 and stores it to $writes",
-      "tableRows" : [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "MOVOR", "$StyleCellHead Reads",   "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
-                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             " ˅ ",   "$StyleCellGreen $reads.1", "$Definition",             "->", "$StyleCellRed $writes",  "$Definition"]]
+      "opStr" :  "Executes the logical OR sum between $reads.0 & $reads.1 and stores it to $writes.<br>This means that $reads.0 bit .0 is compared to $reads.1 bit .0 and if either one of them is  == 1, $writes bit .0 will be written",
+      "tableRows" : [["$StyleCellHead Reads",                          "$StyleCellHead Symbol",   "MOVOR", "$StyleCellHead Reads",    "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             "˅",     "$StyleCellGreen $reads.1", "$Definition",          "->", "$StyleCellRed $writes", "$Definition"          ]]
     }
   },
 
@@ -216,8 +217,10 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Converts $frmLen bytes at $reads from binary to BCD and writes it to $writes",
-      "tableRows" : [["$StyleCellHead Reads",                      "$StyleCellHead Symbol", "DCNVB", "$StyleCellHead Writes", "$StyleCellHead Symbol"],
-                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",             " -> ",  "$StyleCellRed $writes",  "$Definition"]]
+      "tableRows" : [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "DCNVB", "$StyleCellHead Writes",        "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -233,11 +236,14 @@
     "writesOffset" : null,
     "graphicalData" : {
       "opStr" : "This instruction compares $frmLen byte binary data ($reads.0 to $reads.1). Results of comparison are set in the operation output register (R9000, Z0).",
-      "tableRows" : [["$StyleCellHead A",                            "$StyleCellHead Symbol", "COMPB", "$StyleCellHead B",       "$StyleCellHead Symbol", "$StyleCellHead Description"],
-                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             "<> ",   "$StyleCellGreen $reads.1", "$Definition",             "(Doesn't compare bits!)"],
-                     [" ",                                             " ",                       "->",    "$StyleCellRed R9000.0",    "$Definition",             "$reads.0 == $reads.1"],
-                     [" ",                                             " ",                       "->",    "$StyleCellRed R9000.1",    "$Definition",             "$reads.0 <  $reads.1"],
-                     [" ",                                             " ",                       "->",    "$StyleCellRed R9000.5",    "$Definition",             "$reads.0 || $reads.1 > Max (Overflow)"]]
+      "tableRows" : [["$StyleCellHead A",                              "$StyleCellHead Symbol",   "COMPB", "$StyleCellHead B",             "$StyleCellHead Symbol", "$StyleCellHead Description"],
+                     ["$StyleCellGreen $reads.0",                      "$Definition",             "<> ",   "$StyleCellGreen $reads.1",     "$Definition",           "(Doesn't compare bits!)"],
+                     [" ",                                             " ",                       "->",    "$StyleCellRed R9000.0",        "$Definition",           "If $reads.0 == $reads.1"],
+                     [" ",                                             " ",                       "->",    "$StyleCellRed R9000.1",        "$Definition",           "If $reads.0 <  $reads.1"],
+                     [" ",                                             " ",                       "->",    "$StyleCellRed R9000.5",        "$Definition",           "If $reads.0 || $reads.1 > Max (Overflow)"],
+                     ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol",   "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "──────"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             " ",     "$StyleCellGreen $reads.1",     "$Definition",           " "]]
+
     }
   },
 
@@ -276,7 +282,12 @@
     "graphicalData" : {
       "opStr" : "If <b> $depOf is true, it will read $reads.0 and write it to $writes.0. <br>If <b> $depOf </b> is false, it will read $writes.0 and write it to $reads.0.<br> The length is defined by it's format ($frmLen byte(s), $frmKin) multiplied by the value of <b>$frmMod.1</b>",
       "tableExtraDescription" : "Read / Write depends on the state of $depOf",
-      "tableRows" : ["$StyleCellYellow",  "$reads.0", "$Definition", "XMOVB", "$StyleCellYellow",  "$writes.0", "$Definition"]
+      "tableRows" : [["$StyleCellHead A",                               "$StyleCellHead Symbol", "XMOVB",   "$StyleCellHead B",             "$StyleCellHead Symbol", "$StyleCellHead Description"],
+                     ["$StyleCellYellow $reads.0",                      "$Definition",           "<>",      "$StyleCellYellow $writes.0",   "$Definition",           "-"                         ],
+                     [" ",                                              " ",                     "If == 1", "$StyleCellGreen $depOf",       "$Definition",           "Move $reads.0 -> $writes.0"],
+                     [" ",                                              " ",                     "If == 0", "$StyleCellRed $depOf",         "$Definition",           "Move $reads.0 <- $writes.0"],
+                     ["$StyleCellHead Affected Bits",                   "$StyleCellHead Symbol", "─────",   "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "──────"                    ],
+                     ["$RowRepeat$frmLenBit $StyleCellYellow $reads.0", "$Definition",           " ",       "$StyleCellYellow $writes.0",   "$Definition",           " "                         ]]
     }
   },
 
@@ -291,8 +302,11 @@
     "readsOffset" : [2, 3],
     "writesOffset" : 4,
     "graphicalData" : {
-      "opStr" : "Adds $reads.0 to $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "+", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" : "Adds $reads.1 to $reads.0 and writes it to $writes",
+      "tableRows" : [["$StyleCellHead Summand A",                      "$StyleCellHead Symbol", "ADDB",   "$StyleCellHead Summand B",     "$StyleCellHead Symbol", " ",     "$StyleCellHead Sum",           "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads.0",                      "$Definition",           "+",      "$StyleCellGreen $reads.1",     "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────",  "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",      "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -308,7 +322,10 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Subtracts $reads.1 from $reads.0 and writes it to $writes",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "-", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "tableRows" : [["$StyleCellHead Minued",                        "$StyleCellHead Symbol", "SUBB",   "$StyleCellHead Subtrahend",     "$StyleCellHead Symbol", " ",     "$StyleCellHead Difference",    "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads.0",                      "$Definition",           "-",      "$StyleCellGreen $reads.1",     "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────",  "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",      "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -323,8 +340,11 @@
     "readsOffset" : [2, 3],
     "writesOffset" : 4,
     "graphicalData" : {
-      "opStr" : "Multiplies $reads.0 by $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "x", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" : "Multiplies $reads.0 with $reads.1 and writes it to $writes",
+      "tableRows" : [["$StyleCellHead Factor A",                       "$StyleCellHead Symbol", "MULB",   "$StyleCellHead Factor B",      "$StyleCellHead Symbol", " ",     "$StyleCellHead Product",       "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads.0",                      "$Definition",           "*",      "$StyleCellGreen $reads.1",     "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────",  "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",      "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -339,8 +359,11 @@
     "readsOffset" : [2, 3],
     "writesOffset" : 4,
     "graphicalData" : {
-      "opStr" : "Divides $reads.1 trough $reads.0 and writes it to $writes",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "/", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" : "Divides $reads.0 by $reads.1 and writes it to $writes",
+      "tableRows" : [["$StyleCellHead Dividend",                       "$StyleCellHead Symbol", "DIVB",   "$StyleCellHead Divisor",       "$StyleCellHead Symbol", " ",     "$StyleCellHead Quotient",      "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads.0",                      "$Definition",           "÷",      "$StyleCellGreen $reads.1",     "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────",  "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",      "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -355,8 +378,13 @@
     "readsOffset" :  2,
     "writesOffset" : 3,
     "graphicalData" : {
-      "opStr" : "Defines $reads as a constant and stores it to $writes",
-      "tableRows" : ["define", "$StyleCellGreen", "$reads", "->", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" : "Defines $writes as a constant",
+      "tableRows" : [["$StyleCellHead Constant",                       "$StyleCellHead Symbol", "NUMEB", "$StyleCellHead Constant output address", "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads",                        "$Definition",           " ",     "$StyleCellRed $writes",                  "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits",           "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads",   "$Definition",           " ",     "$StyleCellRed $writes",                  "$Definition"          ]]
+
+
     }
   },
 
@@ -375,8 +403,11 @@
     "readsOffset" : 1,
     "writesOffset" : 1,
     "graphicalData" : {
-      "opStr" : "TEXT TO DO",
-      "tableRows" : ["EXIN", "$StyleCellGreen","$reads", "$Definition", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" : "This instruction enables the use of the external data input functions (options) of the CNC.<br>It controls the external data input signals to be exchanged between CNC and PMC and automatically executes the CNC-PMC handshake sequence.",
+      "tableRows" : [["$StyleCellHead Controldata address",           "$StyleCellHead Symbol"],
+                     ["$StyleCellYellow $reads",                      "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                 "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellYellow $reads", "$Definition"          ]]
     }
   },
 
@@ -386,8 +417,11 @@
     "readsOffset" : 1,
     "writesOffset" : 2,
     "graphicalData" : {
-      "opStr" : "Moves one byte, $reads to $writes",
-      "tableRows" : ["$StyleCellGreen","$reads", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" : "Moves one byte at $reads and writes it to $writes",
+      "tableRows" : [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "MOVB",  "$StyleCellHead Writes",        "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -397,8 +431,11 @@
     "readsOffset" : 1,
     "writesOffset" : 2,
     "graphicalData" : {
-      "opStr" : "Moves one word, $reads to $writes",
-      "tableRows" : ["$StyleCellGreen","$reads", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" : "Moves one word at $reads and writes it to $writes",
+      "tableRows" : [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "MOVB",  "$StyleCellHead Writes",        "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -409,7 +446,10 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Moves n-bytes, ($frmLen $frmKin) $reads to $writes",
-      "tableRows" : ["$StyleCellGreen","$reads", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "tableRows" : [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "MOVB",  "$StyleCellHead Writes",        "$StyleCellHead Symbol"],
+                     ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
     }
   },
 
@@ -418,8 +458,11 @@
     "format.length" : 1,
     "writesOffset" : 1,
     "graphicalData" : {
-      "opStr" : "Reads dataelements from the PMC / CNC window and writes it to $writes",
-      "tableRows" : ["WINDR", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" : "Reads data items from the PMC / CNC window and writes to $writes",
+      "tableRows" : [["$StyleCellHead Controldata address",         "$StyleCellHead Symbol"],
+                     ["$StyleCellRed $writes",                      "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",               "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellRed $writes", "$Definition"          ]]
     }
   },
 
@@ -428,8 +471,11 @@
     "format.length" : 1,
     "writesOffset" : 1,
     "graphicalData" : {
-      "opStr" : "Reads dataelements from the PMC / CNC window and writes it to $writes",
-      "tableRows" : ["WINDR", "$StyleCellRed","$writes", "$Definition"]
+      "opStr" : "Reads data items from the PMC / CNC window and writes to $writes",
+      "tableRows" : [["$StyleCellHead Controldata address",         "$StyleCellHead Symbol"],
+                     ["$StyleCellRed $writes",                      "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",               "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellRed $writes", "$Definition"          ]]
     }
   },
 
@@ -456,7 +502,16 @@
   },
 
   "53" : {
-    "name" : "AXCTL"
+    "name" : "AXCTL",
+    "format.length" : 8,
+    "readsOffset" : [1, 2],
+    "graphicalData" : {
+      "opStr" : "This instruction simplifies the handshake of DI/DO signal for the axis control by PMC.<br>This instance is using DI/DO group number $reads.0",
+      "tableRows" : [["$StyleCellHead Axisdata address",             "$StyleCellHead Symbol"],
+                     ["$StyleCellRed $reads.1",                      "$Definition"          ],
+                     ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellRed $reads.1", "$Definition"          ]]
+    }
   },
 
   "59" : {
@@ -466,7 +521,8 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Bitwise EXOR links $reads.0 to $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "EXOR", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "tableRows" : [["$StyleCellHead Reads",                          "$StyleCellHead Symbol", "EXOR",                     "$StyleCellHead Reads",    "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           "&oplus; (a.k.a. &#8891;)", "$StyleCellGreen $reads.1", "$Definition",          "->", "$StyleCellRed $writes", "$Definition"          ]]
     }
   },
 
@@ -477,7 +533,8 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Bitwise AND links $reads.0 and $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "&&", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "tableRows" : [["$StyleCellHead Reads",                          "$StyleCellHead Symbol", "LOGAND", "$StyleCellHead Reads",    "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           "&",      "$StyleCellGreen $reads.1", "$Definition",          "->", "$StyleCellRed $writes", "$Definition"          ]]
     }
   },
 
@@ -488,7 +545,8 @@
     "writesOffset" : 4,
     "graphicalData" : {
       "opStr" : "Bitwise OR links $reads.0 to $reads.1 and writes it to $writes",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "OR", "$StyleCellGreen",  "$reads.1", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "tableRows" : [["$StyleCellHead Reads",                          "$StyleCellHead Symbol", "LOGOR", "$StyleCellHead Reads",    "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
+                     ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           "˅",     "$StyleCellGreen $reads.1", "$Definition",          "->", "$StyleCellRed $writes", "$Definition"          ]]
     }
   },
 
@@ -499,7 +557,8 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Bitwise negates $reads and writes it to $writes",
-      "tableRows" : ["NOT", "$StyleCellGreen","$reads", "$Definition", "->", "$StyleCellRed","$writes", "$Definition"]
+      "tableRows" :  [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "LOGNOT", "$StyleCellHead Writes", "$StyleCellHead Symbol"],
+                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           "¬",      "$StyleCellRed $writes", "$Definition"          ]]
     }
   },
 
@@ -573,8 +632,12 @@
     "format.length" : 2,
     "readsOffset" :  [1, 2, 3],
     "graphicalData" : {
-      "opStr" : "Word-Range comparison. <br>Lower / Upper Boundary: <b>$reads.0</b> <br>Lower / Upper Boundary: <b>$reads.1</b> <br>Input Data :            <b>$reads.2</b> <br>Sets its output <br>if $reads.0 ≤ $reads.2 ≤ $reads.1 or <br>if $reads.1 ≤ $reads.2 ≤ $reads.0",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "≤", "$StyleCellGreen",  "$reads.2", "$Definition", "≤", "$StyleCellGreen",  "$reads.1", "$Definition"]
+      "opStr" : "Word-Range comparison. <br>Lower / Upper Boundary: <b>$reads.0</b> <br>Lower / Upper Boundary: <b>$reads.1</b> <br>Inputdata :            <b>$reads.2</b> <br>Sets its output <br>if $reads.0 ≤ $reads.2 ≤ $reads.1 or <br>if $reads.1 ≤ $reads.2 ≤ $reads.0",
+      "tableRows" : [["$StyleCellHead Lower / Upper boundary",          "$StyleCellHead Symbol", "RNGW",  "$StyleCellHead Inputdata",     "$StyleCellHead Symbol", "RNGW",  "$StyleCellHead Lower / Upper boundary", "$StyleCellHead Symbol" ],
+                     ["$StyleCellYellow $reads.0 ",                     "$Definition",           "≤",     "$StyleCellGreen $reads.2",     "$Definition",           "≤",     "$StyleCellYellow $reads.1",             "$Definition"           ],
+                     ["$StyleCellHead Affected Bits",                   "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits",          "$StyleCellHead Symbol" ],
+                     ["$RowRepeat$frmLenBit $StyleCellYellow $reads,0", "$Definition",           " ",     "$StyleCellGreen $reads.2",     "$Definition",           " ",     "$StyleCellYellow $reads.1",             "$Definition"           ]]
+
     }
   },
 
@@ -584,7 +647,10 @@
     "reads" :  [1, 2, 3],
     "graphicalData" : {
       "opStr" : "Doubleword-Range comparison. <br>Lower / Upper Boundary: <b>$reads.0</b> <br>Lower / Upper Boundary: <b>$reads.1</b> <br>Input Data :            <b>$reads.2</b> <br>Sets its output <br>if $reads.0 ≤ $reads.2 ≤ $reads.1 or <br>if $reads.1 ≤ $reads.2 ≤ $reads.0",
-      "tableRows" : ["$StyleCellGreen",  "$reads.0", "$Definition", "≤", "$StyleCellGreen",  "$reads.2", "$Definition", "≤", "$StyleCellGreen",  "$reads.1", "$Definition"]
+      "tableRows" : [["$StyleCellHead Lower / Upper boundary",          "$StyleCellHead Symbol", "RNGW",  "$StyleCellHead Inputdata",     "$StyleCellHead Symbol", "RNGW",  "$StyleCellHead Lower / Upper boundary", "$StyleCellHead Symbol" ],
+                     ["$StyleCellYellow $reads.0 ",                     "$Definition",           "≤",     "$StyleCellGreen $reads.2",     "$Definition",           "≤",     "$StyleCellYellow $reads.1",             "$Definition"           ],
+                     ["$StyleCellHead Affected Bits",                   "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits",          "$StyleCellHead Symbol" ],
+                     ["$RowRepeat$frmLenBit $StyleCellYellow $reads,0", "$Definition",           " ",     "$StyleCellGreen $reads.2",     "$Definition",           " ",     "$StyleCellYellow $reads.1",             "$Definition"           ]]
     }
   }
 }

@@ -33,11 +33,10 @@
 * [ ] **MNCShow: Check for defines before drawing MNCshow**
 
 * [ ] Make sure "Dependency" Bits are being tagged when being a dependency for example for RW / ACT / RST.
-* [ ] Implement Module detection for decompiled MNCs:
-* [ ] Make array of styles
 * [ ] Fix pressable Memory in insOpTables not being pressable anymore (Since newInsOpTableHandling)
 * [x] Fix cell referencing in graphicalData.tableRows
 * [x] Fix definitions not being found in insOpTables
+* [ ] Add dependency bits (Lower / upper boundary, WRT bit etc.) to RNGW / RNGD definitions in the .JSON file
 
 ```
 RD     PMCOM_XY
