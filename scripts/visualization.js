@@ -1,3 +1,4 @@
+
 /* the ladder is organized in a grid */
 /* each operation symbol must be 8 characters long */
 const ReadOps =  ["──┤ ├───", "──┤/├───"];
@@ -15,18 +16,18 @@ class Ladder
    {
     this.inputLines = inputLns;
     this.content = [];
-    this.stack = [new LadderStack(0)];
+    this.stack = [new LadderStack()];
 
     this.generate();
   }
 
   generate()
   {
-    let as;   /* currently active stack */
+    let as;    /* currently active stack */
 
     for (let l of this.inputLines)
     {
-      /* pick out the operators of the line */
+      /* pick out the operator of the current line */
       let match = l.match(readBitOperationsRegex);
       if (match == null)
       {
@@ -48,27 +49,25 @@ class Ladder
 
       as = this.activeStack(); /* update [as] to the latest index, if [this.stack] got extended. */
 
-
 /* COMBAK: somwhere an "undefined" gets pushed in the [.content] property of the LadderStacks
            it maybe at the "OR" and "OR.NOT" cases in the following "switch" statement
            this has been examined using the console.log at the end of this generate method
 */
-
       switch (match[1] + match[2])
       {
         /* read commands. they are always added to the active stack */
         case "RD":
-          this.stack[as].content[this.stack[as].length - 1] += ReadOps[0];
+          this.stack[as].content[this.stack[as].content.length - 1] += ReadOps[0];
           break;
         case "RD.NOT":
-          this.stack[as].content[this.stack[as].length - 1] += ReadOps[1];
+          this.stack[as].content[this.stack[as].content.length - 1] += ReadOps[1];
           break;
         case "AND":
 
-          this.stack[as].content[this.stack[as].length - 1] += ReadOps[0];
+          this.stack[as].content[this.stack[as].content.length - 1] += ReadOps[0];
           break;
         case "AND.NOT":
-          this.stack[as].content[this.stack[as].length - 1] += ReadOps[1];
+          this.stack[as].content[this.stack[as].content.length - 1] += ReadOps[1];
           break;
         case "OR":
           this.stack[as].content.push(ReadOps[0]); /* create new line for "or" commands */
@@ -81,20 +80,22 @@ class Ladder
         /* create new stack */
         case "RD.STK":
           this.stack[as].finished = "RD.STK";
-          this.stack.push(new LadderStack(0));
+          this.stack.push(new LadderStack());
           this.stack[as + 1].content[0] += ReadOps[0]; /* add symbol to newest stack */
           break;
         case "RD.NOT.STK":
           this.stack[as].finished = "RD.NOT.STK";
-          this.stack.push(new LadderStack(0));
+          this.stack.push(new LadderStack());
           this.stack[as + 1].content[0] += ReadOps[0]; /* add symbol to newest stack */
           break;
         /* finish stack */
         case "OR.STK":
           this.stack[as].finished = "OR.STK";
+          this.stack.push(new LadderStack());
           break;
         case "AND.STK":
           this.stack[as].finished = "AND.STK";
+          this.stack.push(new LadderStack());
           break;
 
         /* coil commands they do always close the active stack.
@@ -148,9 +149,24 @@ class Ladder
           // check instruction operations? maybe?
           break;
       }
-      console.log(match[0])
-      console.log(this.stack[as].content);
-      console.log("-------------------------------------------------");
+    }
+
+    /* unifie the length of the stacks */
+    this.content = this.stack[0];
+    for (let stack of this.stack)
+    {
+      stack.content = this.unifieLength(stack.content)
+    }
+
+    /* assemble stacks
+    reversed for-loop which  adds all the stacks togheter*/
+    for (let i = this.stack.length; i > this.stack.length; i--)
+    {
+      /* if it's not iterable, leave it as it is */
+      if (isIterable(this.stack))
+      {
+        
+      }
     }
   }
 
@@ -165,15 +181,45 @@ class Ladder
     }
     return -1 /* all stacks are finished */
   }
+
+  unifieLength(conStack)
+  {
+    let maxLength = 0;
+    if (isIterable(conStack))
+    {
+      for (let i = 0; i < conStack.length; i++)
+      {
+        if (conStack[i].length > maxLength)
+        {
+          maxLength = conStack[i].length;
+        }
+      }
+
+      for (let j = 0; j < conStack.length; j++)
+      {
+        if (conStack[j].length < maxLength)
+        {
+          let temp = "";
+          for (let i = 0; i < (maxLength - conStack[j].length); i++)
+          {
+            temp += Connectors[0];
+          }
+          conStack[j] += temp;
+        }
+      }
+    }
+    console.log(conStack);
+    return conStack
+  }
 }
+
 
 class LadderStack
 {
-  constructor(sh)
+  constructor()
   {
-    this.startHeight = sh;
     this.finished = false;
-    this.content =  [];
+    this.content =  [""];
   }
 }
 
