@@ -12,6 +12,7 @@ const currentModuleNumberRegex =     /^([P])(\d+)/;
 const currentModuleSourceRegex =     /^;---------------\s*fc(\d+).lad\s*\(([^\)]*)/i;
 const currentNetworkRegex =          /^N(\d\d\d\d\d)\:$/g;
 const readBitOperationsRegex =       /^(RD|OR|AND)(\.NOT\.STK|\.NOT|\.STK|)\s+(.+)/;
+const stackOperationsRegex =         /^(OR|AND)(\.STK)\s*/;
 const writeBitOperationsRegex =      /^(WRT|SET|RST)(\.NOT|)\s+(.+)/;
 const instructionOperationRegex =    /^(SUB)\s*(\d*)/;
 const levelSubRegex =                /^(SUB)\s*(\d*)/;
@@ -357,7 +358,7 @@ class Resource
   **         sourcefile Name calls or programNumber calls. Creates new Memory Objects
   **         if a Module was not already defined in the source. Attention!:
   **         The new module will not be appended to the source Module array since it's
-  **         not a definition if it get found in this method. It's just a call.
+  **         not a definition if it gets found using this method. It's just a call.
   ** Return: Module Object. Either the found one or a new one.
   *******************************************************************************/
   getCurrentModule(str1, str2, lineNumber)
@@ -384,6 +385,14 @@ class Resource
     /* does it match the Program Number? */
     if (match1 != null && match1[1,2] != null && match1[1,2] != "")
     {
+      /* exit if we have a sub 65 before the program number, which indicates a subcall
+      a sub 71 on the other hand is fine, this just defines a new subprogram */
+      let exitCheck = this.source.lines[lineNumber - 1].match(instructionOperationRegex)
+      if (exitCheck != null && exitCheck[2] == 65)
+      {
+        return
+      }
+
       for (let i = 0; i < this.Modules.length; i++)
       {
         /* Check if the P Number is already defined */
@@ -820,8 +829,60 @@ class Resource
       return found;
     }
   }
+
+  /*******************************************************************************
+  ** Action: serves an array of all commands / instructions which
+  **         are in the specified network [network] ins file [sourcefile]
+  **         Example arguments: network -> 17, sourcefile -> 63523
+  ** Return: Array of found all commands in a network
+  *******************************************************************************/
+  serveNetworkData(network, sourceFile) {
+    let returnValues = [];
+
+    /* scan all bitOperations */
+    for (let o of this.bitOperations)
+    {
+      if (o.inModule.sourceFile == sourceFile)
+      {
+        if (parseInt(o.inNetwork, 10) == network)
+        {
+          returnValues.push(o);
+        }
+      }
+    }
+
+    /* scan all insOperations */
+    for (let o of this.instructionOperations)
+    {
+      if (o.inModule.sourceFile == sourceFile)
+      {
+        if (parseInt(o.inNetwork, 10) == network)
+        {
+          returnValues.push(o);
+        }
+      }
+    }
+
+    returnValues.sort(opSort)
+    return returnValues;
+  }
+
 }
 
+function opSort(a, b)
+{
+  let aLine = a.inLine;
+  let bLine = b.inLine;
+  if (aLine > bLine)
+  {
+    return 1
+  }
+  else if (bLine > aLine)
+  {
+    return -1
+  }
+  return null
+}
 
 /*******************************************************************************
 ** Action: Formats strings from YY/MM/DD HH:MM to DD.MMMM YYYY HH:MM

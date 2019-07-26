@@ -65,6 +65,25 @@ function draw()
   analyzeDependencies (Data);
   analyzeResults      (Data);
 
+  /* /////////////////////////////////////////// DEBUG */
+  let a =
+  ["RD         R5583.1",
+   "OR         R5070.3",
+   "AND        R5572.1",
+   // "RD.STK     G765.7",
+   // "OR         R5365.4",
+   // "OR.NOT     D74.3",
+   // "RD.STK     R5572.2",
+   // "OR         R5574.7",
+   // "AND.STK",
+   // "OR.STK",
+   // "OR         R5093.4",
+   // "OR         D1636.3",
+   "AND        R10.2"];
+  b = new Ladder(a);
+  console.log(b);
+  /* /////////////////////////////////////////// DEBUG */
+
   /* handle warnings */
   Warnings = checkWarnings(WarningLog);
 
