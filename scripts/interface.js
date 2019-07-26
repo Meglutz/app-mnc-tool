@@ -71,7 +71,7 @@ document.getElementById(mncShowClose).onclick = function()
 
 /*******************************************************************************
 ** Action: Creates a new mncShow overlay and displays it if the clicked
-**         queryresult ([resultId]) is NOT an instance of insOp.
+**         queryresult. ([resultId]) it's NOT an instance of insOp.
 ** Return: null
 *******************************************************************************/
 function evalMNCShow(resultId)
@@ -93,19 +93,21 @@ function evalMNCShow(resultId)
 }
 
 /*******************************************************************************
-** Action: hides mncShow overlay, deletes all displayed result and puts the memory
+** Action: hides overlays, deletes all displayed results and puts the memory
 **         into the [query-value] input field. prioritizes bits but can also
 **         handle clicked bytes
 ** Return: null
 *******************************************************************************/
-function evalMNCShowLineClick(line)
+function evalDOM_memoryClick(line)
 {
   match = memRegexp.exec(line);
   if (match != null)
   {
     /* clear all results, hide the mncShow overlay and put the new line into the query input field */
     removeDOM_elements(tlElementId);
+    removeDOM_elements(insOpElementId);
     document.getElementById(mncShowOverlay).style.display = "none";
+    document.getElementById(insOpOverlay).style.display = "none";
     let el = document.getElementsByTagName("input");
     el["query-value"].value = match[1] + match[2] + match[3];
   }
@@ -113,7 +115,7 @@ function evalMNCShowLineClick(line)
 
 function displayDOMquery(ofs)
 {
-  /* exit if the ofs will make  the [ActiveQuery] out of range */
+  /* exit if the [ofs] will put the [ActiveQuery] out of range */
   if (ActiveQuery + ofs >= MyQueries.length || ActiveQuery + ofs < 0)
   {
     return
@@ -524,6 +526,7 @@ function addDOM_tableRow(parentElement, rowContent, optClass = null, cellType = 
     if (item.style != "")
     {
       text = appendDOMtag(text, "class", item.style);
+      cell = appendDOMtag(cell, "onclick", "evalDOM_memoryClick('" + item.content + "')")
     }
     text.innerHTML = item.content;
     cell.appendChild(text);
@@ -584,8 +587,34 @@ function addDOM_MNCShowList(query, resultIndex)
     {
       mncLine = addDOM_element("a", mncShowElementId, "code")
     }
-    mncLine = appendDOMtag(mncLine, "onclick", "evalMNCShowLineClick('" + query.src.source.lines[i] + "')")
-    mncLine.innerHTML = (i).pad(5) + ": <b>" + query.src.source.lines[i] + "</b>";
+    mncLine = appendDOMtag(mncLine, "onclick", "evalDOM_memoryClick('" + query.src.source.lines[i] + "')")
+
+    /* check for definition in the lines to improve readability */
+    let line = query.src.source.lines[i];
+    let match = line.match(memRegexp);
+    let def = null;
+    if (match != null)
+    {
+      def = query.src.getDef(match[0]);
+    }
+
+    /* replace memory with the definition if we found one */
+    if (def != null)
+    {
+      /* check if it's a bit / byte definitions by looking if the definition contains a [bitAddress] */
+      if (def.bitAddress != "")
+      {
+        line = line.replace((def.byteType + def.byteAddress + "." + def.bitAddress), def.symbol);
+      }
+      else
+      {
+        line = line.replace((def.byteType + def.byteAddress), def.symbol);
+      }
+    }
+
+    /* write content into DOM line entry */
+    mncLine.innerHTML = (i).pad(5) + ": <b>" + line + "</b>";
+
     list.appendChild(mncLine);
   }
 }

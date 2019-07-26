@@ -11,7 +11,7 @@
 
   /* Black Anthracite */
   --tone-2-color:         #212121;
-  --tone-2-accent-color:  #212121;
+  --tone-2-accent-color:  #424242;
 
   /* Light Gray */
   --tone-3-color:         #a2a2a2;
@@ -90,6 +90,7 @@ header {
   width: 100%;
   display: none;
   position: fixed;
+  overflow: auto;
   z-index: 1;
   top: 0;
   left: 0;
@@ -167,19 +168,39 @@ header {
   border-radius: 3px;
 }
 
+
 /* cell styles */
 .insop-table .red-cell {
   background-color: var(--tone-4-color);
   color: var(--tone-4-accent);
 }
+.insop-table .red-cell:hover {
+  background-color: var(--tone-1-color);
+  color: var(--tone-4-accent);
+  cursor: pointer;
+}
+
+
 .insop-table .green-cell  {
   background-color: var(--tone-5-color);
   color: var(--tone-5-accent);
 }
+.insop-table .green-cell:hover  {
+  background-color: var(--tone-1-color);
+  color: var(--tone-5-accent);
+  cursor: pointer;
+}
+
+
 .insop-table .yellow-cell  {
   background-color: var(--tone-6-color);
   color: var(--tone-6-accent);
 }
+.insop-table .yellow-cell:hover  {
+  background-color: var(--tone-1-color);
+  color: var(--tone-6-accent);
+}
+
 
 .insop-table .head-cell  {
   background-color: var(--main-color);
