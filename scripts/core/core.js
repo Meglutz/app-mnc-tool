@@ -72,9 +72,16 @@ function draw()
 
   /* /////////////////////////////////////////// DEBUG */
   let a =
-  ["RD         R5583.1",
-   "OR         R5070.3",
-   "AND        R5572.1",
+  ["RD         R6000.0",
+   "AND        R6000.1",
+   "AND        R6000.2",
+   "OR         R6000.3",
+   "AND.NOT    R6000.4",
+   "OR         R6000.5",
+   "WRT        R6000.6"]
+   // ["RD         R6000.1",
+   //  "OR         R6000.3",
+   //  "AND        R6000.1",
    // "RD.STK     G765.7",
    // "OR         R5365.4",
    // "OR.NOT     D74.3",
@@ -84,9 +91,12 @@ function draw()
    // "OR.STK",
    // "OR         R5093.4",
    // "OR         D1636.3",
-   "AND        R10.2"];
-  b = new Ladder(LadderData);
-  console.log(b);
+   // "AND        R10.2",
+   // "WRT        R100.4"];
+   let b = new LadderNetwork(LadderData, a);
+   b.makeMap();
+   b.makeStacks();
+   console.log(b);
   /* /////////////////////////////////////////// DEBUG */
 
   /* handle warnings */

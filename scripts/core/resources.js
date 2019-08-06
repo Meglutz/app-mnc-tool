@@ -19,6 +19,7 @@ const levelSubRegex =                /^(SUB)\s*(\d*)/;
 const instructionReadWriteRegex =    /^([A-Z])(\d*)$/;
 const instructionFormatRegex =       /^(\d|)(\d\d|)(\d|)$/;
 const instructionDependencyRegex =   /^(RD|OR|AND)(\.NOT\.STK|\.NOT|\.STK|)\s+(.+)/;
+const ladderVisOperationRegex =      /^(RD|OR|AND|WRT|SET|RST)(\.NOT\.STK|\.NOT|\.STK|)\s+(.+)/;
 
 const headerMNCstartRegex =          /^\%\@1$/;
 const headerMNCstopRegex =           /^\%$/;

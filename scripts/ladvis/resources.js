@@ -24,53 +24,96 @@ class LadderNetwork
   {
     this.genSource = genSrc;
     this.source = src;
-    this.map = [];
+    this.ops = [];
+    this.stacks = [];
   }
+
 
   makeMap()
   {
-    for (let op of this.source)
+    for (let i = 0; i < this.source.length; i++)
     {
-      let newMapNode = this.extractOp(op);
-      if (newMapNode == null)
+      let match = this.source[i].match(ladderVisOperationRegex);
+      if (match != null)
       {
-        throw ("Error@'makeMap': newMapNode is null.");
+        /* create deep copy of obj (totally referenceless) */
+        let sourceOp = JSON.parse(JSON.stringify(this.genSource[match[1] + match[2]]));
+        sourceOp.assignedMemory = match[3] /* add the found memory to the new entry in [this.ops] */
+        this.ops.push(sourceOp);
       }
       else
       {
-        this.map.push(newMapNode);
+        throw ("Error@'makeMap': match is null..");
       }
     }
   }
 
-  extractOp(str)
-  {
-    /* get operation type of string. f.e. rd, or, and, wrt etc. */
-    let match;
-    switch (true)
-    {
-      case str.match(readBitOperationsRegex) != null:
-        match = str.match(readBitOperationsRegex);
-        break;
-      case str.match(writeBitOperationsRegex) != null:
-        match = str.match(writeBitOperationsRegex);
-        break;
-    }
 
-    /* get the [genSource] object and set it's [assignedMemory] property to the value contained
-    in [str] */
-    if (match != null)
+  makeStacks()
+  {
+    let stack = [];
+    let conNbr = 0;
+
+    for (let i = 0; i < this.ops.length; i++)
     {
-      let ret = this.genSource[match[1] + match[2]];
-      if (ret != null)
+      switch (this.ops[i].logic)
       {
-        ret.assignedMemory = match[3];
-        return ret
+        /* new-stack commands */
+        case "RD":
+          this.ops[i].inputLink = "CON_" + conNbr;
+          conNbr++;
+          this.ops[i].outputLink = "CON_" + conNbr;
+          stack.push(this.ops[i]);
+          conNbr++;
+          break;
+        case "RD.STK" || "RD.NOT.STK":
+          /* finish & archive previous stack */
+          this.stacks.push([...stack]);
+          stack = [];
+
+          this.ops[i].inputLink = this.stacks[this.stacks.length - 1].outputLink;      /* make the connection to the last item in the previous stack */
+          this.ops[i].outputLink = "CON_" + conNbr;
+          stack.push(this.ops[i]);
+          conNbr++;
+          break;
+
+        /* finish-stack / new-stack commands */
+        case "AND.STK":
+          this.stacks.push([...stack]);
+          this.stacks.push("AND.STK");
+          stack = [];
+          break;
+        case "OR.STK":
+          this.stacks.push([...stack]);
+          this.stacks.push("OR.STK");
+          stack = [];
+          break;
+
+        /* 0815 commands */
+        case ("AND" || "AND.NOT"):
+          // this.ops[i].inputLink = "TEST";
+          this.ops[i].inputLink = this.ops[i - 1].outputLink
+          this.ops[i].outputLink = "CON_" + conNbr;
+          stack.push(this.ops[i]);
+          conNbr++;
+          break;
+
+        case "OR" || "OR.NOT":
+          this.ops[i].inputLink = stack[0].inputLink;
+          this.ops[i].outputLink = this.ops[i - 1].outputLink;
+          stack.push(this.ops[i]);
+          break;
+
+        /* finish-network commands */
+        case "WRT" || "WRT.NOT" || "SET" || "RST":
+          this.ops[i].inputLink = this.ops[i - 1].outputLink;
+          this.ops[i].outputLink = "CON_" + conNbr;
+          stack.push(this.ops[i]);
+          /* finish stack */
+          this.stacks.push([...stack]); stack = [];
+          conNbr++;
+          break;
       }
-    }
-    else
-    {
-      return null;
     }
   }
 }

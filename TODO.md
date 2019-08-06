@@ -32,6 +32,7 @@
 * [x] Fix pressable Memory in insOpTables not being pressable anymore (Since newInsOpTableHandling)
 * [x] **MNCShow: Only parse lines which are in the same network as the selected Op**
 * [x] **MNCShow: Check for defines before drawing MNCshow**
+* [ ] Update all ugly shallow object copy routines to `let sourceOp = JSON.parse(JSON.stringify(this.genSource[match[1] + match[2]]));`
 
 ## Nice-to-have
 * [x] Check all regexes on single strings
