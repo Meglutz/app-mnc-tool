@@ -3,12 +3,14 @@
 *******************************************************************************/
 
 let Source = "./mnemonic.mnc";
-let InstructionSource = "./resources/fanuc_ins.json"
+let InstructionSource = "./resources/fanuc_instructions.json"
+let LadderSource = "./resources/fanuc_ladder_source.json"
 
 let MyQueries = [];
 let Data;
 let MNC;
 let InstructionData;
+let LadderData;
 
 let ActiveQuery = 0;
 let ActiveInsOpTable;
@@ -33,7 +35,10 @@ function preload()
   /* the loadStrings function returns an array, indexed by the line count of the loaded file */
   MNC = new Mnemonic(loadStrings(Source, console.log("Mnemonic file loaded correctly.")));
   Data = new Resource(MNC);
+
+  /* generate JSON objs */
   InstructionData = loadJSON(InstructionSource);
+  LadderData =      loadJSON(LadderSource);
 }
 
 
@@ -80,7 +85,7 @@ function draw()
    // "OR         R5093.4",
    // "OR         D1636.3",
    "AND        R10.2"];
-  b = new Ladder(a);
+  b = new Ladder(LadderData);
   console.log(b);
   /* /////////////////////////////////////////// DEBUG */
 
