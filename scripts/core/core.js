@@ -71,28 +71,19 @@ function draw()
   analyzeResults      (Data);
 
   /* /////////////////////////////////////////// DEBUG */
-  let a =
-  ["RD         R6000.0",
-   "AND        R6000.1",
-   "AND        R6000.2",
-   "OR         R6000.3",
-   "AND.NOT    R6000.4",
-   "OR         R6000.5",
-   "WRT        R6000.6"]
-   // ["RD         R6000.1",
-   //  "OR         R6000.3",
-   //  "AND        R6000.1",
-   // "RD.STK     G765.7",
-   // "OR         R5365.4",
-   // "OR.NOT     D74.3",
-   // "RD.STK     R5572.2",
-   // "OR         R5574.7",
-   // "AND.STK",
-   // "OR.STK",
-   // "OR         R5093.4",
-   // "OR         D1636.3",
-   // "AND        R10.2",
-   // "WRT        R100.4"];
+  let a = ["RD         R7940.4",
+           "OR         R7943.2",
+           "RD.STK     R7958.0",
+           "AND        R7957.5",
+           "OR.STK",
+           "RD.STK     F1747.4",
+           "OR         Y9.2",
+           "AND.STK",
+           "AND        R7990.5",
+           "AND        R7955.4",
+           "WRT        Y9.2",
+           "WRT        R4200.3"]
+
    let b = new LadderNetwork(LadderData, a);
    b.makeMap();
    b.makeStacks();
