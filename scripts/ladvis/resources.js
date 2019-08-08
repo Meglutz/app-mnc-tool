@@ -55,236 +55,181 @@ class LadderNetwork
         WRT, WRT.NOT, SET, RST
     - etc. */
 
+    let activeStack = new LadderStack();
+    let connectionsCounter = 0;
+    let activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++;
 
-  //   let stackBuffer = [];
-  //   let conNbr = 0;
-  //
-  //   for (let i = 0; i < this.ops.length; i++)
-  //   {
-  //     switch (this.ops[i].logic)
-  //     {
-  //       /* new-stack commands
-  //       ------------------------------------------------------------------------ */
-  //       case "RD":
-  //         this.ops[i].inputLink = conNbr;
-  //         conNbr++;
-  //         this.ops[i].outputLink = conNbr;
-  //         stackBuffer.push(this.ops[i]);
-  //         conNbr++;
-  //         break;
-  //
-  //       /* finish & archive previous stack
-  //       ------------------------------------------------------------------------ */
-  //       case "RD.STK":
-  //       case "RD.NOT.STK":
-  //         /* only push if the stack's not empty
-  //         (could happen when OR.STK is followed by AND.STK or vice versa) */
-  //         if (stackBuffer != []) {this.stacks.push([...stackBuffer]);}
-  //         stackBuffer = [];
-  //
-  //         conNbr += 100;
-  //         this.ops[i].inputLink = conNbr;
-  //         conNbr++;
-  //         // this.ops[i].inputLink = this.stacks[this.stacks.length - 1][this.stacks[this.stacks.length - 1].length - 1].outputLink;
-  //         this.ops[i].outputLink = conNbr;
-  //         stackBuffer.push(this.ops[i]);
-  //         conNbr++;
-  //         break;
-  //
-  //       /* finish-stack / new-stack commands
-  //       ------------------------------------------------------------------------ */
-  //       case "AND.STK":
-  //         /* only push if the stackBuffer's not empty
-  //         (could happen when OR.STK is followed by AND.STK or vice versa) */
-  //         if (stackBuffer != []) {this.stacks.push([...stackBuffer]);}
-  //
-  //         stackBuffer = [];
-  //         break;
-  //       case "OR.STK":
-  //         /* only push if the stackBuffer's not empty
-  //         (could happen when OR.STK is followed by AND.STK or vice versa) */
-  //         if (stackBuffer != []) {this.stacks.push([...stackBuffer]);}
-  //         stackBuffer = [];
-  //         break;
-  //
-  //       /* 0815 commands
-  //       ------------------------------------------------------------------------ */
-  //       case "AND":
-  //       case "AND.NOT":
-  //         // this.ops[i].inputLink = "TEST";
-  //         this.ops[i].inputLink = this.ops[i - 1].outputLink
-  //         this.ops[i].outputLink = conNbr;
-  //         stackBuffer.push(this.ops[i]);
-  //         conNbr++;
-  //         break;
-  //
-  //       case "OR":
-  //       case "OR.NOT":
-  //         this.ops[i].inputLink = stackBuffer[0].inputLink;
-  //         this.ops[i].outputLink = this.ops[i - 1].outputLink;
-  //         stackBuffer.push(this.ops[i]);
-  //         break;
-  //
-  //       /* finish-network commands
-  //       ------------------------------------------------------------------------ */
-  //       case "WRT":
-  //       case "WRT.NOT":
-  //       case "SET":
-  //       case "RST":
-  //         this.ops[i].inputLink = this.ops[i - 1].outputLink;
-  //         this.ops[i].outputLink = conNbr;
-  //         stackBuffer.push(this.ops[i]);
-  //
-  //         /* finish stack */
-  //         this.stacks.push([...stackBuffer]); stackBuffer = [];
-  //         conNbr++;
-  //         break;
-  //     }
-  //   }
-  // }
-
-  let activeStack = new LadderStack();
-  let connectionsCounter = 0;
-  let activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++;
-
-  for (let i = 0; i < this.ops.length; i++)
-  {
-    /* create a deep copy of the op we want to evaluate */
-    let evalOp = JSON.parse(JSON.stringify(this.ops[i]));
-
-    switch (evalOp.logic)
+    for (let i = 0; i < this.ops.length; i++)
     {
-      /* new-stack commands
-      ------------------------------------------------------------------------ */
-      case "RD":
-        evalOp.inputLink = activeConnection;
-        activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++;
+      /* create a deep copy of the op we want to evaluate */
+      let evalOp = JSON.parse(JSON.stringify(this.ops[i]));
 
-        evalOp.outputLink = activeConnection;
-        activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++;
+      switch (evalOp.logic)
+      {
+        /* new-stack commands
+        ------------------------------------------------------------------------ */
+        case "RD":
+          evalOp.inputLink = activeConnection;
+          activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++;
 
-        activeStack.content.push(evalOp);
-        break;
-
-      /* finish & archive previous stack
-      ------------------------------------------------------------------------ */
-      case "RD.STK":
-      case "RD.NOT.STK":
-        /* only push if the stack's not empty
-        (could happen when OR.STK is followed by AND.STK or vice versa) */
-        if (activeStack.content != [])
-        {
-          this.stacks.push(activeStack);
-        }
-        activeStack = new LadderStack();
-
-        evalOp.inputLink = activeConnection;
-        activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++
-
-        evalOp.outputLink = activeConnection;
-        activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++
-
-        activeStack.content.push(evalOp);
-        break;
-
-      /* finish-stack / new-stack commands
-      ------------------------------------------------------------------------ */
-      case "AND.STK":
-      case "OR.STK":
-        /* only push if the activeStack.content's not empty
-        (could happen when OR.STK is followed by AND.STK or vice versa) */
-        if (activeStack.content != [])
-        {
-          this.stacks.push(activeStack);
-        }
-        activeStack = new LadderStack();
-        break;
-
-      /* 0815 commands
-      ------------------------------------------------------------------------ */
-      case "AND":
-      case "AND.NOT":
-        /* test if the current stack already has an item in it to grab it's outputLink from.
-        if it doesn't, then use the terminatingLink of the previous Network */
-        /* DEBUG: the above is correct, but [connectionsCounter] - 1 would store the same connection id... */
-        if (activeStack.content.length == 0)
-        {
-          evalOp.inputLink = this.stacks[this.stacks.length - 1].terminatingLink;
-        }
-        else
-        {
-          evalOp.inputLink = activeStack.content[activeStack.content.length - 1].outputLink;
-        }
-
-        evalOp.outputLink = activeConnection;
-        activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++
-
-        activeStack.content.push(evalOp);
-        break;
-
-      case "OR":
-      case "OR.NOT":
-        /* test if the current stack already has an item in it to grab it's inputLink from.
-        if it doesn't, then use the beginningLink of the previous Network */
-        /* DEBUG: the above is correct, but [connectionsCounter] - 1 would store the same connection id... */
-        if (activeStack.content.length == 0)
-        {
-          evalOp.inputLink = "UNDECIDABLE";
-        }
-        else
-        {
-          evalOp.outputLink = activeStack.content[activeStack.content.length - 1].inputLink;
-        }
-
-        evalOp.inputLink = activeStack.content[0].inputLink;
-
-        activeStack.content.push(evalOp);
-        break;
-
-      /* finish-network commands
-      ------------------------------------------------------------------------ */
-      case "WRT":
-      case "WRT.NOT":
-      case "SET":
-      case "RST":
-        /* if the op beforehand was also a WRT, WRT.NOT etc. op, then
-        set the current one parallel to the beforehand one */
-        if (this.ops[i - 1].logic.match(/^(WRT|WRT.NOT|SET|RST)$/) != null)
-        {
-          evalOp.inputLink = activeStack.content[activeStack.content.length - 1].inputLink;
           evalOp.outputLink = activeConnection;
+          activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++;
+
           activeStack.content.push(evalOp);
-        }
-        else
-        {
-          evalOp.inputLink = activeStack.content[activeStack.content.length - 1].outputLink;
+          break;
+
+        /* finish & archive previous stack
+        ------------------------------------------------------------------------ */
+        case "RD.STK":
+        case "RD.NOT.STK":
+          /* only push if the stack's not empty
+          (could happen when OR.STK is followed by AND.STK or vice versa) */
+          if (activeStack.content != [])
+          {
+            this.stacks.push(activeStack);
+          }
+          activeStack = new LadderStack();
+
+          evalOp.inputLink = activeConnection;
+          activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++
+
           evalOp.outputLink = activeConnection;
+          activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++
+
           activeStack.content.push(evalOp);
-        }
-        break;
+          break;
+
+        /* finish-stack / new-stack commands
+        ------------------------------------------------------------------------ */
+        case "AND.STK":
+        case "OR.STK":
+          /* only push if the activeStack.content's not empty
+          (could happen when OR.STK is followed by AND.STK or vice versa) */
+          if (activeStack.content != [])
+          {
+            this.stacks.push(activeStack);
+          }
+          activeStack = new LadderStack();
+
+          /* push the logic (or / and.stk) to help assemble the stacks in the next step */
+          this.stacks.push(evalOp.logic);
+          break;
+
+        /* 0815 commands
+        ------------------------------------------------------------------------ */
+        case "AND":
+        case "AND.NOT":
+          /* test if the current stack already has an item in it to grab it's outputLink from.
+          if it doesn't, then use the terminatingLink of the previous Network */
+          /* DEBUG: the above is correct, but [connectionsCounter] - 1 would store the same connection id... */
+          if (activeStack.content.length == 0)
+          {
+            evalOp.inputLink = null;
+          }
+          else
+          {
+            evalOp.inputLink = activeStack.content[activeStack.content.length - 1].outputLink;
+          }
+
+          evalOp.outputLink = activeConnection;
+          activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++
+
+          activeStack.content.push(evalOp);
+          break;
+
+        case "OR":
+        case "OR.NOT":
+          /* test if the current stack already has an item in it to grab it's inputLink from.
+          if it doesn't, then use the beginningLink of the previous Network */
+          /* DEBUG: the above is correct, but [connectionsCounter] - 1 would store the same connection id... */
+          if (activeStack.content.length == 0)
+          {
+            evalOp.inputLink = null;
+          }
+          else
+          {
+            evalOp.inputLink = activeStack.content[activeStack.content.length - 1].inputLink;
+          }
+
+          evalOp.outputLink = activeStack.content[activeStack.content.length - 1].outputLink;
+
+          activeStack.content.push(evalOp);
+          break;
+
+        /* finish-network commands
+        ------------------------------------------------------------------------ */
+        case "WRT":
+        case "WRT.NOT":
+        case "SET":
+        case "RST":
+          /* if the op beforehand was also a WRT, WRT.NOT etc. op, then
+          set the current one parallel to the beforehand one */
+          if (this.ops[i - 1].logic.match(/^(WRT|WRT.NOT|SET|RST)$/) != null)
+          {
+            evalOp.inputLink = activeStack.content[activeStack.content.length - 1].inputLink;
+            evalOp.outputLink = activeConnection;
+            activeStack.content.push(evalOp);
+
+            /* if this was the last item in the ops array, then finish the stack */
+            if (i == this.ops.length - 1)
+            {
+              this.stacks.push(activeStack);
+            }
+          }
+          else /* if there wasn't a WRT, WRT.NOT etc. beforehand, just link it as AND */
+          {
+            evalOp.inputLink = activeStack.content[activeStack.content.length - 1].outputLink;
+            evalOp.outputLink = activeConnection;
+            activeStack.content.push(evalOp);
+          }
+          break;
+      }
     }
   }
 
-  /* COMBAK DOESENT WORK*/
-  /* finish all generated stacks */
-  for (let stack of this.stacks)
+  stackAssemble()
   {
-    stack.finishStack();
+    let tempStack
+    for (let i = 0; i < this.stacks.length; i++)
+    {
+      if (this.stacks[i] == "AND.STK") /* AND link to previous stack */
+      {
+        /* remove current stack, since it's only actually the "AND.STK" string */
+        console.log(this.stacks.splice(i, 1));
+
+        /* link the stacks, and replace them */
+        tempStack = this.stackLinker("AND.STK", this.stacks[i - 1], this.stacks[i - 2]);
+        this.stacks.splice(i - 1, 1);
+        this.stacks.splice(i - 2, 1, tempStack);
+
+        /*COMBAK; IT WORKS */
+      }
+      else if (this.stacks[i] == "OR.STK") /* OR link to previous stack */
+      {
+        // this.stacks.splice(i, 1);
+      }
+      else if (isIterable(this.stacks[i].content))
+      {
+        /* do nothing */
+      }
+      else
+      {
+        throw ("Error@'" + this.stackAssemble.name + "': Current stack's content isn't allowed: " + this.stacks[i].content);
+      }
+    }
   }
-}
 
-  andStacker(stackId1, stackId2)
+  stackLinker(type, stack1, stack2)
   {
-    /* get highest outputLink number (= y) of [stackId1]
-   and get smallest inputLink number (= x) of [stackId2]. We can then
-   merge them together by replacing each occurence of y in [stackId1] with x
-   or by repalcing each occurence of x in [stackId2] with y */
-  }
+    switch (type)
+    {
+      case "OR.STK":
+        break;
+      case "AND.STK":
+        break;
+    }
 
-
-  orStacker(stackId1, stackId2)
-  {
-
+    return "STACK " + type + " STACK2"
   }
 }
 

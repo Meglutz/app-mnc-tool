@@ -87,6 +87,7 @@ function draw()
    let b = new LadderNetwork(LadderData, a);
    b.makeMap();
    b.makeStacks();
+   b.stackAssemble();
    console.log(b);
   /* /////////////////////////////////////////// DEBUG */
 
