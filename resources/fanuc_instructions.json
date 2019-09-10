@@ -482,9 +482,8 @@
     "name" : "DIFU",
     "format.length" : 1,
     "readsOffset" : 1,
-    "dependency" : ["ActivationDependency", -1],
     "graphicalData" : {
-      "opStr" : "Generates a positive impulse of the signal $depOf. DIFU Number: $reads",
+      "opStr" : "Generates a positive impulse of the signals directly in front of it. DIFU Number: $reads",
       "tableRows" : null
     }
   },
@@ -493,9 +492,8 @@
     "name" : "DIFD",
     "format.length" : 1,
     "readsOffset" : 1,
-    "dependency" : ["ActivationDependency", -1],
     "graphicalData" : {
-      "opStr" : "Generates a negative impulse of the signal $depOf. DIFD Number: $reads",
+      "opStr" : "Generates a negative impulse of the signals directly in front of it. DIFD Number: $reads",
       "tableRows" : null
     }
   },
