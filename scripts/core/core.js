@@ -71,23 +71,36 @@ function draw()
   analyzeResults      (Data);
 
   /* /////////////////////////////////////////// DEBUG */
-  let a = ["RD         R7940.4",
-           "OR         R7943.2",
-           "RD.STK     R7958.0",
-           "AND        R7957.5",
-           "OR.STK",
-           "RD.STK     F1747.4",
-           "OR         Y9.2",
-           "AND.STK",
-           "AND        R7990.5",
-           "AND        R7955.4",
-           "WRT        Y9.2",
-           "WRT        R4200.3"]
+  let a = ["RD         R7940.4", /* new piece           */
+           "OR         R7943.2", /* |                   */
+                                 /* |                   */
+           "RD.STK     R7958.0", /* |  new piece        */
+           "AND        R7957.5", /* |  |                */
+           "OR.STK",             /* |  close piece (OR) */
+                                 /* |                   */
+           "RD.STK     F1747.4", /* |  new piece        */
+           "OR         Y9.2",    /* |  |                */
+           "AND.STK",            /* |  close piece (AND)*/
+                                 /* |                   */
+           "AND        R7990.5", /* |                   */
+           "AND        R7955.4", /* |                   */
+           "WRT        Y9.2",    /* |                   */
+           "WRT        R4200.3"] /* close puiece (END)  */
+/*
+
+├──┤ ├─┬────┬─┤ ├─┬─┤ ├───┤ ├─┬──⃝
+       │    │     │           │
+├──┤ ├─┘    ├─┤ ├─┘           └──⃝
+            │
+├──┤ ├───┤ ├┘
+
+*/
 
    let b = new LadderNetwork(LadderData, a);
    b.makeMap();
-   b.makeStacks();
-   b.stackAssemble();
+   b.stackMaker();
+   b.stackChecker();
+   // b.stackAssemble();
    console.log(b);
   /* /////////////////////////////////////////// DEBUG */
 
@@ -417,7 +430,7 @@ function checkWarnings(warn)
   if (warn.length != 0)
   {
     str = "There are Warnings, please check the Log!"
-    console.log("%c" + str, "color: " + red);
+    console.warn("%c" + str, "color: " + red);
     return str;
   }
   else

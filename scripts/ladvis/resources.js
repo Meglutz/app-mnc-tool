@@ -17,10 +17,11 @@ class LadderNetwork
     this.genSource = genSrc;
     this.source = src;
     this.ops = [];
-    this.stacks = [];
+    this.stack = [];
   }
 
-
+  /* matches each mnemonic line in the [src] to a opteration
+  in the [genSource] and saves it to [ops] */
   makeMap()
   {
     for (let i = 0; i < this.source.length; i++)
@@ -41,7 +42,7 @@ class LadderNetwork
   }
 
 
-  makeStacks()
+  stackMaker()
   {
 
     /* this handles most of the fanuc compiler logic (it's quiet simple).
@@ -51,11 +52,13 @@ class LadderNetwork
         RD, RD.STK or RD.NOT.STK
       - a stack is always finished and a fresh one is started with:
         OR.STK or AND.STK
-      - a stack is always finished when encountering
+      - a stack (& also a Network) is always finished when encountering
         WRT, WRT.NOT, SET, RST
     - etc. */
 
-    let activeStack = new LadderStack();
+    let STACK = [];
+    STACK.push(new LadderPiece());
+    let activePiece = STACK[STACK.length - 1];
     let connectionsCounter = 0;
     let activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++;
 
@@ -75,20 +78,20 @@ class LadderNetwork
           evalOp.outputLink = activeConnection;
           activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++;
 
-          activeStack.content.push(evalOp);
+          activePiece.content.push(evalOp);
           break;
 
-        /* finish & archive previous stack
+        /* Push new piece on Stack, don't close the previous one
         ------------------------------------------------------------------------ */
         case "RD.STK":
         case "RD.NOT.STK":
-          /* only push if the stack's not empty
+          /* only push if the activePiece.content is not empty
           (could happen when OR.STK is followed by AND.STK or vice versa) */
-          if (activeStack.content != [])
+          if (activePiece.content.length != 0)
           {
-            this.stacks.push(activeStack);
+            STACK.push(new LadderPiece());
+            activePiece = STACK[STACK.length - 1];
           }
-          activeStack = new LadderStack();
 
           evalOp.inputLink = activeConnection;
           activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++
@@ -96,23 +99,31 @@ class LadderNetwork
           evalOp.outputLink = activeConnection;
           activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++
 
-          activeStack.content.push(evalOp);
+          activePiece.content.push(evalOp);
           break;
 
         /* finish-stack / new-stack commands
         ------------------------------------------------------------------------ */
         case "AND.STK":
         case "OR.STK":
-          /* only push if the activeStack.content's not empty
-          (could happen when OR.STK is followed by AND.STK or vice versa) */
-          if (activeStack.content != [])
+          /* inversed loop to find the next un-closed stack */
+          for (let i = STACK.length - 1; i >= 0; i--)
           {
-            this.stacks.push(activeStack);
+            if (STACK[i].closed.stack != true)
+            {
+              STACK[i].closed = true;
+              STACK[i].type = evalOp.logic; /* note the type of stack-link */
+              break;
+            }
           }
-          activeStack = new LadderStack();
 
-          /* push the logic (or / and.stk) to help assemble the stacks in the next step */
-          this.stacks.push(evalOp.logic);
+          /* only push if the activePiece.content's not empty
+          (could happen when OR.STK is followed by AND.STK or vice versa) */
+          if (activePiece.content != [])
+          {
+            STACK.push(new LadderPiece());
+            activePiece = STACK[STACK.length - 1];
+          }
           break;
 
         /* 0815 commands
@@ -122,19 +133,19 @@ class LadderNetwork
           /* test if the current stack already has an item in it to grab it's outputLink from.
           if it doesn't, then use the terminatingLink of the previous Network */
           /* DEBUG: the above is correct, but [connectionsCounter] - 1 would store the same connection id... */
-          if (activeStack.content.length == 0)
+          if (activePiece.content.length == 0)
           {
             evalOp.inputLink = null;
           }
           else
           {
-            evalOp.inputLink = activeStack.content[activeStack.content.length - 1].outputLink;
+            evalOp.inputLink = activePiece.content[activePiece.content.length - 1].outputLink;
           }
 
           evalOp.outputLink = activeConnection;
           activeConnection = new LadderConnection(connectionsCounter); connectionsCounter++
 
-          activeStack.content.push(evalOp);
+          activePiece.content.push(evalOp);
           break;
 
         case "OR":
@@ -142,18 +153,18 @@ class LadderNetwork
           /* test if the current stack already has an item in it to grab it's inputLink from.
           if it doesn't, then use the beginningLink of the previous Network */
           /* DEBUG: the above is correct, but [connectionsCounter] - 1 would store the same connection id... */
-          if (activeStack.content.length == 0)
+          if (activePiece.content.length == 0)
           {
             evalOp.inputLink = null;
           }
           else
           {
-            evalOp.inputLink = activeStack.content[activeStack.content.length - 1].inputLink;
+            evalOp.inputLink = activePiece.content[activePiece.content.length - 1].inputLink;
           }
 
-          evalOp.outputLink = activeStack.content[activeStack.content.length - 1].outputLink;
+          evalOp.outputLink = activePiece.content[activePiece.content.length - 1].outputLink;
 
-          activeStack.content.push(evalOp);
+          activePiece.content.push(evalOp);
           break;
 
         /* finish-network commands
@@ -166,83 +177,87 @@ class LadderNetwork
           set the current one parallel to the beforehand one */
           if (this.ops[i - 1].logic.match(/^(WRT|WRT.NOT|SET|RST)$/) != null)
           {
-            evalOp.inputLink = activeStack.content[activeStack.content.length - 1].inputLink;
+            evalOp.inputLink = activePiece.content[activePiece.content.length - 1].inputLink;
             evalOp.outputLink = activeConnection;
-            activeStack.content.push(evalOp);
+            activePiece.content.push(evalOp);
 
             /* if this was the last item in the ops array, then finish the stack */
             if (i == this.ops.length - 1)
             {
-              this.stacks.push(activeStack);
+              activePiece.closed = true;
+              activePiece.type = "Network End";
             }
           }
           else /* if there wasn't a WRT, WRT.NOT etc. beforehand, just link it as AND */
           {
-            evalOp.inputLink = activeStack.content[activeStack.content.length - 1].outputLink;
+            evalOp.inputLink = activePiece.content[activePiece.content.length - 1].outputLink;
             evalOp.outputLink = activeConnection;
-            activeStack.content.push(evalOp);
+            activePiece.content.push(evalOp);
           }
           break;
       }
+    }
+
+    this.stack = STACK;
+  }
+
+  stackChecker()
+  {
+    for (let i = 0; i < this.stack.length; i++)
+    {
+        if (this.stack[i].closed != true)
+        {
+          console.warn("There's a un-closed LadderPiece in the currently evaluated network. It's this:")
+          console.warn(this.stack[i]);
+        }
     }
   }
 
   stackAssemble()
   {
     let tempStack
-    for (let i = 0; i < this.stacks.length; i++)
+    for (let i = 0; i < this.stack.length; i++)
     {
-      if (this.stacks[i] == "AND.STK") /* AND link to previous stack */
+      if (this.stack[i] == "AND.STK") /* AND link to previous stack */
       {
         /* remove current stack, since it's only actually the "AND.STK" string */
-        console.log(this.stacks.splice(i, 1));
+        console.log(this.stack.splice(i, 1));
 
         /* link the stacks, and replace them */
-        tempStack = this.stackLinker("AND.STK", this.stacks[i - 1], this.stacks[i - 2]);
-        this.stacks.splice(i - 1, 1);
-        this.stacks.splice(i - 2, 1, tempStack);
+        tempStack = this.stackLinker("AND.STK", this.stack[i - 1], this.stack[i - 2]);
+        this.stack.splice(i - 1, 1);
+        this.stack.splice(i - 2, 1, tempStack);
 
         /*COMBAK; IT WORKS */
       }
-      else if (this.stacks[i] == "OR.STK") /* OR link to previous stack */
+      else if (this.stack[i] == "OR.STK") /* OR link to previous stack */
       {
-        // this.stacks.splice(i, 1);
+        // this.stack.splice(i, 1);
       }
-      else if (isIterable(this.stacks[i].content))
+      else if (isIterable(this.stack[i].content))
       {
         /* do nothing */
       }
       else
       {
-        throw ("Error@'" + this.stackAssemble.name + "': Current stack's content isn't allowed: " + this.stacks[i].content);
+        throw ("Error@'" + this.stackAssemble.name + "': Current stack's content isn't allowed: " + this.stack[i].content);
       }
     }
   }
-
-  stackLinker(type, stack1, stack2)
-  {
-    switch (type)
-    {
-      case "OR.STK":
-        break;
-      case "AND.STK":
-        break;
-    }
-
-    return "STACK " + type + " STACK2"
-  }
 }
 
-class LadderStack
+class LadderPiece
 {
   constructor()
   {
     this.beginningLink   = {id: Infinity};
     this.terminatingLink = {id: 0};
+    this.type = null;
+    this.closed = false;
     this.content = [];
   }
 
-  finishStack()
+  stackFinisher()
   {
     for (let i = 0; i > this.content.length; i++)
     {
@@ -256,7 +271,7 @@ class LadderStack
       }
       else
       {
-        throw ("Error@'" + this.finishStack().name + "': the .inputLink property is not an instance of the LadderConnection class");
+        throw ("Error@'" + this.stackFinisher().name + "': the .inputLink property is not an instance of the LadderConnection class");
       }
 
       /* find out what the biggest outputLink id is in this stack (the biggest is always the last) */
@@ -269,7 +284,7 @@ class LadderStack
       }
       else
       {
-        throw ("Error@'" + this.finishStack().name + "': the .outputLink property is not an instance of the LadderConnection class");
+        throw ("Error@'" + this.stackFinisher().name + "': the .outputLink property is not an instance of the LadderConnection class");
       }
     }
   }

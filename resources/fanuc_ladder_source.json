@@ -114,7 +114,7 @@
   },
 
   "WRT" : {
-    "symbol" :         "┤ ├",
+    "symbol" :         "( )",
     "assignedMemory" : null,
     "logic" :          "WRT",
     "state" :          false,
@@ -125,7 +125,7 @@
   },
 
   "WRT.NOT" : {
-    "symbol" :         "┤/├",
+    "symbol" :         "(/)",
     "assignedMemory" : null,
     "logic" :          "WRT.NOT",
     "state" :          true,
@@ -136,7 +136,7 @@
   },
 
   "SET" : {
-    "symbol" :         "┤S├",
+    "symbol" :         "(S)",
     "assignedMemory" : null,
     "logic" :          "SET",
     "state" :          false,
@@ -147,7 +147,7 @@
   },
 
   "RST" : {
-    "symbol" :         "┤R├",
+    "symbol" :         "(R)",
     "assignedMemory" : null,
     "logic" :          "RST",
     "state" :          false,
