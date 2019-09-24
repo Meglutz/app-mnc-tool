@@ -3,12 +3,14 @@
 *******************************************************************************/
 
 let Source = "./mnemonic.mnc";
-let InstructionSource = "./resources/fanuc_ins.json"
+let InstructionSource = "./resources/fanuc_instructions.json"
+let LadderSource = "./resources/fanuc_ladder_source.json"
 
 let MyQueries = [];
 let Data;
 let MNC;
 let InstructionData;
+let LadderData;
 
 let ActiveQuery = 0;
 let ActiveInsOpTable;
@@ -33,7 +35,10 @@ function preload()
   /* the loadStrings function returns an array, indexed by the line count of the loaded file */
   MNC = new Mnemonic(loadStrings(Source, console.log("Mnemonic file loaded correctly.")));
   Data = new Resource(MNC);
+
+  /* generate JSON objs */
   InstructionData = loadJSON(InstructionSource);
+  LadderData =      loadJSON(LadderSource);
 }
 
 
@@ -64,6 +69,40 @@ function draw()
   analyzeLogic        (Data);
   analyzeDependencies (Data);
   analyzeResults      (Data);
+
+  /* /////////////////////////////////////////// DEBUG */
+  let a = ["RD         R7940.4", /* new piece           */
+           "OR         R7943.2", /* |                   */
+                                 /* |                   */
+           "RD.STK     R7958.0", /* |  new piece        */
+           "AND        R7957.5", /* |  |                */
+           "OR.STK",             /* |  close piece (OR) */
+                                 /* |                   */
+           "RD.STK     F1747.4", /* |  new piece        */
+           "OR         Y9.2",    /* |  |                */
+           "AND.STK",            /* |  close piece (AND)*/
+                                 /* |                   */
+           "AND        R7990.5", /* |                   */
+           "AND        R7955.4", /* |                   */
+           "WRT        Y9.2",    /* |                   */
+           "WRT        R4200.3"] /* close puiece (END)  */
+/*
+
+├──┤ ├─┬────┬─┤ ├─┬─┤ ├───┤ ├─┬──⃝
+       │    │     │           │
+├──┤ ├─┘    ├─┤ ├─┘           └──⃝
+            │
+├──┤ ├───┤ ├┘
+
+*/
+
+   let b = new LadderNetwork(LadderData, a);
+   b.makeMap();
+   b.stackMaker();
+   b.stackChecker();
+   // b.stackAssemble();
+   console.log(b);
+  /* /////////////////////////////////////////// DEBUG */
 
   /* handle warnings */
   Warnings = checkWarnings(WarningLog);
@@ -391,7 +430,7 @@ function checkWarnings(warn)
   if (warn.length != 0)
   {
     str = "There are Warnings, please check the Log!"
-    console.log("%c" + str, "color: " + red);
+    console.warn("%c" + str, "color: " + red);
     return str;
   }
   else

@@ -34,16 +34,34 @@
 }
 
 
+/* Style selectorWindow stuff */
+/******************************************************************************/
+/******************************************************************************/
+.selector-div {
+  margin: 10%;
+}
+
+.selector-entry {
+  text-align: left;
+  letter-spacing: 2px;
+  margin: 0px;
+  font-family: "consolas";
+  padding: 5px;
+  background-color: var(--main-color);
+  color: var(--tone-1-color);
+  border-radius: 3px;
+}
+
 /* Style Scrollbar */
 /******************************************************************************/
 ::-webkit-scrollbar {
-        background-color: var(--main-color);
-        width: .8em
+  background-color: var(--main-color);
+  width: .8em
 }
 
 ::-webkit-scrollbar-thumb:window-inactive,
 ::-webkit-scrollbar-thumb {
-        background:  var(--main-accent-color);
+  background:  var(--main-accent-color);
 }
 
 /* Style Body */

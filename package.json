@@ -1,10 +1,13 @@
 {
   "name": "MNC.Tool",
-  "version": "1.0.0",
+  "version": "4.1.1",
   "description": "Electron based tool to analyze Fanuc mnemonic files",
+  "author": "WashirePie",
+  "license": "MIT",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "repository": "https://github.com/WashirePie/MNC.Tool",
   "keywords": [
@@ -14,10 +17,25 @@
     "Fanuc",
     "Analyzer"
   ],
-  "author": "WashirePie",
-  "license": "MIT",
+  "build": {
+    "mac": {
+      "appId": "MANDELBROT.Tool",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "NSIS",
+      "icon": "build/icon.ico"
+    }
+  },
   "devDependencies": {
-    "electron": "^4.1.4"
+    "electron": "^4.1.4",
+    "electron-builder": "^21.2.0"
   },
   "dependencies": {
     "iconv-lite": "^0.4.24"

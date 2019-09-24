@@ -1,0 +1,159 @@
+{
+  "COMMENT" : {
+    "0" : "JSON-Info"
+  },
+
+  "RD" : {
+    "symbol" :         "┤ ├",
+    "assignedMemory" : null,
+    "logic" :          "RD",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    false,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "RD.STK" : {
+    "symbol" :         "┤ ├",
+    "assignedMemory" : null,
+    "logic" :          "RD.STK",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    false,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "OR" : {
+    "symbol" :         "┤ ├",
+    "assignedMemory" : null,
+    "logic" :          "OR",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    false,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "AND" : {
+    "symbol" :         "┤ ├",
+    "assignedMemory" : null,
+    "logic" :          "AND",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    false,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "RD.NOT" : {
+    "symbol" :         "┤/├",
+    "assignedMemory" : null,
+    "logic" :          "RD.NOT",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    true,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "RD.NOT.STK" : {
+    "symbol" :         "┤/├",
+    "assignedMemory" : null,
+    "logic" :          "RD.NOT.STK",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    true,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "OR.NOT" : {
+    "symbol" :         "┤/├",
+    "assignedMemory" : null,
+    "logic" :          "OR.NOT",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    true,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "AND.NOT" : {
+    "symbol" : "┤/├",
+    "assignedMemory" : null,
+    "logic" :          "AND.NOT",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    true,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "AND.STK" : {
+    "symbol" : "",
+    "assignedMemory" : null,
+    "logic" :          "AND.STK",
+    "state" :          null,
+    "inputState" :     null,
+    "outputState" :    null,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "OR.STK" : {
+    "symbol" : "",
+    "assignedMemory" : null,
+    "logic" :          "OR.STK",
+    "state" :          null,
+    "inputState" :     null,
+    "outputState" :    null,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "WRT" : {
+    "symbol" :         "( )",
+    "assignedMemory" : null,
+    "logic" :          "WRT",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    true,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "WRT.NOT" : {
+    "symbol" :         "(/)",
+    "assignedMemory" : null,
+    "logic" :          "WRT.NOT",
+    "state" :          true,
+    "inputState" :     false,
+    "outputState" :    true,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "SET" : {
+    "symbol" :         "(S)",
+    "assignedMemory" : null,
+    "logic" :          "SET",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    true,
+    "inputLink" :      null,
+    "outputLink" :     null
+  },
+
+  "RST" : {
+    "symbol" :         "(R)",
+    "assignedMemory" : null,
+    "logic" :          "RST",
+    "state" :          false,
+    "inputState" :     false,
+    "outputState" :    true,
+    "inputLink" :      null,
+    "outputLink" :     null
+  }
+}
