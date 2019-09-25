@@ -7,6 +7,8 @@
   "main": "main.js",
   "scripts": {
     "pack": "electron-builder --dir",
+    "start": "electron .",
+    "startDebug": "electron . -debug",
     "dist": "electron-builder"
   },
   "repository": "https://github.com/WashirePie/MNC.Tool",

@@ -50,9 +50,16 @@ function createMainWindow()
     }
   )
 
-  mainWindow.maximize();                       /* maximize mainWindow */
-  mainWindow.loadFile('index.html') /* load the mainWindow_index.html of the app. */
-  // mainWindow.webContents.openDevTools()     /* open the DevTools. */
+  /* maximize mainWindow */
+  mainWindow.maximize();
+  mainWindow.loadFile('index.html')
+
+  /* open the DevTools. */
+  if (process.argv[2] == "-debug")
+  {
+    mainWindow.webContents.openDevTools()
+  }
+
 
   /* Emitted when the window is closed. */
   mainWindow.on('closed', function ()

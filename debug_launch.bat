@@ -1,0 +1,6 @@
+@echo off
+
+echo Launching Electron with the MNC.Tool application in Debug Mode...
+npm run startDebug
+
+echo Exiting...
