@@ -24,7 +24,6 @@ const insOpClose       =    "overlay-close-button-2";
 
 const mncSelOverlay    =    "overlay-container-0";
 const mncSelTableLoc   =    "mnc-select-table-location";
-const mncSelInfoText   =    "mnc-select-text";
 
 const errorTitle       =    "error-header";
 const errorText        =    "error-text";
@@ -115,6 +114,17 @@ function evalDOM_memoryClick(line)
     let el = document.getElementsByTagName("input");
     el["query-value"].value = match[1] + match[2] + match[3];
   }
+}
+
+/*******************************************************************************
+** Action: sets the global variable [MNC] to the clicked entry of the mncSel
+**         table.
+** Return: null
+*******************************************************************************/
+function evalDOM_mnemonicClick(mnc)
+{
+  MNC = mnc;
+  run();
 }
 
 function displayDOMquery(ofs)
@@ -324,11 +334,11 @@ function addDOM_result (title, content1, content2, content3, content4, highlight
   }
 
   /* add style tag to level tag */
-  tagElement           = appendDOMtag(tagElement, "class", "level-tag-" + content4);
+  tagElement.appendTag("class", "level-tag-" + content4);
   tagElement.innerHTML = "Ladder-Level: " + content4;
   h1Element.innerHTML  = content1;
   pElement.innerHTML   = content2 + "<br>";
-  p2Element            = appendDOMtag(p2Element, "class", "module-string");
+  p2Element.appendTag("class", "module-string");
   p2Element.innerHTML  = content3;
 
   divElement.appendChild(tagElement);
@@ -529,8 +539,8 @@ function addDOM_tableRow(parentElement, rowContent, optClass = null, cellType = 
     /* add style to text element, if applicable */
     if (item.style != "")
     {
-      text = appendDOMtag(text, "class", item.style);
-      cell = appendDOMtag(cell, "onclick", "evalDOM_memoryClick('" + item.content + "')")
+      text.appendTag("class", item.style);
+      cell.appendTag("onclick", "evalDOM_memoryClick('" + item.content + "')")
     }
     text.innerHTML = item.content;
     cell.appendChild(text);
@@ -591,7 +601,7 @@ function addDOM_MNCShowList(query, resultIndex)
     {
       mncLine = addDOM_element("a", mncShowElementId, "code")
     }
-    mncLine = appendDOMtag(mncLine, "onclick", "evalDOM_memoryClick('" + query.src.source.lines[i] + "')")
+    mncLine.appendTag("onclick", "evalDOM_memoryClick('" + query.src.source.lines[i] + "')")
 
     /* check for definition in the lines to improve readability */
     let line = query.src.source.lines[i];
@@ -634,29 +644,11 @@ function addDOM_element(type, id, addClass = null)
   el.setAttribute("id", id);
   if (addClass != null)
   {
-    el = appendDOMtag(el, "class", addClass);
+    el.appendTag("class", addClass);
   }
   return el;
 }
 
-
-/*******************************************************************************
-** Action: Appends DOM tag to DOM element
-** Return: DOM element
-*******************************************************************************/
-function appendDOMtag(el, type, addVal)
-{
-  let curr = el.getAttribute(type);
-  if (curr != null)
-  {
-    el.setAttribute(type, curr + " " + addVal);
-  }
-  else
-  {
-    el.setAttribute(type, addVal);
-  }
-  return el;
-}
 
 /*******************************************************************************
 ** Action: Replaces value of DOM tag of a specified DOM element.
@@ -704,7 +696,7 @@ function updateDOMinfo(warningStr, warningLog = null, source) {
 
   let circleElement = document.getElementById(stateButton);
   /* initialize state circle, otherwise replaceDOMtagValue will throw an error */
-  circleElement = appendDOMtag(circleElement, "class", stateRedClass);
+  circleElement.appendTag("class", stateRedClass);
 
   let aElement      = {warn:    document.getElementById(stateWarning),
                        warnLog: document.getElementById(stateWarningLog),

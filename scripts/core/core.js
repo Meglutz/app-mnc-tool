@@ -9,7 +9,7 @@ let Source = "./mnemonic.mnc";
 let MyQueries = [];
 let Data;
 let MNCs = [];
-let MNC;
+let MNC = undefined;
 let InstructionData;
 let LadderData;
 
@@ -37,46 +37,83 @@ function preload()
   let files = fs.readdirSync("./");
 
   /* find files which are a [.mnc] file */
-  let MNCs = [];
   for (let file of files)
   {
     if (file.match(/.*\.mnc/) != null)
     {
+      /* the loadStrings function returns an array, indexed by the line count of the loaded file */
       MNCs.push(new Mnemonic(loadStrings("./" + file, console.log("Mnemonic file loaded correctly."))));
     }
   }
- COMBAK
-  document.getElementById(mncSelOverlay).style.display = "block";
-
-  /* the loadStrings function returns an array, indexed by the line count of the loaded file */
-  MNC = MNCs[0]
-  Data = new Resource(MNC);
-
-  /* generate JSON objs */
-  InstructionData = loadJSON(InstructionSource);
-  LadderData =      loadJSON(LadderSource);
 }
-
 
 function setup()
 {
-  /* pre-analyze mnemonic levels and structure */
-  MNC.levels.push(new LineRange(MNC.lines, "1",   /^\%\@3/,   /^SUB\s1$/));
-  MNC.levels.push(new LineRange(MNC.lines, "2",   /^SUB\s1$/, /^SUB\s2$/));
-  MNC.levels.push(new LineRange(MNC.lines, "SUB", /^SUB\s2$/, /^SUB\s64$/));
-  // MNC.levels.three = new Level("3", /^SUB\s2$/, /^SUB\s48$/);
+  /* analyze mnemonics, get their data */
+  for (let i = 0; i < MNCs.length; i++)
+  {
+    /* pre-analyze mnemonic levels and structure */
+    MNCs[i].levels.push(new LineRange(MNCs[i].lines, "1",   /^\%\@3/,   /^SUB\s1$/));
+    MNCs[i].levels.push(new LineRange(MNCs[i].lines, "2",   /^SUB\s1$/, /^SUB\s2$/));
+    MNCs[i].levels.push(new LineRange(MNCs[i].lines, "SUB", /^SUB\s2$/, /^SUB\s64$/));
+    MNCs[i].ranges.head = new LineRange(MNCs[i].lines, "HEAD", /^\%\@1/, /^\%\@2/);
+    MNCs[i].ranges.defs = new LineRange(MNCs[i].lines, "DEFS", /^\%\@2/, /^\%\@3/);
+    MNCs[i].ranges.ladr = new LineRange(MNCs[i].lines, "LADR", /^\%\@3/, /^\%\@4/);
+    MNCs[i].ranges.mesg = new LineRange(MNCs[i].lines, "MESG", /^\%\@4/, /^\%\@5/);
 
-  MNC.ranges.head = new LineRange(MNC.lines, "HEAD", /^\%\@1/, /^\%\@2/);
-  MNC.ranges.defs = new LineRange(MNC.lines, "DEFS", /^\%\@2/, /^\%\@3/);
-  MNC.ranges.ladr = new LineRange(MNC.lines, "LADR", /^\%\@3/, /^\%\@4/);
-  MNC.ranges.mesg = new LineRange(MNC.lines, "MESG", /^\%\@4/, /^\%\@5/);
+    MNCs[i].getMNCinfo();
 
-  MNC.getMNCinfo();
+    // TODO: Move to interface.js and make a pretty function
+    let row = document.createElement("tr");
+    let type = document.createElement("td");
+    let note = document.createElement("td");
+    let date = document.createElement("td");
+    let release = document.createElement("td");
+    let lines = document.createElement("td");
+
+    row.appendTag("class", "mnemonic-select-table");
+    row.appendTag("onclick", "evalDOM_mnemonicClick(MNCs[" + i + "])")
+
+    type.appendTag("class", "mnemonic-select-table");
+    note.appendTag("class", "mnemonic-select-table");
+    date.appendTag("class", "mnemonic-select-table");
+    release.appendTag("class", "mnemonic-select-table");
+    lines.appendTag("class", "mnemonic-select-table");
+
+    type.innerHTML = MNCs[i].info.type;
+    note.innerHTML = MNCs[i].info.note;
+    date.innerHTML = MNCs[i].info.compileDate;
+    release.innerHTML = MNCs[i].info.release;
+    lines.innerHTML = MNCs[i].lines.length;
+
+    row.appendChild(type);
+    row.appendChild(note);
+    row.appendChild(date);
+    row.appendChild(release);
+    row.appendChild(lines);
+
+    document.getElementById(mncSelTableLoc).appendChild(row);
+  }
+
+  /* wait until user selects mnemonic file
+  [MNC] is set when an item in the table is clicked, since this invokes the evalDOM_mnemonicClick function  */
+  document.getElementById(mncSelOverlay).style.display = "block";
 }
-
 
 function draw()
 {
+
+}
+
+function run()
+{
+  document.getElementById(mncSelOverlay).style.display = "none";
+  Data = new Resource(MNC);
+  
+  /* generate JSON objs */
+  InstructionData = loadJSON(InstructionSource);
+  LadderData =      loadJSON(LadderSource);
+
   /* start timer */
   MNC.timer.start = new Date().getTime();
 
@@ -101,23 +138,23 @@ function draw()
            "AND        R7990.5", /* |                   */
            "AND        R7955.4", /* |                   */
            "WRT        Y9.2",    /* |                   */
-           "WRT        R4200.3"] /* close puiece (END)  */
-/*
+           "WRT        R4200.3"] /* close piece (END)   */
 
-├──┤ ├─┬────┬─┤ ├─┬─┤ ├───┤ ├─┬──⃝
-       │    │     │           │
-├──┤ ├─┘    ├─┤ ├─┘           └──⃝
-            │
-├──┤ ├───┤ ├┘
+  /*
+  ├──┤ ├─┬────┬─┤ ├─┬─┤ ├───┤ ├─┬──⃝
+         │    │     │           │
+  ├──┤ ├─┘    ├─┤ ├─┘           └──⃝
+              │
+  ├──┤ ├───┤ ├┘
 
-*/
+  */
 
-   let b = new LadderNetwork(LadderData, a);
-   b.makeMap();
-   b.stackMaker();
-   b.stackChecker();
-   // b.stackAssemble();
-   console.log(b);
+  let b = new LadderNetwork(LadderData, a);
+  b.makeMap();
+  b.stackMaker();
+  b.stackChecker();
+  // b.stackAssemble();
+  console.log(b);
   /* /////////////////////////////////////////// DEBUG */
 
   /* handle warnings */
@@ -501,6 +538,25 @@ Number.prototype.pad = function(size)
     s = "0" + s;
   }
   return s;
+}
+
+
+/*******************************************************************************
+** Action: Appends [val] to a [tag] or creates it if it doesn't exist
+** Return: this
+*******************************************************************************/
+HTMLElement.prototype.appendTag = function(tag, val)
+{
+  let curr = this.getAttribute(tag);
+  if (curr != null)
+  {
+    this.setAttribute(tag, curr + " " + val);
+  }
+  else
+  {
+    this.setAttribute(tag, val);
+  }
+  return this;
 }
 
 
