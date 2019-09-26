@@ -155,6 +155,44 @@ header {
   margin: 0px;
 }
 
+/* Style mncSel table */
+/******************************************************************************/
+.mnc-select-table table {
+  border-collapse: collapse;
+  /* text-align: left; */
+}
+COMBAK
+.mnc-select-table table, th, td {
+  border: 3px solid red;
+}
+/*
+.mnc-select-table  th, td {
+  border: 10px solid black;
+  padding: 15px;
+  text-align: left;
+} */
+
+/* .mnc-select-table table, th, td {
+  border: 1px solid var(--tone-1-accent);
+  font-family: "Roboto";
+  padding: 5px;
+  background-color: var(--main-color);
+  border: 1px;
+  border-radius: 3px;
+}
+
+.mnc-select-table h1, p {
+  margin: 0px;
+  color: var(--tone-1-color);
+}
+
+.mnc-select-table .head-cell  {
+  background-color: var(--main-color);
+  color: var(--tone-1-color);
+  font-size: 1rem;
+  font-weight: bold;
+} */
+
 /* Style inSop table */
 /******************************************************************************/
 .insop-table table {

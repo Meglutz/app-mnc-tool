@@ -22,6 +22,10 @@ const insOpInfoLoc     =    "insop-info-location";
 const insOpElementId   =    "insop-table_element";
 const insOpClose       =    "overlay-close-button-2";
 
+const mncSelOverlay    =    "overlay-container-0";
+const mncSelTableLoc   =    "mnc-select-table-location";
+const mncSelInfoText   =    "mnc-select-text";
+
 const errorTitle       =    "error-header";
 const errorText        =    "error-text";
 

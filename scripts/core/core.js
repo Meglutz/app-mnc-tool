@@ -2,12 +2,13 @@
 ** Definitions
 *******************************************************************************/
 
-let Source = "./mnemonic.mnc";
 let InstructionSource = "./resources/fanuc_instructions.json"
 let LadderSource = "./resources/fanuc_ladder_source.json"
 
+let Source = "./mnemonic.mnc";
 let MyQueries = [];
 let Data;
+let MNCs = [];
 let MNC;
 let InstructionData;
 let LadderData;
@@ -32,8 +33,23 @@ const green = "#3bb728"
 
 function preload()
 {
+  let fs = require("fs");
+  let files = fs.readdirSync("./");
+
+  /* find files which are a [.mnc] file */
+  let MNCs = [];
+  for (let file of files)
+  {
+    if (file.match(/.*\.mnc/) != null)
+    {
+      MNCs.push(new Mnemonic(loadStrings("./" + file, console.log("Mnemonic file loaded correctly."))));
+    }
+  }
+ COMBAK
+  document.getElementById(mncSelOverlay).style.display = "block";
+
   /* the loadStrings function returns an array, indexed by the line count of the loaded file */
-  MNC = new Mnemonic(loadStrings(Source, console.log("Mnemonic file loaded correctly.")));
+  MNC = MNCs[0]
   Data = new Resource(MNC);
 
   /* generate JSON objs */
