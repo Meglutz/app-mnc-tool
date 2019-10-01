@@ -29,18 +29,6 @@ The easiest method so far is to open the MNC in NotePad++ and select `Encoding >
 save the file as such.
 
 
-## Dev Overview / App Structure
-
-Quick overview on how this app is structured:
-
-- `main.js` creates the electron Obj and passes the `index.html` file into the main window. `index.html` is the only
-html file (aka. view or window) for this application.
-
-- `index.html` is styled by the cascading stylesheets in `/styles`
-
-- `index.html` includes all jscripts from the `/scripts` folder.
-
-
 ### A general Overview on how to build an electron application
 
 1. Make sure you've got a `build` folder in your projects root dir.
