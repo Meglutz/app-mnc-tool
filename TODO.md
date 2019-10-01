@@ -33,6 +33,7 @@
 * [x] **MNCShow: Only parse lines which are in the same network as the selected Op**
 * [x] **MNCShow: Check for defines before drawing MNCshow**
 * [ ] Update all ugly shallow object copy routines to `let sourceOp = JSON.parse(JSON.stringify(this.genSource[match[1] + match[2]]));`
+* [ ] Take care of all TODO Tags in the whole code
 
 ## Nice-to-have
 * [x] Check all regexes on single strings
