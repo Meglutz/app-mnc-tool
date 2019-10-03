@@ -31,8 +31,11 @@
       ]
     },
     "win": {
-      "target": "NSIS",
+      "target": ["portable"],
       "icon": "build/icon.ico"
+    },
+    "portable": {
+      "artifactName": "MNC.Tool.exe"
     }
   },
   "devDependencies": {

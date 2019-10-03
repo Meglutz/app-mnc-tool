@@ -2,14 +2,15 @@
 ** Definitions
 *******************************************************************************/
 
+let IPC = require("electron").ipcRenderer;
+
 let InstructionSource = "./resources/fanuc_instructions.json"
 let LadderSource = "./resources/fanuc_ladder_source.json"
 
-let Source = "./mnemonic.mnc";
+let MNC = undefined;
+let MNCs = [];
 let MyQueries = [];
 let Data;
-let MNCs = [];
-let MNC = undefined;
 let InstructionData;
 let LadderData;
 
@@ -30,11 +31,9 @@ const green = "#3bb728"
 /*******************************************************************************
 ** p5 Main functions
 *******************************************************************************/
-
 function preload()
 {
-  let fs = require("fs");
-  let files = fs.readdirSync("./");
+  let files = walkMnc("./");
 
   /* find files which are a [.mnc] file */
   for (let file of files)
@@ -42,13 +41,18 @@ function preload()
     if (file.match(/.*\.mnc/) != null)
     {
       /* the loadStrings function returns an array, indexed by the line count of the loaded file */
-      MNCs.push(new Mnemonic(loadStrings("./" + file, console.log("Mnemonic file loaded correctly."))));
+      MNCs.push(new Mnemonic(loadStrings("./" + file, console.log("Mnemonic file(s) loaded correctly."))));
     }
   }
 }
 
+
 function setup()
 {
+  /* generate JSON objs */
+  InstructionData = loadJSON(InstructionSource);
+  LadderData =      loadJSON(LadderSource);
+
   /* analyze mnemonics, get their data */
   for (let i = 0; i < MNCs.length; i++)
   {
@@ -60,39 +64,18 @@ function setup()
     MNCs[i].ranges.defs = new LineRange(MNCs[i].lines, "DEFS", /^\%\@2/, /^\%\@3/);
     MNCs[i].ranges.ladr = new LineRange(MNCs[i].lines, "LADR", /^\%\@3/, /^\%\@4/);
     MNCs[i].ranges.mesg = new LineRange(MNCs[i].lines, "MESG", /^\%\@4/, /^\%\@5/);
-
     MNCs[i].getMNCinfo();
 
-    // TODO: Move to interface.js and make a pretty function
-    let row = document.createElement("tr");
-    let type = document.createElement("td");
-    let note = document.createElement("td");
-    let date = document.createElement("td");
-    let release = document.createElement("td");
-    let lines = document.createElement("td");
+    addDOM_mncSelectRow(MNCs[i].info, MNCs[i].lines.length, i);
+  }
 
-    row.appendTag("class", "mnemonic-select-table");
-    row.appendTag("onclick", "evalDOM_mnemonicClick(MNCs[" + i + "])")
+  /* if there aren't any [.mnc]s around, then exit */
+  if (MNCs == null || MNCs.length == 0)
+  {
+    alert("There are no mnemonic files around!");
 
-    type.appendTag("class", "mnemonic-select-table");
-    note.appendTag("class", "mnemonic-select-table");
-    date.appendTag("class", "mnemonic-select-table");
-    release.appendTag("class", "mnemonic-select-table");
-    lines.appendTag("class", "mnemonic-select-table");
-
-    type.innerHTML = MNCs[i].info.type;
-    note.innerHTML = MNCs[i].info.note;
-    date.innerHTML = MNCs[i].info.compileDate;
-    release.innerHTML = MNCs[i].info.release;
-    lines.innerHTML = MNCs[i].lines.length;
-
-    row.appendChild(type);
-    row.appendChild(note);
-    row.appendChild(date);
-    row.appendChild(release);
-    row.appendChild(lines);
-
-    document.getElementById(mncSelTableLoc).appendChild(row);
+    /* close tool via IPC command */
+    IPC.send("closeTool", "-");
   }
 
   /* wait until user selects mnemonic file
@@ -100,19 +83,12 @@ function setup()
   document.getElementById(mncSelOverlay).style.display = "block";
 }
 
-function draw()
-{
-
-}
+function draw() {}
 
 function run()
 {
   document.getElementById(mncSelOverlay).style.display = "none";
   Data = new Resource(MNC);
-  
-  /* generate JSON objs */
-  InstructionData = loadJSON(InstructionSource);
-  LadderData =      loadJSON(LadderSource);
 
   /* start timer */
   MNC.timer.start = new Date().getTime();
@@ -123,39 +99,44 @@ function run()
   analyzeDependencies (Data);
   analyzeResults      (Data);
 
-  /* /////////////////////////////////////////// DEBUG */
-  let a = ["RD         R7940.4", /* new piece           */
-           "OR         R7943.2", /* |                   */
-                                 /* |                   */
-           "RD.STK     R7958.0", /* |  new piece        */
-           "AND        R7957.5", /* |  |                */
-           "OR.STK",             /* |  close piece (OR) */
-                                 /* |                   */
-           "RD.STK     F1747.4", /* |  new piece        */
-           "OR         Y9.2",    /* |  |                */
-           "AND.STK",            /* |  close piece (AND)*/
-                                 /* |                   */
-           "AND        R7990.5", /* |                   */
-           "AND        R7955.4", /* |                   */
-           "WRT        Y9.2",    /* |                   */
-           "WRT        R4200.3"] /* close piece (END)   */
+/* /////////////////////////////////////////////////////////////////////////////////// */
+/* ///////////////////////////////////////////////////////////////////////////// DEBUG */
 
-  /*
-  ├──┤ ├─┬────┬─┤ ├─┬─┤ ├───┤ ├─┬──⃝
-         │    │     │           │
-  ├──┤ ├─┘    ├─┤ ├─┘           └──⃝
-              │
-  ├──┤ ├───┤ ├┘
+  let a =   ["RD         R7940.4", /* new piece           */
+             "OR         R7943.2", /* |                   */
+                                   /* |                   */
+             "RD.STK     R7958.0", /* |  new piece        */
+             "AND        R7957.5", /* |  |                */
+             "OR.STK",             /* |  close piece (OR) */
+                                   /* |                   */
+             "RD.STK     F1747.4", /* |  new piece        */
+             "OR         Y9.2",    /* |  |                */
+             "AND.STK",            /* |  close piece (AND)*/
+                                   /* |                   */
+             "AND        R7990.5", /* |                   */
+             "AND        R7955.4", /* |                   */
+             "WRT        Y9.2",    /* |                   */
+             "WRT        R4200.3"] /* close piece (END)   */
 
-  */
+              /*
+              ├──┤ ├─┬────┬─┤ ├─┬─┤ ├───┤ ├─┬──⃝
+                     │    │     │           │
+              ├──┤ ├─┘    ├─┤ ├─┘           └──⃝
+                          │
+              ├──┤ ├───┤ ├┘
+
+              */
 
   let b = new LadderNetwork(LadderData, a);
   b.makeMap();
   b.stackMaker();
   b.stackChecker();
+
   // b.stackAssemble();
   console.log(b);
-  /* /////////////////////////////////////////// DEBUG */
+
+/* ///////////////////////////////////////////////////////////////////////////// DEBUG */
+/* /////////////////////////////////////////////////////////////////////////////////// */
 
   /* handle warnings */
   Warnings = checkWarnings(WarningLog);
@@ -571,4 +552,36 @@ function isIterable(obj) {
     return false;
   }
   return typeof obj[Symbol.iterator] === 'function';
+}
+
+
+/*******************************************************************************
+** Action: Recursivly checks a path for [.mnc] files
+** Return: Array of mnemonic files
+*******************************************************************************/
+let walkMnc = function(dir)
+{
+  let results = [];
+  let fs = require("fs");
+  let list = fs.readdirSync(dir);
+
+  list.forEach(function(file)
+  {
+    file = dir + '/' + file;
+    let stat = fs.statSync(file);
+    if (stat && stat.isDirectory())
+    {
+      /* Recurse into a subdirectory */
+      results = results.concat(walkMnc(file));
+    }
+    else
+    {
+      // /* Is a [.mnc] file */
+      if (file.match(/.*\.mnc/) != null)
+      {
+        results.push(file)
+      }
+    }
+  });
+  return results;
 }

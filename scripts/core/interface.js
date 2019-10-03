@@ -349,6 +349,7 @@ function addDOM_result (title, content1, content2, content3, content4, highlight
   tlBody.appendChild(divElement);
 }
 
+
 /*******************************************************************************
 ** Action: Adds new DOM table for instruction operation visualisation
 ** Return: null
@@ -376,6 +377,44 @@ function addDOM_insOpTable(query, resultIndex)
   {
     addDOM_tableRow(document.getElementById(insOpTableLoc), row, false);
   }
+}
+
+
+/*******************************************************************************
+** Action: Adds new DOM table row to the mnc select table
+** Return: null
+*******************************************************************************/
+function addDOM_mncSelectRow(mncInfo, sloc, index)
+{
+  let row = document.createElement("tr");
+  let type = document.createElement("td");
+  let note = document.createElement("td");
+  let date = document.createElement("td");
+  let release = document.createElement("td");
+  let lines = document.createElement("td");
+
+  row.appendTag("class", "mnemonic-select-table");
+  row.appendTag("onclick", "evalDOM_mnemonicClick(MNCs[" + index + "])")
+
+  type.appendTag("class", "mnemonic-select-table");
+  note.appendTag("class", "mnemonic-select-table");
+  date.appendTag("class", "mnemonic-select-table");
+  release.appendTag("class", "mnemonic-select-table");
+  lines.appendTag("class", "mnemonic-select-table");
+
+  type.innerHTML =    mncInfo.type;
+  note.innerHTML =    mncInfo.note;
+  date.innerHTML =    mncInfo.compileDate;
+  release.innerHTML = mncInfo.release;
+  lines.innerHTML =   sloc;
+
+  row.appendChild(type);
+  row.appendChild(note);
+  row.appendChild(date);
+  row.appendChild(release);
+  row.appendChild(lines);
+
+  document.getElementById(mncSelTableLoc).appendChild(row);
 }
 
 
@@ -695,8 +734,20 @@ function removeDOM_elements(id) {
 function updateDOMinfo(warningStr, warningLog = null, source) {
 
   let circleElement = document.getElementById(stateButton);
+
   /* initialize state circle, otherwise replaceDOMtagValue will throw an error */
-  circleElement.appendTag("class", stateRedClass);
+  /* TODO: This part is actually the HTMLElement.prototype.appendTag() function from [core.js]
+  but it seems to only work like this. */
+  let curr = circleElement.getAttribute("class");
+  if (curr != null)
+  {
+    circleElement.setAttribute("class", curr + " " + stateRedClass);
+  }
+  else
+  {
+    circleElement.setAttribute("class", stateRedClass);
+  }
+
 
   let aElement      = {warn:    document.getElementById(stateWarning),
                        warnLog: document.getElementById(stateWarningLog),
