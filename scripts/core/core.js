@@ -33,11 +33,13 @@ const green = "#3bb728"
 *******************************************************************************/
 function preload()
 {
-  let files = walkMnc("./");
+  // let files = walkMnc("./");
+  let files = walkMnc("C:/Projects");
 
   /* find files which are a [.mnc] file */
   for (let file of files)
   {
+    console.log(file);
     if (file.match(/.*\.mnc/) != null)
     {
       /* the loadStrings function returns an array, indexed by the line count of the loaded file */
