@@ -1,5 +1,5 @@
 @echo off
 
-npm run
+npm run start
 
 echo Exiting...

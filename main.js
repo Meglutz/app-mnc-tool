@@ -56,9 +56,6 @@ function createMainWindow()
     mainWindow.webContents.openDevTools()
   }
 
-  /* DEBUG: force open devtools */
-  mainWindow.webContents.openDevTools()
-
   /* Emitted when the window is closed. */
   mainWindow.on('closed', function ()
     {
