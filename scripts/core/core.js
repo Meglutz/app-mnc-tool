@@ -76,7 +76,14 @@ function setup()
     MNCs[i].ranges.ladr = new LineRange(MNCs[i].lines, "LADR", /^\%\@3/, /^\%\@4/);
     MNCs[i].ranges.mesg = new LineRange(MNCs[i].lines, "MESG", /^\%\@4/, /^\%\@5/);
     MNCs[i].getMNCinfo();
+  }
 
+  /* sort to have the most recently compiled on top, add to DOM */
+  MNCs.sort(function(a, b)
+  {
+    return b.info.compileDate - a.info.compileDate;
+  });
+  for (var i = 0; i < MNCs.length; i++) {
     addDOM_mncSelectRow(MNCs, i);
   }
 
@@ -84,6 +91,8 @@ function setup()
   [MNC] is set when an item in the table is clicked, since this invokes the evalDOM_mnemonicClick function  */
   document.getElementById(mncSelOverlay).style.display = "block";
 }
+
+
 
 function draw() {}
 

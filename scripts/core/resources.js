@@ -191,7 +191,7 @@ class Mnemonic
       switch (true)
       {
         case tempLine.charAt(0) == "7":
-          this.info.compileDate = formatDate(tempLine.substring(2));
+          this.info.compileDate = new Date(formatDate(tempLine.substring(2)));
         break;
 
         case tempLine.charAt(0) == "1" && tempLine.charAt(1) == "0":
