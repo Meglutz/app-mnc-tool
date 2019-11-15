@@ -384,7 +384,7 @@ function addDOM_insOpTable(query, resultIndex)
 ** Action: Adds new DOM table row to the mnc select table
 ** Return: null
 *******************************************************************************/
-function addDOM_mncSelectRow(mncInfo, sloc, index)
+function addDOM_mncSelectRow(mncAr, index)
 {
   let row = document.createElement("tr");
   let type = document.createElement("td");
@@ -392,6 +392,7 @@ function addDOM_mncSelectRow(mncInfo, sloc, index)
   let date = document.createElement("td");
   let release = document.createElement("td");
   let lines = document.createElement("td");
+  let path = document.createElement("td");
 
   row.appendTag("class", "mnemonic-select-table");
   row.appendTag("onclick", "evalDOM_mnemonicClick(MNCs[" + index + "])")
@@ -401,18 +402,21 @@ function addDOM_mncSelectRow(mncInfo, sloc, index)
   date.appendTag("class", "mnemonic-select-table");
   release.appendTag("class", "mnemonic-select-table");
   lines.appendTag("class", "mnemonic-select-table");
+  lines.appendTag("class", "mnemonic-select-table");
 
-  type.innerHTML =    mncInfo.type;
-  note.innerHTML =    mncInfo.note;
-  date.innerHTML =    mncInfo.compileDate;
-  release.innerHTML = mncInfo.release;
-  lines.innerHTML =   sloc;
+  type.innerHTML =    mncAr[index].info.type;
+  note.innerHTML =    mncAr[index].info.note;
+  date.innerHTML =    mncAr[index].info.compileDate;
+  release.innerHTML = mncAr[index].info.release;
+  lines.innerHTML =   mncAr[index].lines.length;
+  path.innerHTML =    mncAr[index].filePath;
 
   row.appendChild(type);
   row.appendChild(note);
   row.appendChild(date);
   row.appendChild(release);
   row.appendChild(lines);
+  row.appendChild(path);
 
   document.getElementById(mncSelTableLoc).appendChild(row);
 }

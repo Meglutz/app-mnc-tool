@@ -6,6 +6,7 @@ let IPC = require("electron").ipcRenderer;
 
 let InstructionSource = "./resources/fanuc_instructions.json"
 let LadderSource = "./resources/fanuc_ladder_source.json"
+let MnemonicSource = "C:/Projects";
 
 let MNC = undefined;
 let MNCs = [];
@@ -33,8 +34,7 @@ const green = "#3bb728"
 *******************************************************************************/
 function preload()
 {
-  // let files = walkMnc("./");
-  let files = walkMnc("C:/Projects");
+  let files = walkMnc(MnemonicSource);
 
   /* find files which are a [.mnc] file */
   for (let file of files)
@@ -43,8 +43,17 @@ function preload()
     if (file.match(/.*\.mnc/) != null)
     {
       /* the loadStrings function returns an array, indexed by the line count of the loaded file */
-      MNCs.push(new Mnemonic(loadStrings("./" + file, console.log("Mnemonic file(s) loaded correctly."))));
+      MNCs.push(new Mnemonic(loadStrings(file, console.log("Mnemonic file(s) loaded correctly.")), file));
     }
+  }
+
+  /* if there aren't any [.mnc]s around, then exit */
+  if (MNCs == null || MNCs.length == 0)
+  {
+    alert("There are no mnemonic files around! \n Searched '" + MnemonicSource + "' recursivly");
+
+    /* close tool via IPC command */
+    IPC.send("closeTool", "-");
   }
 }
 
@@ -68,16 +77,7 @@ function setup()
     MNCs[i].ranges.mesg = new LineRange(MNCs[i].lines, "MESG", /^\%\@4/, /^\%\@5/);
     MNCs[i].getMNCinfo();
 
-    addDOM_mncSelectRow(MNCs[i].info, MNCs[i].lines.length, i);
-  }
-
-  /* if there aren't any [.mnc]s around, then exit */
-  if (MNCs == null || MNCs.length == 0)
-  {
-    alert("There are no mnemonic files around!");
-
-    /* close tool via IPC command */
-    IPC.send("closeTool", "-");
+    addDOM_mncSelectRow(MNCs, i);
   }
 
   /* wait until user selects mnemonic file
@@ -465,7 +465,7 @@ function checkWarnings(warn)
   let str;
   if (warn.length != 0)
   {
-    str = "There are Warnings, please check the Log!"
+    str = "There are Warnings, please check the Mnemonic Stats! \n Be advised that the results may be inaccurate or incomplete."
     console.warn("%c" + str, "color: " + red);
     return str;
   }

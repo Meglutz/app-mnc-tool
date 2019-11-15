@@ -1,6 +1,6 @@
 {
   "name": "MNC.Tool",
-  "version": "4.1.1",
+  "version": "5.0.0",
   "description": "Electron based tool to analyze Fanuc mnemonic files",
   "author": "WashirePie",
   "license": "MIT",
@@ -41,7 +41,7 @@
     }
   },
   "devDependencies": {
-    "electron": "^4.1.4",
+    "electron": "^4.2.12",
     "electron-builder": "^21.2.0"
   },
   "dependencies": {

@@ -141,9 +141,10 @@ class GraphicalData
 *******************************************************************************/
 class Mnemonic
 {
-  constructor(lines)
+  constructor(lines, filePath)
   {
     this.lines = lines;           /* = String Array, one index per MNC line */
+    this.filePath = filePath;
     this.levels = [];
     this.ranges = {head:  null,  /* = Object of Type [LineRange] */
                    defs:  null,  /* = Object of Type [LineRange] */
