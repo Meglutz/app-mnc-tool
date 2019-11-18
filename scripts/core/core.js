@@ -40,7 +40,7 @@ function preload()
   for (let file of files)
   {
     console.log(file);
-    if (file.match(/.*\.mnc/) != null)
+    if (file.match(/mnemonic\.mnc/) != null)
     {
       /* the loadStrings function returns an array, indexed by the line count of the loaded file */
       MNCs.push(new Mnemonic(loadStrings(file, console.log("Mnemonic file(s) loaded correctly.")), file));
