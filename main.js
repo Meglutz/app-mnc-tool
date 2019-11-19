@@ -4,8 +4,70 @@ let IPC = require("electron").ipcMain;
 /* global reference of window obj. Otherwise the window will be closed if the
 JavaScript object is garbage collected. */
 let mainWindow
+let modalWindow
 
-app.on('ready', createMainWindow)
+
+app.on('ready', () =>
+{
+    /* Loading Modal Window
+  ******************************************************************************/
+  modalWindow = new BrowserWindow (
+    {
+      width: 600,
+      height: 300,
+      frame: false,
+      resizable: false,
+      modal: true,
+      webPreferences:
+      {
+        nodeIntegration: true
+      }
+    }
+  )
+
+  modalWindow.loadFile('launch.html')
+  modalWindow.on('closed', () => /* Garbage collection */
+  {
+    modalWindow = null
+  })
+
+  /* Main Window
+  ******************************************************************************/
+  mainWindow = new BrowserWindow
+  (
+    {
+      width: 800,
+      height: 600,
+      show: false,
+      webPreferences:
+      {
+        nodeIntegration: true
+      }
+    }
+  )
+
+  mainWindow.loadFile('index.html')
+
+  /* open the DevTools. */
+  if (process.argv[2] == "-debug")
+  {
+    mainWindow.webContents.openDevTools()
+  }
+
+  mainWindow.once('ready-to-show', function()
+  {
+
+  })
+
+  /* Emitted when the window is closed. */
+  mainWindow.on('closed', () => /* Garbage collection */
+  {
+    mainWindow = null
+  })
+
+})
+
+
 
 /* quit when all windows are closed. */
 app.on('window-all-closed', function ()
@@ -32,40 +94,13 @@ app.on('activate', function ()
 )
 
 
-function createMainWindow()
+/* Start Main window if loading of MNc's has finished */
+IPC.on("openTool", function(event, data)
 {
-  mainWindow = new BrowserWindow
-  (
-    {
-      width: 800,
-      height: 600,
-      webPreferences:
-      {
-        nodeIntegration: true
-      }
-    }
-  )
-
-  /* maximize mainWindow */
+  modalWindow.destroy();
+  mainWindow.show();
   mainWindow.maximize();
-  mainWindow.loadFile('index.html')
-
-  /* open the DevTools. */
-  if (process.argv[2] == "-debug")
-  {
-    mainWindow.webContents.openDevTools()
-  }
-
-  /* Emitted when the window is closed. */
-  mainWindow.on('closed', function ()
-    {
-      /* dereference the window object, usually you would store windows in an array if your
-      app supports multi windows, this is the time when you should delete the corresponding element. */
-      mainWindow = null
-    }
-  )
-}
-
+})
 
 /* Close tool on [closeTool] via IPC */
 IPC.on("closeTool", function(event, data)

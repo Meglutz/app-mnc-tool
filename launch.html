@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>require('./scripts/electron/renderer.js')</script>
+
+    <style media="screen">
+      *,
+      :before,
+      :after
+      {
+        box-sizing: border-box;
+      }
+
+      body
+      {
+        overflow: hidden;
+        background-color: #fdf9fd;
+        color: #011a32;
+        font: 16px/1.25 'Roboto', sans-serif;
+        text-align: center;
+      }
+
+      #color-bounce-wrapper
+      {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 80em;
+      }
+
+      #color-bounce-container
+      {
+        display: flex;
+        flex-direction: column;
+        float: left;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 1rem;
+        padding-top: 40px;
+        width: 100%;
+      }
+
+      color-bounce-text
+      {
+        color: #011a32;
+        animation: text-shadow 1.5s ease-in-out infinite;
+        font-size: 5em;
+        font-weight: 100;
+        line-height: 1;
+      }
+
+
+      @keyframes text-shadow
+      {
+        0%
+        {
+          transform: translateY(0);
+          text-shadow: 0 0 0 #0c2ffb,         0 0 0 #2cfcfd,        0 0 0 #fb203b,          0 0 0 #fefc4b;
+        }
+
+        20%
+        {
+          transform: translateY(-1em);
+          text-shadow: 0 0.125em 0 #0c2ffb,   0 0.25em 0 #2cfcfd,   0 -0.125em 0 #fb203b,   0 -0.25em 0 #fefc4b;
+        }
+
+        40%
+        {
+          transform: translateY(0.5em);
+          text-shadow: 0 -0.0625em 0 #0c2ffb, 0 -0.125em 0 #2cfcfd, 0 0.0625em 0 #fb203b,   0 0.125em 0 #fefc4b;
+        }
+
+       60%
+       {
+          transform: translateY(-0.25em);
+          text-shadow: 0 0.03125em 0 #0c2ffb, 0 0.0625em 0 #2cfcfd, 0 -0.03125em 0 #fb203b, 0 -0.0625em 0 #fefc4b;
+        }
+
+        80%
+        {
+          transform: translateY(0);
+          text-shadow: 0 0 0 #0c2ffb,         0 0 0 #2cfcfd,        0 0 0 #fb203b,          0 0 0 #fefc4b;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce)
+      {
+        *
+        {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+
+    </style>
+    <meta charset="utf-8" />
+
+  </head>
+
+  <body>
+    <div id="color-bounce-wrapper">
+        <div id="color-bounce-container">
+
+          <color-bounce-text>MNC.Tool</color-bounce-text>
+          <p>Loading...</p>
+
+        </div>
+    </div>
+  </body>
+</html>

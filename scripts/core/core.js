@@ -47,6 +47,7 @@ function preload()
     }
   }
 
+
   /* if there aren't any [.mnc]s around, then exit */
   if (MNCs == null || MNCs.length == 0)
   {
@@ -54,6 +55,11 @@ function preload()
 
     /* close tool via IPC command */
     IPC.send("closeTool", "-");
+  }
+  else
+  {
+    /* open tool via IPC command */
+    IPC.send("openTool", "-");
   }
 }
 
