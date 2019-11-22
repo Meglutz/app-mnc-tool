@@ -445,7 +445,7 @@
     "writesOffset" : 3,
     "graphicalData" : {
       "opStr" : "Moves n-bytes, ($frmLen $frmKin) $reads to $writes",
-      "tableRows" : [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "MOVB",  "$StyleCellHead Writes",        "$StyleCellHead Symbol"],
+      "tableRows" : [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "MOVN",  "$StyleCellHead Writes",        "$StyleCellHead Symbol"],
                      ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
