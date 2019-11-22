@@ -17,7 +17,7 @@ const writeBitOperationsRegex =      /^(WRT|SET|RST)(\.NOT|)\s+(.+)/;
 const instructionOperationRegex =    /^(SUB)\s*(\d*)/;
 const levelSubRegex =                /^(SUB)\s*(\d*)/;
 const instructionReadWriteRegex =    /^([A-Z])(\d*)$/;
-const instructionFormatRegex =       /^(\d|)(\d\d|)(\d|)$/;
+const instructionFormatRegex =       /^(1|0)(\d\d)(\d)$/;
 const instructionDependencyRegex =   /^(RD|OR|AND)(\.NOT\.STK|\.NOT|\.STK|)\s+(.+)/;
 const ladderVisOperationRegex =      /^(RD|OR|AND|WRT|SET|RST)(\.NOT\.STK|\.NOT|\.STK|)\s*(.*)/;
 
@@ -783,9 +783,17 @@ class Resource
   *******************************************************************************/
   instructionFormat(lines, index, offset)
   {
-    let format = lines[index + offset];
-    let match = instructionFormatRegex.exec(format);
-    let kind = "Normal";
+    let match = instructionFormatRegex.exec(lines[index + offset]);
+
+
+    /* if it's not a const or adress definer, return parsed line */
+    if (match == null)
+    {
+      return {kind: "Normal", length: parseInt(lines[index + offset])}
+    }
+
+    /* run the mnc line trough the [instructionFormatRegex] */
+    let kind;
     let length = parseInt(match[1], 10);
     /* change kind / length if it's not a normal format */
     if (match[2] && match[3] != null)
@@ -795,11 +803,11 @@ class Resource
       {
         case "0":
           kind = "Constant";
-        break;
+          break;
 
         case "1":
           kind = "Adress";
-        break;
+          break;
       }
     }
     return {kind: kind, length: length};
