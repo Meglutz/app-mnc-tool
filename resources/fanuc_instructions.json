@@ -8,24 +8,28 @@
     "5" : "                    $frmKin              -> Value of format.kind",
     "6" : "                    $frmMod              -> Value of format.modifier",
     "7" : "                    $frmLenBit           -> Value of format.length multiplied by 8. F.e. If Word, then $frmLenBit = 16",
-    "8" : "                    $RowRepeatX          -> Repeats the current row X times. No spaces allowed. Other ph's can be used. F.e. '$RowRepeat$frmLenBit'"
-
+    "8" : "                    $RowRepeatX          -> Repeats the current row X times. No spaces allowed. Other ph's can be used. F.e. '$RowRepeat$frmLenBit'",
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "1" : {
-    "name" : "END1"
+    "name" : "END1",
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "2" : {
-    "name" : "END2"
+    "name" : "END2",
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "48" : {
-    "name" : "END3"
+    "name" : "END3",
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "64" : {
-    "name" : "SUBEND"
+    "name" : "SUBEND",
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "65" : {
@@ -34,7 +38,8 @@
     "readsOffset" : 1,
     "graphicalData" : {
       "opStr" : "Starts the Subprogram $reads"
-    }
+    },
+    "scanTime" : {"min": 1.1, "max": 1.3}
   },
 
   "66" : {
@@ -43,7 +48,8 @@
     "readsOffset" : 1,
     "graphicalData" : {
       "opStr" : "Starts the Subprogram $reads"
-    }
+    },
+    "scanTime" : {"min": 1.1, "max": 1.3}
   },
 
   "71" : {
@@ -52,35 +58,41 @@
     "readsOffset" : 1,
     "graphicalData" : {
       "opStr" : "Header of the Subprogram $reads"
-    }
+    },
+    "scanTime" : {"min": 1.1, "max": 1.3}
   },
 
   "72" : {
-    "name" : "SUBE"
+    "name" : "SUBE",
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "3" : {
     "name" : "TMR",
     "format.length" : 1,
-    "readsOffset" : 1
+    "readsOffset" : 1,
+    "scanTime" : {"min": 2.0, "max": 4.0}
   },
 
   "24" : {
     "name" : "TMRB",
     "format.length" : 1,
-    "readsOffset" : 1
+    "readsOffset" : 1,
+    "scanTime" : {"min": 1.5, "max": 3.2}
   },
 
   "54" : {
     "name" : "TMRC",
     "format.length" : 1,
-    "readsOffset" : 1
+    "readsOffset" : 1,
+    "scanTime" : {"min": 2.2, "max": 3.3}
   },
 
   "77" : {
     "name" : "TMBRF",
     "format.length" : 1,
-    "readsOffset" : 1
+    "readsOffset" : 1,
+    "scanTime" : {"min": 2.1, "max": 2.9}
   },
 
   "25" : {
@@ -94,14 +106,16 @@
                      ["$StyleCellGreen $reads.0",                      "$Definition",           "<>",    "$StyleCellGreen $reads.1",     "$Definition"          , "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",     "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "5" : {
     "name" : "CTR",
     "format.length" : 1,
     "readsOffset" : 1,
-    "writesOffset" : 1
+    "writesOffset" : 1,
+    "scanTime" : {"min": 1.3, "max": 2.0}
   },
 
   "55" : {
@@ -113,7 +127,8 @@
       "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
       "tableRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", "$StyleCellHead Reads",  "$StyleCellHead Symbol", " "   ],
                      ["$StyleCellGreen $reads", "$Definition",           "$StyleCellRed $writes", "$Definition",           "CTRC"]]
-    }
+    },
+    "scanTime" : {"min": 1.6, "max": 3.7}
   },
 
   "56" : {
@@ -125,22 +140,26 @@
       "opStr" : "Reads counter initialization value from $reads and handles the counter register $writes",
       "tabelRows" : [["$StyleCellHead Reads",   "$StyleCellHead Symbol", "$StyleCellHead Reads",  "$StyleCellHead Symbol", " "   ],
                      ["$StyleCellGreen $reads", "$Definition",           "$StyleCellRed $writes", "$Definition",           "CTRB"]]
-    }
+    },
+    "scanTime" : {"min": 1.1, "max": 2.6}
   },
 
   "6" : {
     "name" : "ROT",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "26" : {
     "name" : "ROTB",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "7" : {
     "name" : "COD",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "27" : {
@@ -154,12 +173,14 @@
                      ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "8" : {
     "name" : "MOVE",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": 1.3, "max": 1.8}
   },
 
   "28" : {
@@ -171,43 +192,52 @@
       "opStr" :  "Executes the logical OR sum between $reads.0 & $reads.1 and stores it to $writes.<br>This means that $reads.0 bit .0 is compared to $reads.1 bit .0 and if either one of them is  == 1, $writes bit .0 will be written",
       "tableRows" : [["$StyleCellHead Reads",                          "$StyleCellHead Symbol",   "MOVOR", "$StyleCellHead Reads",    "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             "˅",     "$StyleCellGreen $reads.1", "$Definition",          "->", "$StyleCellRed $writes", "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "9" : {
     "name" : "COM",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "29" : {
     "name" : "COME",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "10" : {
-    "name" : "JMP"
+    "name" : "JMP",
+    "scanTime" : {"min": 0.6, "max": 1.5}
   },
 
   "30" : {
-    "name" : "JMPE"
+    "name" : "JMPE",
+    "scanTime" : {"min": 0.009, "max": 0.009}
   },
 
   "68" : {
-    "name" : "JMPB"
+    "name" : "JMPB",
+    "scanTime" : {"min": 1.3, "max": 1.4}
   },
 
   "69" : {
-    "name" : "LBL"
+    "name" : "LBL",
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "11" : {
     "name" : "PARI",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "14" : {
     "name" : "DCNV",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "31" : {
@@ -221,12 +251,14 @@
                      ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "15" : {
     "name" : "COMP",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": 1.4, "max": 2.1}
   },
 
   "32" : {
@@ -244,32 +276,38 @@
                      ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol",   "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "──────"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",             " ",     "$StyleCellGreen $reads.1",     "$Definition",           " "]]
 
-    }
+    },
+    "scanTime" : {"min": 2.5, "max": 3.1}
   },
 
   "16" : {
     "name" : "COIN",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "33" : {
     "name" : "SFT",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "17" : {
     "name" : "DSCH",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "34" : {
     "name" : "DSCHB",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "18" : {
     "name" : "XMOV",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "35" : {
@@ -287,12 +325,14 @@
                      [" ",                                              " ",                     "If == 0", "$StyleCellRed $depOf",         "$Definition",           "Move $reads.0 <- $writes.0"],
                      ["$StyleCellHead Affected Bits",                   "$StyleCellHead Symbol", "─────",   "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "──────"                    ],
                      ["$RowRepeat$frmLenBit $StyleCellYellow $reads.0", "$Definition",           " ",       "$StyleCellYellow $writes.0",   "$Definition",           " "                         ]]
-    }
+    },
+    "scanTime" : {"min": 0.073, "max": 0.073}
   },
 
   "19" : {
     "name" : "ADD",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": 3.4, "max": 5.8}
   },
 
   "36" : {
@@ -306,12 +346,14 @@
                      ["$StyleCellGreen $reads.0",                      "$Definition",           "+",      "$StyleCellGreen $reads.1",     "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────",  "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",      "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 2.5, "max": 3.5}
   },
 
   "20" : {
     "name" : "SUB",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": 2.9, "max": 5.3}
   },
 
   "37" : {
@@ -325,12 +367,14 @@
                      ["$StyleCellGreen $reads.0",                      "$Definition",           "-",      "$StyleCellGreen $reads.1",     "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────",  "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",      "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 2.5, "max": 3.5}
   },
 
   "21" : {
     "name" : "MUL",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": 3.8, "max": 5.7}
   },
 
   "38" : {
@@ -344,12 +388,14 @@
                      ["$StyleCellGreen $reads.0",                      "$Definition",           "*",      "$StyleCellGreen $reads.1",     "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────",  "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",      "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 3.2, "max": 3.7}
   },
 
   "22" : {
     "name" : "DIV",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": 3.7, "max": 5.8}
   },
 
   "39" : {
@@ -363,12 +409,14 @@
                      ["$StyleCellGreen $reads.0",                      "$Definition",           "÷",      "$StyleCellGreen $reads.1",     "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                  "$StyleCellHead Symbol", "─────",  "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           " ",      "$StyleCellGreen $reads.1",     "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 1.8, "max": 3.7}
   },
 
   "23" : {
     "name" : "NUME",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "40" : {
@@ -384,16 +432,19 @@
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads",   "$Definition",           " ",     "$StyleCellRed $writes",                  "$Definition"          ]]
 
 
-    }
+    },
+    "scanTime" : {"min": 0.1, "max": 0.992}
   },
 
   "49" : {
     "name" : "DISP",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "41" : {
-    "name" : "DISPB"
+    "name" : "DISPB",
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "42" : {
@@ -407,7 +458,8 @@
                      ["$StyleCellYellow $reads",                      "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                 "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellYellow $reads", "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "43" : {
@@ -421,7 +473,8 @@
                      ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 0.073, "max": 0.073}
   },
 
   "44" : {
@@ -435,7 +488,8 @@
                      ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 0.091, "max": 0.091}
   },
 
   "45" : {
@@ -449,7 +503,8 @@
                      ["$StyleCellGreen $reads",                      "$Definition",           "->",    "$StyleCellRed $writes",        "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           " ",     "$StyleCellRed $writes",        "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 2.0, "max": 15.8}
   },
 
   "51" : {
@@ -462,7 +517,8 @@
                      ["$StyleCellRed $writes",                      "$Definition"          ],
                      ["$StyleCellHead Affected Bits",               "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellRed $writes", "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 12.8, "max": 1500}
   },
 
   "52" : {
@@ -475,7 +531,8 @@
                      ["$StyleCellRed $writes",                      "$Definition"          ],
                      ["$StyleCellHead Affected Bits",               "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellRed $writes", "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 39.4, "max": 1500}
   },
 
   "57" : {
@@ -485,7 +542,8 @@
     "graphicalData" : {
       "opStr" : "Generates a positive impulse of the signals directly in front of it. DIFU Number: $reads",
       "tableRows" : null
-    }
+    },
+    "scanTime" : {"min": 0.5, "max": 1.0}
   },
 
   "58" : {
@@ -495,7 +553,8 @@
     "graphicalData" : {
       "opStr" : "Generates a negative impulse of the signals directly in front of it. DIFD Number: $reads",
       "tableRows" : null
-    }
+    },
+    "scanTime" : {"min": 0.9, "max": 1.3}
   },
 
   "53" : {
@@ -508,7 +567,8 @@
                      ["$StyleCellRed $reads.1",                      "$Definition"          ],
                      ["$StyleCellHead Affected Bits",                "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellRed $reads.1", "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": 7.6, "max": 17.0}
   },
 
   "59" : {
@@ -520,7 +580,8 @@
       "opStr" : "Bitwise EXOR links $reads.0 to $reads.1 and writes it to $writes",
       "tableRows" : [["$StyleCellHead Reads",                          "$StyleCellHead Symbol", "EXOR",                     "$StyleCellHead Reads",    "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           "&oplus; (a.k.a. &#8891;)", "$StyleCellGreen $reads.1", "$Definition",          "->", "$StyleCellRed $writes", "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "60" : {
@@ -532,7 +593,8 @@
       "opStr" : "Bitwise AND links $reads.0 and $reads.1 and writes it to $writes",
       "tableRows" : [["$StyleCellHead Reads",                          "$StyleCellHead Symbol", "LOGAND", "$StyleCellHead Reads",    "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           "&",      "$StyleCellGreen $reads.1", "$Definition",          "->", "$StyleCellRed $writes", "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "61" : {
@@ -544,7 +606,8 @@
       "opStr" : "Bitwise OR links $reads.0 to $reads.1 and writes it to $writes",
       "tableRows" : [["$StyleCellHead Reads",                          "$StyleCellHead Symbol", "LOGOR", "$StyleCellHead Reads",    "$StyleCellHead Symbol", " ",  "$StyleCellHead Writes", "$StyleCellHead Symbol"],
                      ["$RowRepeat$frmLenBit $StyleCellGreen $reads.0", "$Definition",           "˅",     "$StyleCellGreen $reads.1", "$Definition",          "->", "$StyleCellRed $writes", "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "62" : {
@@ -556,72 +619,86 @@
       "opStr" : "Bitwise negates $reads and writes it to $writes",
       "tableRows" :  [["$StyleCellHead Reads",                        "$StyleCellHead Symbol", "LOGNOT", "$StyleCellHead Writes", "$StyleCellHead Symbol"],
                       ["$RowRepeat$frmLenBit $StyleCellGreen $reads", "$Definition",           "¬",      "$StyleCellRed $writes", "$Definition"          ]]
-    }
+    },
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "90" : {
     "name" : "FNC90",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "91" : {
     "name" : "FNC91",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "92" : {
     "name" : "FNC92",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "93" : {
     "name" : "FNC93",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "94" : {
     "name" : "FNC94",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "95" : {
     "name" : "FNC95",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "96" : {
     "name" : "FNC96",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "97" : {
     "name" : "FNC97",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "88" : {
     "name" : "MMC3R",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "89" : {
     "name" : "MMC3W",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "98" : {
     "name" : "MMCWR",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "99" : {
     "name" : "MMCWW",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "460" : {
     "name" : "PID",
-    "usedUndefinedInstruction" : true
+    "usedUndefinedInstruction" : true,
+    "scanTime" : {"min": -1, "max": -1}
   },
 
   "219" : {
@@ -635,7 +712,8 @@
                      ["$StyleCellHead Affected Bits",                   "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits",          "$StyleCellHead Symbol" ],
                      ["$RowRepeat$frmLenBit $StyleCellYellow $reads,0", "$Definition",           " ",     "$StyleCellGreen $reads.2",     "$Definition",           " ",     "$StyleCellYellow $reads.1",             "$Definition"           ]]
 
-    }
+    },
+    "scanTime" : {"min": 0.127, "max": 0.127}
   },
 
   "220" : {
@@ -648,6 +726,7 @@
                      ["$StyleCellYellow $reads.0 ",                     "$Definition",           "≤",     "$StyleCellGreen $reads.2",     "$Definition",           "≤",     "$StyleCellYellow $reads.1",             "$Definition"           ],
                      ["$StyleCellHead Affected Bits",                   "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits", "$StyleCellHead Symbol", "─────", "$StyleCellHead Affected Bits",          "$StyleCellHead Symbol" ],
                      ["$RowRepeat$frmLenBit $StyleCellYellow $reads,0", "$Definition",           " ",     "$StyleCellGreen $reads.2",     "$Definition",           " ",     "$StyleCellYellow $reads.1",             "$Definition"           ]]
-    }
+    },
+    "scanTime" : {"min": 0.127, "max": 0.127}
   }
 }

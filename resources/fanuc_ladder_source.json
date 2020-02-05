@@ -1,6 +1,7 @@
 {
   "COMMENT" : {
-    "0" : "JSON-Info"
+    "0" : "JSON-Info",
+    "scanTime" :       {"min": -1, "max": -1}
   },
 
   "RD" : {
@@ -11,7 +12,8 @@
     "inputState" :     false,
     "outputState" :    false,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.009, "max": 0.009}
   },
 
   "RD.STK" : {
@@ -22,7 +24,8 @@
     "inputState" :     false,
     "outputState" :    false,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.009, "max": 0.009}
   },
 
   "OR" : {
@@ -33,7 +36,8 @@
     "inputState" :     false,
     "outputState" :    false,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.137, "max": 0.137}
   },
 
   "AND" : {
@@ -44,7 +48,8 @@
     "inputState" :     false,
     "outputState" :    false,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.137, "max": 0.137}
   },
 
   "RD.NOT" : {
@@ -55,7 +60,8 @@
     "inputState" :     false,
     "outputState" :    true,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.009, "max": 0.009}
   },
 
   "RD.NOT.STK" : {
@@ -66,7 +72,8 @@
     "inputState" :     false,
     "outputState" :    true,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.009, "max": 0.009}
   },
 
   "OR.NOT" : {
@@ -77,7 +84,8 @@
     "inputState" :     false,
     "outputState" :    true,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.137, "max": 0.137}
   },
 
   "AND.NOT" : {
@@ -88,7 +96,8 @@
     "inputState" :     false,
     "outputState" :    true,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.137, "max": 0.137}
   },
 
   "AND.STK" : {
@@ -99,7 +108,8 @@
     "inputState" :     null,
     "outputState" :    null,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": -1, "max": -1}
   },
 
   "OR.STK" : {
@@ -110,7 +120,8 @@
     "inputState" :     null,
     "outputState" :    null,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": -1, "max": -1}
   },
 
   "WRT" : {
@@ -121,7 +132,8 @@
     "inputState" :     false,
     "outputState" :    true,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.27, "max": 0.27}
   },
 
   "WRT.NOT" : {
@@ -132,7 +144,8 @@
     "inputState" :     false,
     "outputState" :    true,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.27, "max": 0.27}
   },
 
   "SET" : {
@@ -143,7 +156,8 @@
     "inputState" :     false,
     "outputState" :    true,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.27, "max": 0.27}
   },
 
   "RST" : {
@@ -154,6 +168,7 @@
     "inputState" :     false,
     "outputState" :    true,
     "inputLink" :      null,
-    "outputLink" :     null
+    "outputLink" :     null,
+    "scanTime" :       {"min": 0.27, "max": 0.27}
   }
 }
